@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>deluluprinter.xyz | Unfairly Cheap Prints</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            cyan: '#00FFFF',
+                            magenta: '#FF00FF',
+                            yellow: '#FFEA00',
+                            black: '#111111',
+                            green: '#25D366' // WhatsApp Green
+                        }
+                    },
+                    boxShadow: {
+                        'brutal': '6px 6px 0px 0px rgba(17, 17, 17, 1)',
+                        'brutal-hover': '2px 2px 0px 0px rgba(17, 17, 17, 1)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FAFAFA;
+            background-image: radial-gradient(#E5E7EB 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .brutal-transition {
+            transition: all 0.2s ease-in-out;
+        }
+        .brutal-transition:hover {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px 0px rgba(17, 17, 17, 1);
+        }
+    </style>
+</head>
+<body class="text-brand-black antialiased overflow-x-hidden selection:bg-brand-magenta selection:text-white">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full top-0 z-50 bg-[#FAFAFA]/90 backdrop-blur-sm border-b-2 border-brand-black">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i class="ph-fill ph-printer text-3xl text-brand-magenta"></i>
+                <span class="font-bold text-xl md:text-2xl tracking-tight">deluluprinter.xyz</span>
+            </div>
+            <button onclick="openModal()" class="hidden md:flex items-center gap-2 bg-brand-black text-white px-5 py-2 rounded-full font-semibold hover:bg-gray-800 transition">
+                <span>Order Now</span>
+                <i class="ph-bold ph-arrow-right"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-16 md:pt-48 md:pb-24 px-4 max-w-6xl mx-auto">
+        <div class="text-center max-w-4xl mx-auto">
+            <div class="inline-block bg-brand-yellow border-2 border-brand-black px-4 py-1 rounded-full font-bold text-sm mb-6 shadow-[3px_3px_0px_0px_rgba(17,17,17,1)] rotate-[-2deg]">
+                Warning: Shockingly affordable prices ahead 🚨
+            </div>
+            <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold leading-tight mb-6">
+                Print your school assignments without going <span class="bg-brand-cyan px-2 border-2 border-brand-black shadow-brutal inline-block rotate-1">broke.</span>
+            </h1>
+            <p class="text-lg sm:text-xl md:text-2xl text-gray-700 mb-10 max-w-2xl mx-auto">
+                Why does printer ink sometimes feel like it's made of liquid gold? We keep it simple. Get premium quality prints for just ₹10 and save your pocket money for momos. 
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="#pricing" class="bg-white border-2 border-brand-black px-8 py-4 text-lg font-bold shadow-brutal brutal-transition rounded-xl w-full sm:w-auto text-center">
+                    See Our Prices
+                </a>
+                <button onclick="openModal()" class="bg-brand-green text-white border-2 border-brand-black px-8 py-4 text-lg font-bold shadow-brutal brutal-transition rounded-xl flex items-center justify-center gap-2 w-full sm:w-auto">
+                    <i class="ph-bold ph-whatsapp text-2xl"></i>
+                    WhatsApp Us
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- The "Problem" Section -->
+    <section class="py-16 px-4 border-y-2 border-brand-black bg-brand-black text-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-4xl md:text-5xl font-bold mb-6 text-brand-yellow">Printing shouldn't be a luxury.</h2>
+                    <p class="text-lg md:text-xl text-gray-300 mb-4">
+                        Ever tried getting a simple school project printed and wondered if you accidentally bought a small plot of land instead? Yeah, us too.
+                    </p>
+                    <p class="text-lg md:text-xl text-gray-300">
+                        We hate complicated math. No extra charge for a drop of color. No extra charge for double-sided magic. <span class="text-brand-cyan font-bold">Mostly everything on normal paper is just ₹10.</span> Simple, affordable, delulu-free.
+                    </p>
+                </div>
+                <div class="relative">
+                    <div class="bg-white text-brand-black p-8 rounded-2xl border-4 border-brand-magenta transform rotate-2">
+                        <h3 class="text-2xl font-bold mb-4 border-b-2 border-gray-200 pb-2">The Math We Skip:</h3>
+                        <ul class="space-y-3 text-lg font-semibold text-gray-600">
+                            <li class="flex justify-between"><span>Base B&W page</span> <span>₹??</span></li>
+                            <li class="flex justify-between"><span>Oh, it's color?</span> <span class="text-red-500">+₹??</span></li>
+                            <li class="flex justify-between"><span>Wait, is that an image?</span> <span class="text-red-500">+₹??</span></li>
+                            <li class="flex justify-between"><span>Confusion fee</span> <span class="text-red-500">+₹??</span></li>
+                        </ul>
+                        <div class="mt-4 pt-4 border-t-2 border-gray-200 flex justify-between font-bold text-2xl text-brand-green">
+                            <span>Our Price</span>
+                            <span>Just ₹10 🚀</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-24 px-4 max-w-6xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">No Math Required Pricing.</h2>
+            <p class="text-xl text-gray-600">Premium quality, zero drama. Here's exactly what you'll pay.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <!-- Card 1 -->
+            <div class="bg-brand-yellow border-2 border-brand-black rounded-2xl p-6 shadow-brutal brutal-transition flex flex-col h-full">
+                <div class="mb-4">
+                    <i class="ph-duotone ph-file-text text-5xl mb-2"></i>
+                    <h3 class="text-2xl font-bold">The "Whatever" Page</h3>
+                    <p class="text-sm font-semibold mt-2 opacity-80">Color? B&W? Photocopy? Doesn't matter.</p>
+                </div>
+                <div class="mt-auto pt-6">
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-5xl font-bold">₹10</span>
+                        <span class="font-bold opacity-80">/page</span>
+                    </div>
+                    <ul class="mt-4 space-y-2 text-sm font-semibold border-t-2 border-brand-black/20 pt-4">
+                        <li>✓ Standard A4 Paper</li>
+                        <li>✓ Full Color included</li>
+                        <li>✓ Zero hidden fees</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="bg-brand-cyan border-2 border-brand-black rounded-2xl p-6 shadow-brutal brutal-transition flex flex-col h-full">
+                <div class="mb-4">
+                    <i class="ph-duotone ph-sticker text-5xl mb-2"></i>
+                    <h3 class="text-2xl font-bold">Regular Stickers</h3>
+                    <p class="text-sm font-semibold mt-2 opacity-80">Slap your memes everywhere.</p>
+                </div>
+                <div class="mt-auto pt-6">
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-5xl font-bold">₹25</span>
+                        <span class="font-bold opacity-80">/page</span>
+                    </div>
+                    <ul class="mt-4 space-y-2 text-sm font-semibold border-t-2 border-brand-black/20 pt-4">
+                        <li>✓ Matte finish</li>
+                        <li>✓ Great for laptops</li>
+                        <li>✓ Print as many as fit on A4</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="bg-brand-magenta text-white border-2 border-brand-black rounded-2xl p-6 shadow-brutal brutal-transition flex flex-col h-full">
+                <div class="mb-4">
+                    <i class="ph-duotone ph-sparkle text-5xl mb-2"></i>
+                    <h3 class="text-2xl font-bold">Premium Stickers</h3>
+                    <p class="text-sm font-semibold mt-2 opacity-80">For when you need to be fancy.</p>
+                </div>
+                <div class="mt-auto pt-6">
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-5xl font-bold">₹40</span>
+                        <span class="font-bold opacity-80">/page</span>
+                    </div>
+                    <ul class="mt-4 space-y-2 text-sm font-semibold border-t-2 border-white/30 pt-4">
+                        <li>✓ High durability</li>
+                        <li>✓ Premium glossy/matte finish</li>
+                        <li>✓ Super vibrant colors</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="bg-white border-2 border-brand-black rounded-2xl p-6 shadow-brutal brutal-transition flex flex-col h-full relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-brand-black text-white text-xs font-bold px-3 py-1 rounded-bl-xl z-10">BEST QUALITY</div>
+                <div class="mb-4 relative z-20">
+                    <i class="ph-duotone ph-image text-5xl mb-2"></i>
+                    <h3 class="text-2xl font-bold">Glossy Photos</h3>
+                    <p class="text-sm font-semibold mt-2 opacity-80 text-gray-600">Studio quality memories.</p>
+                </div>
+                <div class="mt-auto pt-6 relative z-20">
+                    <div class="flex items-baseline gap-1">
+                        <span class="text-5xl font-bold">₹80</span>
+                        <span class="font-bold opacity-80 text-gray-600">/page</span>
+                    </div>
+                    <ul class="mt-4 space-y-2 text-sm font-semibold text-gray-700 border-t-2 border-brand-black/20 pt-4">
+                        <li>✓ Thick photo paper</li>
+                        <li>✓ High-res printing</li>
+                        <li>✓ Frame-ready quality</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- How it Works & CTA -->
+    <section class="py-20 bg-[#e0e7ff] border-t-2 border-brand-black px-4 relative overflow-hidden">
+        <!-- Decorative blobs -->
+        <div class="absolute top-[-50px] left-[-50px] w-64 h-64 bg-brand-yellow rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+        <div class="absolute bottom-[-50px] right-[-50px] w-64 h-64 bg-brand-magenta rounded-full blur-3xl opacity-30 pointer-events-none"></div>
+
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <h2 class="text-3xl sm:text-4xl md:text-6xl font-bold mb-8">Ready to print without crying over the bill?</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 text-left">
+                <div class="bg-white border-2 border-brand-black p-6 rounded-xl shadow-[4px_4px_0px_0px_rgba(17,17,17,1)]">
+                    <div class="w-10 h-10 bg-brand-cyan text-brand-black font-bold flex items-center justify-center rounded-full border-2 border-brand-black mb-4">1</div>
+                    <h4 class="font-bold text-xl mb-2">Send Document</h4>
+                    <p class="text-gray-600 text-sm">Ping us on WhatsApp with your PDF, Word doc, or images.</p>
+                </div>
+                <div class="bg-white border-2 border-brand-black p-6 rounded-xl shadow-[4px_4px_0px_0px_rgba(17,17,17,1)]">
+                    <div class="w-10 h-10 bg-brand-magenta text-white font-bold flex items-center justify-center rounded-full border-2 border-brand-black mb-4">2</div>
+                    <h4 class="font-bold text-xl mb-2">Tell Us What</h4>
+                    <p class="text-gray-600 text-sm">Need it normal? Sticker? Glossy? Just say the word.</p>
+                </div>
+                <div class="bg-white border-2 border-brand-black p-6 rounded-xl shadow-[4px_4px_0px_0px_rgba(17,17,17,1)]">
+                    <div class="w-10 h-10 bg-brand-yellow text-brand-black font-bold flex items-center justify-center rounded-full border-2 border-brand-black mb-4">3</div>
+                    <h4 class="font-bold text-xl mb-2">Pick It Up</h4>
+                    <p class="text-gray-600 text-sm">We'll print it lightning fast. You pay. Everyone is happy.</p>
+                </div>
+            </div>
+
+            <button onclick="openModal()" class="flex sm:inline-flex justify-center items-center gap-3 bg-brand-green text-white border-2 border-brand-black px-6 sm:px-10 py-4 sm:py-5 text-lg sm:text-xl font-bold shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] hover:shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] hover:translate-x-1 hover:translate-y-1 transition-all rounded-2xl w-full sm:w-auto">
+                <i class="ph-bold ph-whatsapp text-3xl"></i>
+                Send Files on WhatsApp
+            </button>
+            <p class="mt-4 font-semibold text-gray-600">Quick replies. High quality. No nonsense.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-brand-black text-white py-8 border-t-4 border-brand-yellow">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <i class="ph-fill ph-printer text-2xl text-brand-yellow"></i>
+                <span class="font-bold text-xl">deluluprinter.xyz</span>
+            </div>
+            <div class="text-gray-400 text-sm text-center md:text-right">
+                <p>Because great prints shouldn't cost a fortune.</p>
+                <p class="mt-1">Proudly supporting students, artists, and everyone in between.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Button -->
+    <button onclick="openModal()" class="fixed bottom-6 right-6 bg-brand-green text-white p-4 rounded-full border-2 border-brand-black shadow-[4px_4px_0px_0px_rgba(17,17,17,1)] hover:shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all z-50 flex items-center justify-center group cursor-pointer">
+        <i class="ph-bold ph-whatsapp text-3xl group-hover:scale-110 transition-transform"></i>
+        <!-- Ping animation -->
+        <span class="absolute -top-1 -right-1 flex h-4 w-4">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-yellow opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-4 w-4 bg-brand-yellow border border-brand-black"></span>
+        </span>
+    </button>
+
+    <!-- Order Modal -->
+    <div id="wa-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-brand-black/80 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white border-4 border-brand-black p-6 rounded-2xl shadow-[8px_8px_0px_0px_rgba(17,17,17,1)] max-w-md w-full transform scale-95 transition-transform duration-300 relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-brand-black hover:text-brand-magenta transition-colors">
+                <i class="ph-bold ph-x text-2xl"></i>
+            </button>
+            <h3 class="text-2xl font-bold mb-4 pr-6">What do you need printed?</h3>
+            <form onsubmit="sendToWhatsApp(event)">
+                <div class="mb-4">
+                    <label class="block font-bold mb-2 text-gray-700">Select Print Type:</label>
+                    <select id="print-type" class="w-full border-2 border-brand-black rounded-xl p-3 font-semibold bg-[#FAFAFA] focus:outline-none focus:border-brand-magenta focus:ring-2 focus:ring-brand-magenta/50 cursor-pointer">
+                        <option value="Normal Page">The "Whatever" Page (₹10/page)</option>
+                        <option value="Regular Stickers">Regular Stickers (₹25/page)</option>
+                        <option value="Premium Stickers">Premium Stickers (₹40/page)</option>
+                        <option value="Glossy Photos">Glossy Photos (₹80/page)</option>
+                    </select>
+                </div>
+                <div class="mb-6">
+                    <label class="block font-bold mb-2 text-gray-700">Special Requests (Optional):</label>
+                    <textarea id="special-requests" rows="3" placeholder="e.g. Please print pages 1-5 only, double-sided, or I want 3 copies of each." class="w-full border-2 border-brand-black rounded-xl p-3 bg-[#FAFAFA] focus:outline-none focus:border-brand-magenta focus:ring-2 focus:ring-brand-magenta/50 resize-none font-medium"></textarea>
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeModal()" class="flex-1 bg-gray-200 border-2 border-brand-black font-bold py-3 rounded-xl hover:bg-gray-300 transition-colors">Cancel</button>
+                    <button type="submit" class="flex-[2] bg-brand-green text-white border-2 border-brand-black font-bold py-3 rounded-xl shadow-[4px_4px_0px_0px_rgba(17,17,17,1)] hover:shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] hover:translate-x-1 hover:translate-y-1 transition-all flex justify-center items-center gap-2">
+                        <i class="ph-bold ph-whatsapp text-xl"></i> Send to Chat
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Smooth scroll behavior for internal links -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Modal Logic
+        function openModal() {
+            const modal = document.getElementById('wa-modal');
+            modal.classList.remove('hidden');
+            // Slight delay to allow display block to apply before transitioning opacity
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.children[0].classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('wa-modal');
+            modal.classList.add('opacity-0');
+            modal.children[0].classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                // Reset form on close
+                document.getElementById('special-requests').value = '';
+                document.getElementById('print-type').selectedIndex = 0;
+            }, 300);
+        }
+
+        function sendToWhatsApp(event) {
+            event.preventDefault();
+            const typeSelect = document.getElementById('print-type');
+            const selectedOption = typeSelect.options[typeSelect.selectedIndex].text;
+            const specialRequests = document.getElementById('special-requests').value.trim();
+            
+            let message = `Hi! I want these photos/files printed in *${selectedOption}*.`;
+            
+            if (specialRequests) {
+                message += `\n\n*Special Requests:*\n${specialRequests}`;
+            }
+            
+            const waUrl = `https://wa.me/919907488075?text=${encodeURIComponent(message)}`;
+            window.open(waUrl, '_blank');
+            closeModal();
+        }
+    </script>
+</body>
+</html>
