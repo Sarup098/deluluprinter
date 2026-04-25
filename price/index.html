@@ -7,92 +7,54 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Add html2canvas for image saving functionality -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        :root {
-            --a4-width: 210mm;
-            --a4-height: 297mm;
+        /* Disable all scrolling */
+        html, body {
+            overflow: hidden !important;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #2a2a2a; /* Dark presentation background */
+            font-family: 'Space Grotesk', sans-serif;
+            touch-action: none; /* Prevent browser pinch-zoom gestures from fighting our custom zoom */
         }
 
-        body {
-            font-family: 'Space Grotesk', sans-serif;
-            background-color: #e5e7eb; /* Darker bg outside the A4 sheet for contrast on laptop */
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-        
-        /* The Magic A4 Wrapper */
-        .a4-wrapper {
+        /* Fixed A4 Canvas Settings (794px x 1123px is A4 at 96DPI) */
+        .a4-canvas {
+            width: 794px;
+            height: 1123px;
             background-color: #fafaf8;
-            background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+            background-image: radial-gradient(#d1d5db 1.5px, transparent 1.5px);
             background-size: 24px 24px;
-            margin: 0 auto;
-            position: relative;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            /* Transform origin so zooming feels natural */
+            transform-origin: center center;
+            will-change: transform;
         }
 
-        /* Mobile View (Normal Scroll) */
-        @media (max-width: 767px) {
-            .a4-wrapper {
-                width: 100%;
-                min-height: 100vh;
-                padding: 1rem;
-            }
-        }
-
-        /* Laptop/Desktop View (Fixed A4 Proportions) */
-        @media (min-width: 768px) {
-            .a4-wrapper {
-                width: var(--a4-width);
-                min-height: var(--a4-height);
-                padding: 2.5rem;
-                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-                margin-top: 2rem;
-                margin-bottom: 2rem;
-                border: 1px solid #d1d5db;
-            }
-        }
-
-        /* Print Override */
+        /* Print Override - To ensure perfect printing */
         @media print {
             @page { size: A4 portrait; margin: 0; }
             body { background-color: #fafaf8; }
-            .a4-wrapper {
-                width: 100%;
-                height: 100vh;
-                margin: 0;
-                padding: 2rem;
+            .a4-canvas {
                 box-shadow: none;
                 border: none;
-                /* Strip background pattern for cleaner printing */
-                background-image: none; 
+                background-image: none; /* Strip dots for print */
+                transform: scale(1) !important;
             }
-            /* Hide the download button when printing */
-            #downloadBtn { display: none !important; }
-            /* Ensure neo shadows print properly */
+            .zoom-controls { display: none !important; }
             .neo-shadow { box-shadow: 4px 4px 0px 0px rgba(0,0,0,1) !important; }
             .receipt-shadow { box-shadow: 6px 6px 0px 0px rgba(255,0,255,0.3) !important; }
         }
         
         .neo-border { border: 3px solid #000; }
-        
-        .neo-shadow {
-            box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
-            transition: transform 0.1s ease-in-out;
-        }
-        
-        .neo-shadow:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 6px 6px 0px 0px rgba(0,0,0,1);
-        }
-
-        .receipt-shadow {
-            box-shadow: 6px 6px 0px 0px rgba(255,0,255,0.3);
-        }
+        .neo-shadow { box-shadow: 5px 5px 0px 0px rgba(0,0,0,1); }
+        .receipt-shadow { box-shadow: 6px 6px 0px 0px rgba(255,0,255,0.3); }
 
         /* Custom Colors */
         .bg-delulu-yellow { background-color: #ffde00; }
@@ -105,198 +67,199 @@
         .bg-delulu-blue { background-color: #2962ff; }
     </style>
 </head>
-<body class="text-black antialiased selection:bg-black selection:text-white pb-0">
+<body class="text-black antialiased selection:bg-black selection:text-white flex items-center justify-center relative">
 
-    <div class="a4-wrapper" id="capture-area">
+    <!-- Interactive Zoom Canvas Container -->
+    <div id="zoom-container" class="a4-canvas p-10 border border-gray-300">
         
         <!-- HEADER -->
-        <header class="text-center mb-6 pt-4 md:pt-0 shrink-0">
-            <div class="inline-flex items-center justify-center gap-2 bg-yellow-300 neo-border rounded-full px-4 py-1.5 mb-4 neo-shadow">
-                <span class="font-bold text-xs md:text-sm">Warning: Shockingly affordable prices ahead</span>
-                <span class="text-sm">🚨</span>
+        <header class="text-center mb-6 shrink-0">
+            <div class="inline-flex items-center justify-center gap-2 bg-yellow-300 neo-border rounded-full px-5 py-2 mb-4 neo-shadow">
+                <span class="font-bold text-sm">Warning: Shockingly affordable prices ahead</span>
+                <span class="text-base">🚨</span>
             </div>
 
-            <h1 class="text-3xl md:text-5xl font-black leading-tight mb-2 tracking-tight">
+            <h1 class="text-5xl font-black leading-tight mb-2 tracking-tight">
                 Print everything without going 
-                <span class="bg-delulu-cyan inline-block px-2 py-0.5 neo-border shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] rotate-2">broke.</span>
+                <span class="bg-delulu-cyan inline-block px-3 py-1 neo-border shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rotate-2">broke.</span>
             </h1>
 
-            <p class="text-gray-600 text-sm md:text-lg font-bold">No Math Required Pricing. Premium quality, zero drama.</p>
+            <p class="text-gray-600 text-lg font-bold">No Math Required Pricing. Premium quality, zero drama.</p>
         </header>
 
-        <!-- PRICING GRID (Compact 3x3) -->
-        <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 flex-grow shrink">
+        <!-- PRICING GRID (Compact 3x3 - Fixed Desktop Sizes) -->
+        <main class="grid grid-cols-3 gap-5 flex-grow shrink">
 
             <!-- Card 1: Standard A4 -->
-            <div class="bg-delulu-yellow neo-border rounded-xl p-3 md:p-4 relative neo-shadow flex flex-col h-full bg-opacity-100">
+            <div class="bg-delulu-yellow neo-border rounded-xl p-4 relative neo-shadow flex flex-col h-full bg-opacity-100">
                 <div class="flex items-center gap-2 mb-2">
-                    <i data-lucide="file-text" class="w-5 h-5 md:w-6 md:h-6"></i>
-                    <h3 class="text-lg md:text-xl font-black leading-none">The "Whatever" A4</h3>
+                    <i data-lucide="file-text" class="w-6 h-6"></i>
+                    <h3 class="text-xl font-black leading-none">The "Whatever" A4</h3>
                 </div>
-                <p class="text-xs md:text-sm font-semibold mb-3 opacity-90 leading-tight">Color? B&W? Doesn't matter.</p>
+                <p class="text-sm font-semibold mb-3 opacity-90 leading-tight">Color? B&W? Doesn't matter.</p>
                 <div class="mt-auto">
-                    <div class="flex items-end gap-1 mb-2 border-b-2 border-black/20 pb-2">
-                        <span class="text-3xl md:text-4xl font-black leading-none">₹10</span>
-                        <span class="text-xs md:text-sm font-bold mb-1">/page</span>
+                    <div class="flex items-end gap-1 mb-3 border-b-2 border-black/20 pb-2">
+                        <span class="text-4xl font-black leading-none">₹10</span>
+                        <span class="text-sm font-bold mb-1">/page</span>
                     </div>
-                    <ul class="text-[10px] md:text-xs font-bold space-y-1">
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> Full Color included</li>
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> Zero hidden fees</li>
+                    <ul class="text-xs font-bold space-y-1.5">
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Full Color included</li>
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Zero hidden fees</li>
                     </ul>
                 </div>
             </div>
 
             <!-- Card 2: Regular Stickers -->
-            <div class="bg-delulu-cyan neo-border rounded-xl p-3 md:p-4 relative neo-shadow flex flex-col h-full bg-opacity-100">
+            <div class="bg-delulu-cyan neo-border rounded-xl p-4 relative neo-shadow flex flex-col h-full bg-opacity-100">
                 <div class="flex items-center gap-2 mb-2">
-                    <i data-lucide="sticky-note" class="w-5 h-5 md:w-6 md:h-6"></i>
-                    <h3 class="text-lg md:text-xl font-black leading-none">Regular Sticker A4</h3>
+                    <i data-lucide="sticky-note" class="w-6 h-6"></i>
+                    <h3 class="text-xl font-black leading-none">Regular Sticker A4</h3>
                 </div>
-                <p class="text-xs md:text-sm font-semibold mb-3 opacity-90 leading-tight">Slap your memes everywhere.</p>
+                <p class="text-sm font-semibold mb-3 opacity-90 leading-tight">Slap your memes everywhere.</p>
                 <div class="mt-auto">
-                    <div class="flex items-end gap-1 mb-2 border-b-2 border-black/20 pb-2">
-                        <span class="text-3xl md:text-4xl font-black leading-none">₹25</span>
-                        <span class="text-xs md:text-sm font-bold mb-1">/sheet</span>
+                    <div class="flex items-end gap-1 mb-3 border-b-2 border-black/20 pb-2">
+                        <span class="text-4xl font-black leading-none">₹25</span>
+                        <span class="text-sm font-bold mb-1">/sheet</span>
                     </div>
-                    <ul class="text-[10px] md:text-xs font-bold space-y-1">
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> Matte finish</li>
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> Fit as many on A4</li>
+                    <ul class="text-xs font-bold space-y-1.5">
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Matte finish</li>
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Fit as many on A4</li>
                     </ul>
                 </div>
             </div>
 
             <!-- Card 3: Premium Stickers -->
-            <div class="bg-delulu-magenta text-white neo-border border-white rounded-xl p-3 md:p-4 relative neo-shadow flex flex-col h-full bg-opacity-100" style="border-color: #000;">
+            <div class="bg-delulu-magenta text-white neo-border border-white rounded-xl p-4 relative neo-shadow flex flex-col h-full bg-opacity-100" style="border-color: #000;">
                 <div class="flex items-center gap-2 mb-2">
-                    <i data-lucide="sparkles" class="w-5 h-5 md:w-6 md:h-6"></i>
-                    <h3 class="text-lg md:text-xl font-black leading-none">Premium Stickers</h3>
+                    <i data-lucide="sparkles" class="w-6 h-6"></i>
+                    <h3 class="text-xl font-black leading-none">Premium Stickers</h3>
                 </div>
-                <p class="text-xs md:text-sm font-semibold mb-3 opacity-90 leading-tight">For when you need to be fancy.</p>
+                <p class="text-sm font-semibold mb-3 opacity-90 leading-tight">For when you need to be fancy.</p>
                 <div class="mt-auto">
-                    <div class="flex items-end gap-1 mb-2 border-b-2 border-white/30 pb-2">
-                        <span class="text-3xl md:text-4xl font-black leading-none">₹40</span>
-                        <span class="text-xs md:text-sm font-bold mb-1">/sheet</span>
+                    <div class="flex items-end gap-1 mb-3 border-b-2 border-white/30 pb-2">
+                        <span class="text-4xl font-black leading-none">₹40</span>
+                        <span class="text-sm font-bold mb-1">/sheet</span>
                     </div>
-                    <ul class="text-[10px] md:text-xs font-bold space-y-1">
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> High durability</li>
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> Super vibrant colors</li>
+                    <ul class="text-xs font-bold space-y-1.5">
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> High durability</li>
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Super vibrant colors</li>
                     </ul>
                 </div>
             </div>
 
             <!-- Card 4: Glossy Photos -->
-            <div class="bg-white neo-border rounded-xl p-3 md:p-4 relative neo-shadow flex flex-col h-full bg-opacity-100">
-                <div class="absolute -top-2 -right-2 bg-black text-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded border-2 border-black z-10">
+            <div class="bg-white neo-border rounded-xl p-4 relative neo-shadow flex flex-col h-full bg-opacity-100">
+                <div class="absolute -top-3 -right-3 bg-black text-white px-3 py-1 text-xs font-bold uppercase tracking-wider rounded border-2 border-black z-10">
                     Best Quality
                 </div>
                 <div class="flex items-center gap-2 mb-2 mt-1">
-                    <i data-lucide="image" class="w-5 h-5 md:w-6 md:h-6"></i>
-                    <h3 class="text-lg md:text-xl font-black leading-none">Glossy Photos</h3>
+                    <i data-lucide="image" class="w-6 h-6"></i>
+                    <h3 class="text-xl font-black leading-none">Glossy Photos</h3>
                 </div>
-                <p class="text-xs md:text-sm font-semibold mb-3 opacity-90 leading-tight">Studio quality memories.</p>
+                <p class="text-sm font-semibold mb-3 opacity-90 leading-tight">Studio quality memories.</p>
                 <div class="mt-auto">
-                    <div class="flex items-end gap-1 mb-2 border-b-2 border-black/20 pb-2">
-                        <span class="text-3xl md:text-4xl font-black leading-none">₹80</span>
-                        <span class="text-xs md:text-sm font-bold mb-1">/page</span>
+                    <div class="flex items-end gap-1 mb-3 border-b-2 border-black/20 pb-2">
+                        <span class="text-4xl font-black leading-none">₹80</span>
+                        <span class="text-sm font-bold mb-1">/page</span>
                     </div>
-                    <ul class="text-[10px] md:text-xs font-bold space-y-1">
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> Thick photo paper</li>
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> High-res printing</li>
+                    <ul class="text-xs font-bold space-y-1.5">
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Thick photo paper</li>
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> High-res printing</li>
                     </ul>
                 </div>
             </div>
 
             <!-- Card 5: Passport Photos -->
-            <div class="bg-delulu-green neo-border rounded-xl p-3 md:p-4 relative neo-shadow flex flex-col h-full bg-opacity-100">
+            <div class="bg-delulu-green neo-border rounded-xl p-4 relative neo-shadow flex flex-col h-full bg-opacity-100">
                 <div class="flex items-center gap-2 mb-2">
-                    <i data-lucide="users" class="w-5 h-5 md:w-6 md:h-6"></i>
-                    <h3 class="text-lg md:text-xl font-black leading-none">Passport Photos</h3>
+                    <i data-lucide="users" class="w-6 h-6"></i>
+                    <h3 class="text-xl font-black leading-none">Passport Photos</h3>
                 </div>
-                <p class="text-xs md:text-sm font-semibold mb-3 opacity-90 leading-tight">Because you always lose them.</p>
+                <p class="text-sm font-semibold mb-3 opacity-90 leading-tight">Because you always lose them.</p>
                 <div class="mt-auto">
-                    <div class="flex items-end gap-1 mb-2 border-b-2 border-black/20 pb-2">
-                        <span class="text-3xl md:text-4xl font-black leading-none">₹50</span>
-                        <span class="text-xs md:text-sm font-bold mb-1">/set of 9</span>
+                    <div class="flex items-end gap-1 mb-3 border-b-2 border-black/20 pb-2">
+                        <span class="text-4xl font-black leading-none">₹50</span>
+                        <span class="text-sm font-bold mb-1">/set of 9</span>
                     </div>
-                    <ul class="text-[10px] md:text-xs font-bold space-y-1">
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> Precisely sized</li>
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> Fast processing</li>
+                    <ul class="text-xs font-bold space-y-1.5">
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Precisely sized</li>
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Fast processing</li>
                     </ul>
                 </div>
             </div>
 
             <!-- Card 6: Sticker Passports -->
-            <div class="bg-delulu-teal neo-border rounded-xl p-3 md:p-4 relative neo-shadow flex flex-col h-full bg-opacity-100">
+            <div class="bg-delulu-teal neo-border rounded-xl p-4 relative neo-shadow flex flex-col h-full bg-opacity-100">
                 <div class="flex items-center gap-2 mb-2">
-                    <i data-lucide="user-check" class="w-5 h-5 md:w-6 md:h-6"></i>
-                    <h3 class="text-lg md:text-xl font-black leading-none">Sticker Passports</h3>
+                    <i data-lucide="user-check" class="w-6 h-6"></i>
+                    <h3 class="text-xl font-black leading-none">Sticker Passports</h3>
                 </div>
-                <p class="text-xs md:text-sm font-semibold mb-3 opacity-90 leading-tight">Just peel and stick on forms.</p>
+                <p class="text-sm font-semibold mb-3 opacity-90 leading-tight">Just peel and stick on forms.</p>
                 <div class="mt-auto">
-                    <div class="flex items-end gap-1 mb-2 border-b-2 border-black/20 pb-2">
-                        <span class="text-3xl md:text-4xl font-black leading-none">₹60</span>
-                        <span class="text-xs md:text-sm font-bold mb-1">/set of 9</span>
+                    <div class="flex items-end gap-1 mb-3 border-b-2 border-black/20 pb-2">
+                        <span class="text-4xl font-black leading-none">₹60</span>
+                        <span class="text-sm font-bold mb-1">/set of 9</span>
                     </div>
-                    <ul class="text-[10px] md:text-xs font-bold space-y-1">
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> Self-adhesive back</li>
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> Great for IDs</li>
+                    <ul class="text-xs font-bold space-y-1.5">
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Self-adhesive back</li>
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Great for IDs</li>
                     </ul>
                 </div>
             </div>
 
             <!-- Card 7: Small Apparel -->
-            <div class="bg-delulu-orange neo-border rounded-xl p-3 md:p-4 relative neo-shadow flex flex-col h-full bg-opacity-100">
+            <div class="bg-delulu-orange neo-border rounded-xl p-4 relative neo-shadow flex flex-col h-full bg-opacity-100">
                 <div class="flex items-center gap-2 mb-2">
-                    <i data-lucide="shirt" class="w-5 h-5 md:w-6 md:h-6"></i>
-                    <h3 class="text-lg md:text-xl font-black leading-none">Small Apparel A5</h3>
+                    <i data-lucide="shirt" class="w-6 h-6"></i>
+                    <h3 class="text-xl font-black leading-none">Small Apparel A5</h3>
                 </div>
-                <p class="text-xs md:text-sm font-semibold mb-3 opacity-90 leading-tight">T-shirts, Totes, Hoodies.</p>
+                <p class="text-sm font-semibold mb-3 opacity-90 leading-tight">T-shirts, Totes, Hoodies.</p>
                 <div class="mt-auto">
-                    <div class="flex items-end gap-1 mb-2 border-b-2 border-black/20 pb-2">
-                        <span class="text-3xl md:text-4xl font-black leading-none">₹150</span>
-                        <span class="text-xs md:text-sm font-bold mb-1">/print</span>
+                    <div class="flex items-end gap-1 mb-3 border-b-2 border-black/20 pb-2">
+                        <span class="text-4xl font-black leading-none">₹150</span>
+                        <span class="text-sm font-bold mb-1">/print</span>
                     </div>
-                    <ul class="text-[10px] md:text-xs font-bold space-y-1">
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> Up to A5 graphic</li>
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> Soft feel finish</li>
+                    <ul class="text-xs font-bold space-y-1.5">
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Up to A5 graphic</li>
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Soft feel finish</li>
                     </ul>
                 </div>
             </div>
 
             <!-- Card 8: Full-Page Apparel -->
-            <div class="bg-delulu-purple text-white neo-border border-white rounded-xl p-3 md:p-4 relative neo-shadow flex flex-col h-full bg-opacity-100" style="border-color: #000;">
+            <div class="bg-delulu-purple text-white neo-border border-white rounded-xl p-4 relative neo-shadow flex flex-col h-full bg-opacity-100" style="border-color: #000;">
                 <div class="flex items-center gap-2 mb-2">
-                    <i data-lucide="shirt" class="w-5 h-5 md:w-6 md:h-6"></i>
-                    <h3 class="text-lg md:text-xl font-black leading-none">Full Apparel A4</h3>
+                    <i data-lucide="shirt" class="w-6 h-6"></i>
+                    <h3 class="text-xl font-black leading-none">Full Apparel A4</h3>
                 </div>
-                <p class="text-xs md:text-sm font-semibold mb-3 opacity-90 leading-tight">Big graphics for apparel.</p>
+                <p class="text-sm font-semibold mb-3 opacity-90 leading-tight">Big graphics for apparel.</p>
                 <div class="mt-auto">
-                    <div class="flex items-end gap-1 mb-2 border-b-2 border-white/30 pb-2">
-                        <span class="text-3xl md:text-4xl font-black leading-none">₹250</span>
-                        <span class="text-xs md:text-sm font-bold mb-1">/print</span>
+                    <div class="flex items-end gap-1 mb-3 border-b-2 border-white/30 pb-2">
+                        <span class="text-4xl font-black leading-none">₹250</span>
+                        <span class="text-sm font-bold mb-1">/print</span>
                     </div>
-                    <ul class="text-[10px] md:text-xs font-bold space-y-1">
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> Full A4 size graphic</li>
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> Breathable ink</li>
+                    <ul class="text-xs font-bold space-y-1.5">
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Full A4 size graphic</li>
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Breathable ink</li>
                     </ul>
                 </div>
             </div>
 
             <!-- Card 9: Polaroid Prints -->
-            <div class="bg-delulu-blue text-white neo-border border-white rounded-xl p-3 md:p-4 relative neo-shadow flex flex-col h-full bg-opacity-100" style="border-color: #000;">
+            <div class="bg-delulu-blue text-white neo-border border-white rounded-xl p-4 relative neo-shadow flex flex-col h-full bg-opacity-100" style="border-color: #000;">
                 <div class="flex items-center gap-2 mb-2">
-                    <i data-lucide="camera" class="w-5 h-5 md:w-6 md:h-6"></i>
-                    <h3 class="text-lg md:text-xl font-black leading-none">Polaroid Style</h3>
+                    <i data-lucide="camera" class="w-6 h-6"></i>
+                    <h3 class="text-xl font-black leading-none">Polaroid Style</h3>
                 </div>
-                <p class="text-xs md:text-sm font-semibold mb-3 opacity-90 leading-tight">Aesthetic vibes only.</p>
+                <p class="text-sm font-semibold mb-3 opacity-90 leading-tight">Aesthetic vibes only.</p>
                 <div class="mt-auto">
-                    <div class="flex items-end gap-1 mb-2 border-b-2 border-white/30 pb-2">
-                        <span class="text-3xl md:text-4xl font-black leading-none">₹70</span>
-                        <span class="text-xs md:text-sm font-bold mb-1">/set of 9</span>
+                    <div class="flex items-end gap-1 mb-3 border-b-2 border-white/30 pb-2">
+                        <span class="text-4xl font-black leading-none">₹70</span>
+                        <span class="text-sm font-bold mb-1">/set of 9</span>
                     </div>
-                    <ul class="text-[10px] md:text-xs font-bold space-y-1">
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> Classic white border</li>
-                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i> High quality finish</li>
+                    <ul class="text-xs font-bold space-y-1.5">
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> Classic white border</li>
+                        <li class="flex items-center gap-1.5"><i data-lucide="check" class="w-4 h-4"></i> High quality finish</li>
                     </ul>
                 </div>
             </div>
@@ -304,29 +267,29 @@
         </main>
 
         <!-- FOOTER: URL & Receipt Strip -->
-        <footer class="mt-6 flex flex-col md:flex-row items-center justify-between gap-6 shrink-0 bg-[#111] p-4 rounded-xl neo-border">
+        <footer class="mt-8 flex flex-row items-center justify-between gap-6 shrink-0 bg-[#111] p-5 rounded-2xl neo-border">
             
             <!-- Branding -->
-            <div class="text-center md:text-left text-white">
-                <h2 class="text-2xl md:text-3xl font-black italic tracking-widest">deluluprinter.xyz</h2>
-                <p class="text-xs text-gray-400 mt-1">© 2026 Delulu Printer. Keeping it real.</p>
+            <div class="text-left text-white">
+                <h2 class="text-3xl font-black italic tracking-widest">deluluprinter.xyz</h2>
+                <p class="text-sm text-gray-400 mt-1">© 2026 Delulu Printer. Keeping it real.</p>
             </div>
 
             <!-- Compact Receipt Box -->
-            <div class="bg-white rounded-lg p-3 border-2 border-delulu-magenta receipt-shadow w-full md:w-auto max-w-sm">
-                <div class="space-y-1 font-bold text-xs text-gray-700">
-                    <div class="flex justify-between items-center border-b border-dashed border-gray-300 pb-1">
+            <div class="bg-white rounded-xl p-3 border-2 border-delulu-magenta receipt-shadow w-auto max-w-sm">
+                <div class="space-y-1.5 font-bold text-sm text-gray-700">
+                    <div class="flex justify-between items-center border-b border-dashed border-gray-300 pb-1.5 gap-8">
                         <span>Base A4 page</span>
                         <span>₹??</span>
                     </div>
-                    <div class="flex justify-between items-center border-b border-dashed border-gray-300 pb-1">
+                    <div class="flex justify-between items-center border-b border-dashed border-gray-300 pb-1.5 gap-8">
                         <span>Color/Image fee?</span>
                         <span class="text-red-500">+₹??</span>
                     </div>
                 </div>
-                <div class="mt-2 flex justify-between items-center bg-gray-100 p-2 rounded neo-border">
-                    <span class="font-bold text-delulu-green text-sm">Our Price</span>
-                    <span class="font-black text-lg leading-none">Just ₹10 🚀</span>
+                <div class="mt-3 flex justify-between items-center bg-gray-100 p-2 rounded neo-border gap-4">
+                    <span class="font-bold text-delulu-green text-base">Our Price</span>
+                    <span class="font-black text-xl leading-none">Just ₹10 🚀</span>
                 </div>
             </div>
 
@@ -334,77 +297,69 @@
 
     </div>
 
-    <!-- Floating Save Image Button -->
-    <button id="downloadBtn" onclick="saveAsImage()" class="fixed bottom-6 right-6 bg-delulu-cyan text-black px-5 py-3 rounded-full font-bold flex items-center gap-2 neo-border neo-shadow z-50 group hover:-translate-y-1 transition-all">
-        <i data-lucide="download" class="w-5 h-5 group-hover:animate-bounce"></i>
-        <span id="downloadText">Save Flyer</span>
-    </button>
+    <!-- Floating Zoom Controls -->
+    <div class="zoom-controls fixed bottom-8 p-3 rounded-full flex gap-3 z-50 bg-black/80 backdrop-blur border-2 border-white shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+        <button onclick="changeZoom(-0.1)" class="w-12 h-12 flex items-center justify-center bg-white text-black rounded-full hover:bg-gray-200 transition-colors font-black text-xl" aria-label="Zoom Out">
+            <i data-lucide="minus"></i>
+        </button>
+        <button onclick="resetZoom()" class="px-6 h-12 flex items-center justify-center bg-delulu-cyan text-black font-black uppercase rounded-full hover:bg-white transition-colors tracking-wider" aria-label="Reset Zoom">
+            Fit Page
+        </button>
+        <button onclick="changeZoom(0.1)" class="w-12 h-12 flex items-center justify-center bg-white text-black rounded-full hover:bg-gray-200 transition-colors font-black text-xl" aria-label="Zoom In">
+            <i data-lucide="plus"></i>
+        </button>
+    </div>
 
     <script>
         lucide.createIcons();
 
-        function saveAsImage() {
-            const wrapper = document.getElementById('capture-area');
-            const btnText = document.getElementById('downloadText');
-            const icon = document.querySelector('#downloadBtn i');
-            
-            // UI Feedback to show it's working
-            const originalText = btnText.innerText;
-            btnText.innerText = "Saving...";
-            icon.classList.remove('group-hover:animate-bounce');
-            icon.setAttribute('data-lucide', 'loader');
-            icon.classList.add('animate-spin');
-            lucide.createIcons();
+        // Custom Zoom Logic
+        const container = document.getElementById('zoom-container');
+        let currentScale = 1;
+        const A4_WIDTH = 794;
+        const A4_HEIGHT = 1123;
 
-            // PERFORMANCE FIX: Temporarily remove expensive radial background and box shadow for capture
-            const originalBg = wrapper.style.backgroundImage;
-            const originalShadow = wrapper.style.boxShadow;
-            wrapper.style.backgroundImage = 'none';
-            wrapper.style.boxShadow = 'none';
-
-            // Using html2canvas to capture the designated area
-            html2canvas(wrapper, {
-                scale: 1.5, // Reduced slightly from 2x. 1.5x is much faster and still perfect for A4 printing
-                backgroundColor: '#fafaf8',
-                logging: false, // Disabling console logs speeds up processing
-                useCORS: true
-            }).then(canvas => {
-                // Restore expensive styles immediately after capture
-                wrapper.style.backgroundImage = originalBg;
-                wrapper.style.boxShadow = originalShadow;
-
-                // Create a temporary link element to trigger the download
-                const link = document.createElement('a');
-                link.download = 'Delulu-Printer-Pricing.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-
-                // Restore Button UI
-                btnText.innerText = originalText;
-                icon.classList.remove('animate-spin');
-                icon.setAttribute('data-lucide', 'download');
-                icon.classList.add('group-hover:animate-bounce');
-                lucide.createIcons();
-            }).catch(err => {
-                console.error("Error saving image:", err);
-                // Restore expensive styles on error too
-                wrapper.style.backgroundImage = originalBg;
-                wrapper.style.boxShadow = originalShadow;
-
-                btnText.innerText = "Failed!";
-                icon.classList.remove('animate-spin');
-                icon.setAttribute('data-lucide', 'x');
-                lucide.createIcons();
-                
-                // Reset after 2 seconds
-                setTimeout(() => {
-                    btnText.innerText = originalText;
-                    icon.setAttribute('data-lucide', 'download');
-                    icon.classList.add('group-hover:animate-bounce');
-                    lucide.createIcons();
-                }, 2000);
-            });
+        function updateTransform() {
+            // Apply scale, but keep it centered
+            container.style.transform = `scale(${currentScale})`;
         }
+
+        function changeZoom(delta) {
+            // Constrain zoom between 0.3x and 3x
+            currentScale = Math.min(Math.max(0.3, currentScale + delta), 3);
+            updateTransform();
+        }
+
+        function resetZoom() {
+            // Calculate perfect fit for the current viewport (with a little padding)
+            const scaleX = window.innerWidth / (A4_WIDTH + 80);
+            const scaleY = window.innerHeight / (A4_HEIGHT + 160); // Extra padding for buttons
+            currentScale = Math.min(scaleX, scaleY);
+            
+            // Ensure it doesn't get ridiculously large on massive screens
+            if(currentScale > 1.2) currentScale = 1.2;
+            
+            updateTransform();
+        }
+
+        // Catch ALL mouse scrolling to perform zoom instead of vertical scroll
+        window.addEventListener('wheel', (e) => {
+            e.preventDefault(); // Stop native scrolling
+            
+            // Adjust zoom sensitivity based on wheel delta
+            const delta = e.deltaY > 0 ? -0.05 : 0.05;
+            changeZoom(delta);
+        }, { passive: false }); // passive: false is required to allow preventDefault()
+
+        // Handle window resizing
+        window.addEventListener('resize', () => {
+            // Only auto-reset if they haven't manually zoomed too much
+            resetZoom();
+        });
+
+        // Initial setup
+        resetZoom();
+
     </script>
 </body>
 </html>
