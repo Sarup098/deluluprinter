@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artevia Print Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f8fafc;
+            background-image: radial-gradient(#cbd5e1 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+
+        /* Neo-Brutalism Styles */
+        .brutal-border { border: 4px solid #000; }
+        .brutal-shadow { box-shadow: 6px 6px 0px 0px rgba(0,0,0,1); }
+        .brutal-shadow-sm { box-shadow: 4px 4px 0px 0px rgba(0,0,0,1); }
+        .brutal-shadow:active, .brutal-shadow-sm:active, .btn-active:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,1);
+        }
+        
+        /* Selected State for Cards */
+        .card-selected {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,1);
+            position: relative;
+        }
+        .card-selected::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            background: #000;
+            color: #fff;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #fff;
+        }
+
+        /* Toast Animation */
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .toast-enter { animation: slideUp 0.4s ease forwards; }
+    </style>
+</head>
+<body class="min-h-screen text-black p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <div class="inline-block bg-yellow-400 rounded-full px-6 py-2 brutal-border mb-4">
+                <span class="font-bold text-sm">Warning: Your delulu is about to become trululu 🚨</span>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-4">
+                delulu<br>printer <span class="text-cyan-400 brutal-border bg-black px-2 text-white pb-1 inline-block transform -rotate-2">.xyz</span>
+            </h1>
+            <p class="text-xl font-bold text-gray-700">No math pricing. Just vibes and premium quality.</p>
+        </div>
+
+        <!-- Step 1: Choose Type -->
+        <h2 class="text-2xl font-black mb-4">1. Select Output Vibe</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            
+            <!-- Passport Card -->
+            <div id="card-passport" class="bg-yellow-400 brutal-border brutal-shadow rounded-2xl p-4 cursor-pointer transition-all duration-200 flex flex-col" onclick="selectMode('passport')">
+                <div class="mb-2"><i class="fas fa-id-badge text-2xl"></i></div>
+                <h3 class="text-lg font-black mb-1 leading-tight">Passport Size</h3>
+                <div class="text-2xl font-black mb-2 mt-auto">8 <span class="text-xs font-bold">/Sheet</span></div>
+                <p class="text-[10px] font-bold">Paper saver (4x2 top)</p>
+            </div>
+
+            <!-- Normal Prints Card -->
+            <div id="card-normal" class="bg-cyan-400 brutal-border brutal-shadow rounded-2xl p-4 cursor-pointer transition-all duration-200 flex flex-col" onclick="selectMode('normal')">
+                <div class="mb-2"><i class="fas fa-images text-2xl"></i></div>
+                <h3 class="text-lg font-black mb-1 leading-tight">Normal Prints</h3>
+                <div class="text-2xl font-black mb-2 mt-auto">Best <span class="text-xs font-bold">Fit</span></div>
+                <p class="text-[10px] font-bold">Tuition notes & photos</p>
+            </div>
+
+            <!-- Polaroid Card -->
+            <div id="card-polaroid" class="bg-orange-400 brutal-border brutal-shadow rounded-2xl p-4 cursor-pointer transition-all duration-200 flex flex-col" onclick="selectMode('polaroid')">
+                <div class="mb-2"><i class="fas fa-camera-retro text-2xl"></i></div>
+                <h3 class="text-lg font-black mb-1 leading-tight">Polaroids</h3>
+                <div class="text-2xl font-black mb-2 mt-auto">9 <span class="text-xs font-bold">Vibes</span></div>
+                <p class="text-[10px] font-bold">Aesthetic vintage frames</p>
+            </div>
+
+            <!-- Stickers Card -->
+            <div id="card-stickers" class="bg-fuchsia-500 text-white brutal-border brutal-shadow rounded-2xl p-4 cursor-pointer transition-all duration-200 flex flex-col" onclick="selectMode('stickers')">
+                <div class="mb-2"><i class="fas fa-hat-wizard text-2xl"></i></div>
+                <h3 class="text-lg font-black mb-1 leading-tight">Stickers!</h3>
+                <div class="text-2xl font-black mb-2 mt-auto">Shape <span class="text-xs font-bold">Magic</span></div>
+                <p class="text-[10px] font-bold text-fuchsia-100">Custom fun cuts</p>
+            </div>
+
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="bg-white brutal-border brutal-shadow rounded-2xl p-6 md:p-8 grid grid-cols-1 md:grid-cols-5 gap-8 relative">
+            
+            <!-- Controls -->
+            <div class="space-y-6 md:col-span-2">
+                <h2 class="text-2xl font-black">2. Upload & Tweak</h2>
+                
+                <div>
+                    <label class="block text-sm font-bold mb-2">Select Images</label>
+                    <input type="file" id="imageInput" multiple accept="image/*" class="block w-full text-sm text-slate-800
+                        file:mr-4 file:py-3 file:px-4
+                        file:rounded-xl file:border-2 file:border-black
+                        file:text-sm file:font-black file:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+                        file:bg-yellow-400 file:text-black
+                        hover:file:bg-yellow-300 cursor-pointer border-2 border-black rounded-xl p-2 bg-gray-50">
+                    <p class="text-xs font-bold text-gray-500 mt-2" id="fileCount">0 files selected</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold mb-2">Page Orientation</label>
+                    <select id="orientation" class="w-full bg-white border-2 border-black brutal-shadow-sm font-bold text-sm rounded-xl focus:ring-0 focus:outline-none block p-3">
+                        <option value="portrait">A4 Portrait (Vertical)</option>
+                        <option value="landscape">A4 Landscape (Horizontal)</option>
+                    </select>
+                </div>
+
+                <!-- Extra Options for Stickers -->
+                <div id="stickerOptions" class="hidden p-4 bg-fuchsia-100 border-2 border-black rounded-xl border-dashed">
+                    <label class="block text-sm font-black mb-2 text-fuchsia-900">Sticker Shape</label>
+                    <select id="stickerShape" class="w-full bg-white border-2 border-black font-bold text-sm rounded-xl focus:ring-0 focus:outline-none block p-2">
+                        <option value="square">Square / Rectangle</option>
+                        <option value="rounded">Rounded Corners</option>
+                        <option value="circle">Perfect Circle</option>
+                        <option value="heart">Cute Heart</option>
+                        <option value="star">Super Star</option>
+                        <option value="hexagon">Hexagon</option>
+                    </select>
+                </div>
+
+                <button id="generateBtn" class="w-full bg-black text-white font-black py-4 px-4 rounded-xl brutal-shadow transition duration-200 flex items-center justify-center text-lg mt-4 hover:bg-gray-800 btn-active">
+                    <i class="fas fa-wand-magic-sparkles mr-2 text-yellow-400"></i> Do The Magic 🪄
+                </button>
+
+                <div id="loading" class="hidden text-center text-black py-4">
+                    <div class="inline-block w-8 h-8 border-4 border-black border-t-yellow-400 rounded-full animate-spin"></div>
+                    <p class="mt-2 text-sm font-black">Calculating the vibes...</p>
+                </div>
+            </div>
+
+            <!-- Preview -->
+            <div class="bg-gray-100 rounded-2xl p-4 flex flex-col items-center justify-center min-h-[400px] md:min-h-[500px] border-4 border-black border-dashed relative md:col-span-3">
+                <div id="placeholderText" class="text-gray-400 text-center font-bold">
+                    <i class="fas fa-image text-5xl mb-3 block opacity-50"></i>
+                    <p>Your masterpiece will appear here</p>
+                </div>
+                
+                <img id="previewImg" class="hidden max-h-[60vh] max-w-full brutal-border brutal-shadow-sm bg-white object-contain mb-16">
+
+                <div id="actionButtons" class="hidden absolute bottom-6 flex space-x-4 w-full justify-center px-4">
+                    <a id="downloadBtn" class="bg-cyan-400 text-black font-black py-3 px-6 rounded-xl brutal-shadow transition duration-200 flex items-center border-4 border-black cursor-pointer hover:bg-cyan-300 btn-active" download="Delulu_Print.jpg">
+                        <i class="fas fa-download mr-2"></i> 1. Download File
+                    </a>
+                    <a id="waBtn" target="_blank" href="https://wa.me/919907488075?text=Hey%20Delulu%20Printer!%20%F0%9F%91%8B%20I%20just%20generated%20a%20print%20sheet.%20Here%20is%20my%20order..." class="bg-green-400 text-black font-black py-3 px-6 rounded-xl brutal-shadow transition duration-200 flex items-center border-4 border-black cursor-pointer hover:bg-green-300 btn-active">
+                        <i class="fab fa-whatsapp text-xl mr-2"></i> 2. WhatsApp Us
+                    </a>
+                </div>
+            </div>
+
+            <!-- Toast Notification -->
+            <div id="toast" class="hidden absolute top-4 right-4 bg-black text-white px-6 py-4 rounded-xl brutal-shadow border-2 border-white font-black z-50 flex items-center">
+                <i class="fab fa-whatsapp text-green-400 text-2xl mr-3"></i>
+                <span id="toastMsg">Redirecting to WhatsApp in <span id="countdown" class="text-yellow-400">5</span>...</span>
+            </div>
+
+        </div>
+        
+        <div class="mt-8 text-center font-bold text-gray-500 text-sm">
+            Powered by <span class="text-black">deluluprinter.xyz</span> | Artevia Studio Local Engine 🚀
+        </div>
+    </div>
+
+    <script>
+        // State
+        let currentMode = 'normal'; // passport, normal, stickers, polaroid
+
+        // Elements
+        const cards = {
+            passport: document.getElementById('card-passport'),
+            normal: document.getElementById('card-normal'),
+            polaroid: document.getElementById('card-polaroid'),
+            stickers: document.getElementById('card-stickers')
+        };
+        const stickerOptions = document.getElementById('stickerOptions');
+        const imageInput = document.getElementById('imageInput');
+        const fileCount = document.getElementById('fileCount');
+        const generateBtn = document.getElementById('generateBtn');
+        const orientationSelect = document.getElementById('orientation');
+        const stickerShapeSelect = document.getElementById('stickerShape');
+        const loading = document.getElementById('loading');
+        const previewImg = document.getElementById('previewImg');
+        const placeholderText = document.getElementById('placeholderText');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const actionButtons = document.getElementById('actionButtons');
+        const waBtn = document.getElementById('waBtn');
+        const toast = document.getElementById('toast');
+        const countdownEl = document.getElementById('countdown');
+
+        // Mode Selection
+        function selectMode(mode) {
+            currentMode = mode;
+            Object.values(cards).forEach(card => card.classList.remove('card-selected'));
+            cards[mode].classList.add('card-selected');
+            
+            if (mode === 'stickers') {
+                stickerOptions.classList.remove('hidden');
+            } else {
+                stickerOptions.classList.add('hidden');
+            }
+        }
+        selectMode('normal');
+
+        imageInput.addEventListener('change', () => {
+            const count = imageInput.files.length;
+            fileCount.textContent = count > 0 ? `${count} file(s) ready to print` : '0 files selected';
+        });
+
+        // WhatsApp Auto-Redirect Logic
+        downloadBtn.addEventListener('click', () => {
+            toast.classList.remove('hidden');
+            toast.classList.add('toast-enter');
+            let timeLeft = 5;
+            countdownEl.textContent = timeLeft;
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                countdownEl.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    toast.classList.add('hidden');
+                    toast.classList.remove('toast-enter');
+                    window.open(waBtn.href, '_blank');
+                }
+            }, 1000);
+        });
+
+        const loadImage = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        };
+
+        const loadExternalImage = (src) => {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = "anonymous"; 
+                img.onload = () => resolve(img);
+                img.onerror = () => {
+                    console.warn(`Failed to load QR from ${src}, using fallback.`);
+                    resolve(null);
+                };
+                img.src = src;
+            });
+        };
+
+        // --- SHAPE GENERATORS ---
+        function drawHeart(ctx, x, y, width, height) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.beginPath();
+            const topCurveHeight = height * 0.3;
+            ctx.moveTo(width / 2, topCurveHeight);
+            ctx.bezierCurveTo(width / 2, 0, 0, 0, 0, topCurveHeight);
+            ctx.bezierCurveTo(0, height * 0.6, width / 2, height * 0.9, width / 2, height);
+            ctx.bezierCurveTo(width / 2, height * 0.9, width, height * 0.6, width, topCurveHeight);
+            ctx.bezierCurveTo(width, 0, width / 2, 0, width / 2, topCurveHeight);
+            ctx.closePath();
+            ctx.restore();
+        }
+
+        function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
+            let rot = Math.PI / 2 * 3;
+            let x = cx;
+            let y = cy;
+            let step = Math.PI / spikes;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - outerRadius);
+            for (let i = 0; i < spikes; i++) {
+                x = cx + Math.cos(rot) * outerRadius;
+                y = cy + Math.sin(rot) * outerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+                x = cx + Math.cos(rot) * innerRadius;
+                y = cy + Math.sin(rot) * innerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+            }
+            ctx.lineTo(cx, cy - outerRadius);
+            ctx.closePath();
+        }
+
+        function drawHexagon(ctx, x, y, width, height) {
+            ctx.beginPath();
+            ctx.moveTo(x + width * 0.5, y);
+            ctx.lineTo(x + width, y + height * 0.25);
+            ctx.lineTo(x + width, y + height * 0.75);
+            ctx.lineTo(x + width * 0.5, y + height);
+            ctx.lineTo(x, y + height * 0.75);
+            ctx.lineTo(x, y + height * 0.25);
+            ctx.closePath();
+        }
+
+        generateBtn.addEventListener('click', async () => {
+            if (imageInput.files.length === 0) {
+                alert('Whoops! Upload at least one image first.');
+                return;
+            }
+
+            generateBtn.disabled = true;
+            generateBtn.classList.add('opacity-50');
+            loading.classList.remove('hidden');
+            previewImg.classList.add('hidden');
+            placeholderText.classList.add('hidden');
+            actionButtons.classList.add('hidden');
+
+            try {
+                await new Promise(r => setTimeout(r, 50)); 
+
+                const isPortrait = orientationSelect.value === 'portrait';
+                const canvasW = isPortrait ? 2480 : 3508;
+                const canvasH = isPortrait ? 3508 : 2480;
+
+                // Footer Advertisement Configuration (Conditional)
+                const isPassport = currentMode === 'passport';
+                const footerH = isPassport ? 0 : 450; 
+                const printH = canvasH - footerH; 
+
+                const files = Array.from(imageInput.files);
+                let images = await Promise.all(files.map(loadImage));
+                
+                const priceQrSrc = "https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/price.png";
+                const orderQrSrc = "https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/main.png";
+                const [priceQrImg, orderQrImg] = await Promise.all([
+                    loadExternalImage(priceQrSrc),
+                    loadExternalImage(orderQrSrc)
+                ]);
+
+                const canvas = document.createElement('canvas');
+                canvas.width = canvasW;
+                canvas.height = canvasH;
+                const ctx = canvas.getContext('2d');
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvasW, canvasH);
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+
+                // ==========================================
+                // PRINT LAYOUT ENGINE
+                // ==========================================
+
+                if (isPassport) {
+                    const img = images[0]; 
+                    const passW = 413; 
+                    const passH = 531; 
+                    const gap = 60;    
+                    
+                    const targetRatio = passW / passH;
+                    const imgRatio = img.width / img.height;
+                    
+                    let sWidth = img.width, sHeight = img.height, sx = 0, sy = 0;
+                    if (imgRatio > targetRatio) {
+                        sWidth = img.height * targetRatio;
+                        sx = (img.width - sWidth) / 2;
+                    } else {
+                        sHeight = img.width / targetRatio;
+                        sy = (img.height - sHeight) / 2;
+                    }
+
+                    // Push the grid to the left side (StartX = 100)
+                    const startX = 100; 
+                    const startY = 150; 
+
+                    for (let i = 0; i < 8; i++) {
+                        const col = i % 4;
+                        const row = Math.floor(i / 4);
+                        const dx = startX + col * (passW + gap);
+                        const dy = startY + row * (passH + gap);
+                        
+                        ctx.drawImage(img, sx, sy, sWidth, sHeight, dx, dy, passW, passH);
+                        
+                        ctx.strokeStyle = '#cbd5e1'; 
+                        ctx.lineWidth = 3;
+                        ctx.strokeRect(dx, dy, passW, passH);
+                    }
+
+                    // ==========================================
+                    // SIDE ADVERTISEMENT (Passport Mode Only)
+                    // ==========================================
+                    // Starts after the 4 columns of photos
+                    const sideAdX = startX + (4 * passW) + (3 * gap) + 80; 
+                    const sideAdY = startY;
+                    const sideAdW = 380; 
+                    const sideAdH = (2 * passH) + gap; 
+
+                    // Base 
+                    ctx.fillStyle = '#22d3ee';
+                    ctx.fillRect(sideAdX, sideAdY, sideAdW, sideAdH);
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 8;
+                    ctx.strokeRect(sideAdX, sideAdY, sideAdW, sideAdH);
+
+                    // Title
+                    ctx.fillStyle = '#000000';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'top';
+                    ctx.font = '900 40px "Inter", sans-serif';
+                    ctx.fillText("PRINT", sideAdX + sideAdW/2, sideAdY + 40);
+                    ctx.fillText("STICKERS,", sideAdX + sideAdW/2, sideAdY + 85);
+                    ctx.fillText("POLAROIDS", sideAdX + sideAdW/2, sideAdY + 130);
+                    ctx.fillText("& MORE!", sideAdX + sideAdW/2, sideAdY + 175);
+
+                    // Price
+                    ctx.fillStyle = '#facc15';
+                    ctx.fillRect(sideAdX + 20, sideAdY + 240, sideAdW - 40, 110);
+                    ctx.strokeRect(sideAdX + 20, sideAdY + 240, sideAdW - 40, 110);
+                    ctx.fillStyle = '#000000';
+                    ctx.font = '900 28px "Inter", sans-serif';
+                    ctx.fillText("STARTS AT ₹10", sideAdX + sideAdW/2, sideAdY + 260);
+                    ctx.fillText("COLOUR PRINTS", sideAdX + sideAdW/2, sideAdY + 300);
+
+                    // QRs
+                    const drawSideQr = (img, yOffset, label) => {
+                        const qrSize = 180;
+                        const qrX = sideAdX + (sideAdW - qrSize)/2;
+                        const qrY = sideAdY + yOffset;
+                        
+                        ctx.fillStyle = '#000';
+                        ctx.fillRect(qrX + 8, qrY + 8, qrSize, qrSize);
+                        ctx.fillStyle = '#fff';
+                        ctx.fillRect(qrX, qrY, qrSize, qrSize);
+                        ctx.strokeRect(qrX, qrY, qrSize, qrSize);
+                        
+                        if(img) ctx.drawImage(img, qrX + 10, qrY + 10, qrSize - 20, qrSize - 20);
+                        
+                        ctx.fillStyle = '#000';
+                        ctx.font = '900 18px "Inter", sans-serif';
+                        ctx.fillText(label, sideAdX + sideAdW/2, qrY + qrSize + 15);
+                    };
+
+                    drawSideQr(priceQrImg, 380, "SCAN FOR PRICE");
+                    drawSideQr(orderQrImg, 620, "SCAN TO ORDER");
+
+                    // Footer Link
+                    ctx.font = '800 22px "Inter", sans-serif';
+                    ctx.fillText("deluluprinter.xyz", sideAdX + sideAdW/2, sideAdY + 860);
+                    ctx.fillText("WA: 9907488075", sideAdX + sideAdW/2, sideAdY + 890);
+                    
+                    ctx.textAlign = 'left'; // Reset
+
+                } else if (currentMode === 'polaroid') {
+                    let polaroidImgs = [];
+                    for(let i=0; i<9; i++) {
+                        polaroidImgs.push(images[i % images.length]);
+                    }
+
+                    const cols = 3, rows = 3;
+                    const frameW = 700, frameH = 875; 
+                    const gapX = (canvasW - (cols * frameW)) / 4;
+                    const gapY = (printH - (rows * frameH)) / 4; 
+
+                    polaroidImgs.forEach((img, i) => {
+                        const col = i % cols;
+                        const row = Math.floor(i / cols);
+                        const dx = gapX + col * (frameW + gapX);
+                        const dy = gapY + row * (frameH + gapY);
+
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(dx, dy, frameW, frameH);
+
+                        ctx.strokeStyle = '#cbd5e1'; 
+                        ctx.lineWidth = 2;
+                        ctx.setLineDash([15, 15]); 
+                        ctx.strokeRect(dx, dy, frameW, frameH);
+                        ctx.setLineDash([]); 
+
+                        const imgAreaSize = 620;
+                        const margin = (frameW - imgAreaSize) / 2;
+                        const imgX = dx + margin;
+                        const imgY = dy + margin; 
+
+                        const side = Math.min(img.width, img.height);
+                        const sx = (img.width - side) / 2;
+                        const sy = (img.height - side) / 2;
+
+                        ctx.drawImage(img, sx, sy, side, side, imgX, imgY, imgAreaSize, imgAreaSize);
+                    });
+
+                } else {
+                    const n = images.length;
+                    let bestScore = 0;
+                    let bestC = 1, bestR = n;
+                    const gap = Math.floor(Math.min(canvasW, printH) * 0.03); 
+
+                    for (let c = 1; c <= n; c++) {
+                        let r = Math.ceil(n / c);
+                        let cellW = (canvasW - (gap * (c + 1))) / c;
+                        let cellH = (printH - (gap * (r + 1))) / r; 
+                        
+                        let score = 0;
+                        for (let img of images) {
+                            let scale = Math.min(cellW / img.width, cellH / img.height);
+                            score += (img.width * scale) * (img.height * scale);
+                        }
+
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestC = c;
+                            bestR = r;
+                        }
+                    }
+
+                    const cellW = (canvasW - (gap * (bestC + 1))) / bestC;
+                    const cellH = (printH - (gap * (bestR + 1))) / bestR; 
+
+                    images.forEach((img, i) => {
+                        const col = i % bestC;
+                        const row = Math.floor(i / bestC);
+
+                        const scale = Math.min(cellW / img.width, cellH / img.height);
+                        const drawW = img.width * scale;
+                        const drawH = img.height * scale;
+
+                        const startX = gap + (col * (cellW + gap));
+                        const startY = gap + (row * (cellH + gap));
+                        const xOffset = startX + (cellW - drawW) / 2;
+                        const yOffset = startY + (cellH - drawH) / 2;
+
+                        ctx.save();
+
+                        if (currentMode === 'stickers') {
+                            const shape = stickerShapeSelect.value;
+                            
+                            if (shape === 'rounded') {
+                                ctx.beginPath();
+                                ctx.roundRect(xOffset, yOffset, drawW, drawH, Math.min(drawW, drawH) * 0.15);
+                                ctx.clip();
+                            } else if (shape === 'circle') {
+                                ctx.beginPath();
+                                ctx.arc(xOffset + drawW/2, yOffset + drawH/2, Math.min(drawW, drawH)/2, 0, Math.PI*2);
+                                ctx.clip();
+                            } else if (shape === 'heart') {
+                                const side = Math.min(drawW, drawH);
+                                drawHeart(ctx, xOffset + (drawW-side)/2, yOffset + (drawH-side)/2, side, side);
+                                ctx.clip();
+                            } else if (shape === 'star') {
+                                const radius = Math.min(drawW, drawH)/2;
+                                drawStar(ctx, xOffset + drawW/2, yOffset + drawH/2, 5, radius, radius*0.4);
+                                ctx.clip();
+                            } else if (shape === 'hexagon') {
+                                drawHexagon(ctx, xOffset, yOffset + (drawH - Math.min(drawW, drawH))/2, drawW, Math.min(drawW, drawH));
+                                ctx.clip();
+                            }
+                        }
+
+                        ctx.drawImage(img, xOffset, yOffset, drawW, drawH);
+                        ctx.restore(); 
+                    });
+                }
+
+                // ==========================================
+                // BOTTOM ADVERTISEMENT (For Normal/Polaroid/Stickers)
+                // ==========================================
+                if (!isPassport) {
+                    const footerY = printH; 
+
+                    ctx.fillStyle = '#22d3ee'; 
+                    ctx.fillRect(0, footerY, canvasW, footerH);
+                    
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 14;
+                    ctx.beginPath();
+                    ctx.moveTo(0, footerY);
+                    ctx.lineTo(canvasW, footerY);
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#000000';
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'top';
+
+                    // Reduced font sizes and string length to prevent overlapping
+                    ctx.font = '900 65px "Inter", sans-serif';
+                    ctx.fillText("PRINT STICKERS, POLAROIDS & MORE!", 80, footerY + 80);
+
+                    ctx.font = '800 45px "Inter", sans-serif';
+                    ctx.fillText("Order via deluluprinter.xyz  |  WhatsApp: 9907488075", 80, footerY + 180);
+
+                    ctx.fillStyle = '#facc15'; 
+                    ctx.fillRect(70, footerY + 280, 950, 90);
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 6;
+                    ctx.strokeRect(70, footerY + 280, 950, 90);
+                    
+                    ctx.fillStyle = '#000000';
+                    ctx.font = '900 40px "Inter", sans-serif';
+                    ctx.fillText("💥 STARTS AT JUST ₹10 FOR COLOUR PRINTS!", 100, footerY + 305);
+
+                    // Shift QRs to the right and scale slightly to ensure padding
+                    const drawQrBlock = (img, x, label) => {
+                        const qrSize = 220;
+                        const qrY = footerY + 70;
+                        
+                        ctx.fillStyle = '#000000';
+                        ctx.fillRect(x + 10, qrY + 10, qrSize, qrSize);
+                        
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(x, qrY, qrSize, qrSize);
+                        ctx.lineWidth = 6;
+                        ctx.strokeStyle = '#000000';
+                        ctx.strokeRect(x, qrY, qrSize, qrSize);
+
+                        if(img) {
+                            ctx.drawImage(img, x + 15, qrY + 15, qrSize - 30, qrSize - 30);
+                        } else {
+                            ctx.fillStyle = '#000000';
+                            ctx.font = '700 30px "Inter", sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText("QR", x + qrSize/2, qrY + qrSize/2);
+                            ctx.textAlign = 'left';
+                            ctx.textBaseline = 'top';
+                        }
+
+                        ctx.fillStyle = '#000000';
+                        ctx.font = '900 24px "Inter", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(label, x + qrSize/2, qrY + qrSize + 25);
+                        ctx.textAlign = 'left'; 
+                    };
+
+                    drawQrBlock(priceQrImg, canvasW - 650, "SCAN FOR PRICE");
+                    drawQrBlock(orderQrImg, canvasW - 330, "SCAN TO ORDER");
+                }
+
+                // ==========================================
+
+                const finalImageUrl = canvas.toDataURL('image/jpeg', 0.95);
+                previewImg.src = finalImageUrl;
+                downloadBtn.href = finalImageUrl;
+
+                previewImg.classList.remove('hidden');
+                actionButtons.classList.remove('hidden');
+                actionButtons.style.display = 'flex';
+
+            } catch (error) {
+                alert('Error processing: ' + error.message);
+                placeholderText.classList.remove('hidden');
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.classList.remove('opacity-50');
+                loading.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
