@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delulu Printer - Spin Kiosk</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #fafaf8;
+            background-image: radial-gradient(#d1d5db 2px, transparent 2px);
+            background-size: 32px 32px;
+            overflow: hidden; /* Prevents scrolling for kiosk mode */
+            user-select: none; /* Prevents text highlighting */
+        }
+        
+        .neo-border { border: 6px solid #000; }
+        
+        .neo-shadow {
+            box-shadow: 12px 12px 0px 0px rgba(0,0,0,1);
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .neo-shadow:active {
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+            transform: translate(8px, 8px);
+        }
+
+        /* Custom Colors */
+        .bg-delulu-yellow { background-color: #ffde00; }
+        .bg-delulu-cyan { background-color: #00f0ff; }
+        .bg-delulu-magenta { background-color: #ff00ff; }
+        .bg-delulu-green { background-color: #00e676; }
+        .bg-delulu-purple { background-color: #d500f9; }
+
+        /* Animations */
+        @keyframes pulse-fast {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .animate-kiosk-pulse { animation: pulse-fast 1.5s infinite; }
+
+        @keyframes slot-spin {
+            0% { transform: translateY(-50px) scale(0.9); opacity: 0; }
+            50% { transform: translateY(0px) scale(1.1); opacity: 1; }
+            100% { transform: translateY(50px) scale(0.9); opacity: 0; }
+        }
+
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            width: 100%;
+            background: #000;
+            color: #fff;
+            padding: 10px 0;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            border-top: 4px solid #fff;
+            z-index: 50;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: 0.1em;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* UI States */
+        .screen { display: none; }
+        .screen.active { display: flex; }
+
+        .disabled-prize {
+            opacity: 0.3;
+            filter: grayscale(100%);
+            transform: scale(0.95);
+            pointer-events: none;
+            border-color: #ccc;
+        }
+
+        .selected-prize {
+            transform: scale(1.05);
+            box-shadow: 16px 16px 0px 0px rgba(0,0,0,1) !important;
+            border-color: #000;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col items-center justify-center relative">
+
+    <!-- TOP BAR -->
+    <div class="absolute top-8 left-8 right-8 flex justify-between items-center z-50">
+        <div class="bg-black text-white px-6 py-2 rounded-full font-black text-2xl neo-border border-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+            deluluprinter.xyz
+        </div>
+        <div class="bg-delulu-yellow px-6 py-2 rounded-full font-bold text-xl neo-border shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex items-center gap-2">
+            <i data-lucide="zap" class="w-6 h-6"></i> In-Store Kiosk
+        </div>
+    </div>
+
+    <!-- SCREEN 1: IDLE -->
+    <div id="screen-idle" class="screen active flex-col items-center justify-center w-full max-w-4xl px-8 z-10 relative">
+        <h1 class="text-7xl md:text-9xl font-black mb-6 text-center leading-tight tracking-tighter">
+            FEELING <span class="bg-delulu-cyan px-4 py-2 inline-block neo-border rotate-3 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">LUCKY?</span>
+        </h1>
+        <p class="text-3xl font-bold mb-16 text-gray-700 text-center">Tap the button to test your delusion.</p>
+        
+        <button onclick="switchScreen('screen-follow')" class="animate-kiosk-pulse bg-delulu-magenta text-white neo-border rounded-[3rem] px-20 py-10 text-5xl font-black neo-shadow hover:bg-black transition-colors duration-300 flex items-center gap-6">
+            <i data-lucide="dices" class="w-16 h-16"></i>
+            TAP TO SPIN
+        </button>
+    </div>
+
+    <!-- SCREEN 2: FOLLOW CHECK -->
+    <div id="screen-follow" class="screen flex-col items-center justify-center w-full max-w-3xl px-8 z-10 bg-white p-16 rounded-[3rem] neo-border shadow-[20px_20px_0px_0px_rgba(0,0,0,1)]">
+        <div class="bg-delulu-cyan w-24 h-24 rounded-full flex items-center justify-center mb-8 neo-border shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+            <i data-lucide="instagram" class="w-12 h-12"></i>
+        </div>
+        <h2 class="text-6xl font-black mb-6 text-center">Hold up.</h2>
+        <p class="text-3xl font-bold mb-12 text-gray-600 text-center leading-relaxed">Are you following <span class="text-black bg-delulu-yellow px-2 neo-border border-2">@deluluprinter</span> on Instagram?</p>
+        
+        <div class="flex flex-col w-full gap-6">
+            <button onclick="handleFollow(true)" class="bg-delulu-green text-black neo-border p-8 rounded-2xl font-black text-3xl hover:bg-white neo-shadow transition-all text-center">
+                YES, I'M LOYAL 💅
+            </button>
+            <button onclick="handleFollow(false)" class="bg-gray-200 text-gray-500 neo-border border-gray-400 p-6 rounded-2xl font-bold text-2xl hover:bg-gray-300 transition-colors text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)]">
+                No, I like paying full price 🤡
+            </button>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: SPIN & RESULT -->
+    <div id="screen-spin" class="screen flex-col items-center justify-center w-full max-w-6xl px-8 z-10 relative">
+        <h2 id="spin-title" class="text-5xl md:text-7xl font-black mb-4 text-center">The Wheel of Delusion</h2>
+        <p id="spin-subtitle" class="text-2xl md:text-3xl font-bold mb-12 text-gray-600 text-center h-10">Generating prizes...</p>
+
+        <!-- Slot Machine Boxes -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 w-full h-[300px]">
+            
+            <!-- Box 0 -->
+            <div id="box-0" class="h-full rounded-[2rem] neo-border shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] bg-white flex flex-col items-center justify-center p-6 cursor-pointer transition-all duration-300 overflow-hidden relative" onclick="selectPrize(0)">
+                <div class="prize-content hidden flex-col items-center text-center w-full">
+                    <span class="text-7xl mb-4 icon-slot">❓</span>
+                    <h3 class="font-black text-3xl md:text-4xl leading-tight text-slot uppercase">???</h3>
+                </div>
+                <div class="spin-animation flex flex-col items-center w-full absolute">
+                    <span class="text-8xl mb-4 animate-pulse">🎰</span>
+                </div>
+            </div>
+
+            <!-- Box 1 -->
+            <div id="box-1" class="h-full rounded-[2rem] neo-border shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] bg-white flex flex-col items-center justify-center p-6 cursor-pointer transition-all duration-300 overflow-hidden relative" onclick="selectPrize(1)">
+                <div class="prize-content hidden flex-col items-center text-center w-full">
+                    <span class="text-7xl mb-4 icon-slot">❓</span>
+                    <h3 class="font-black text-3xl md:text-4xl leading-tight text-slot uppercase">???</h3>
+                </div>
+                <div class="spin-animation flex flex-col items-center w-full absolute">
+                    <span class="text-8xl mb-4 animate-pulse delay-75">🎰</span>
+                </div>
+            </div>
+
+            <!-- Box 2 -->
+            <div id="box-2" class="h-full rounded-[2rem] neo-border shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] bg-white flex flex-col items-center justify-center p-6 cursor-pointer transition-all duration-300 overflow-hidden relative" onclick="selectPrize(2)">
+                <div class="prize-content hidden flex-col items-center text-center w-full">
+                    <span class="text-7xl mb-4 icon-slot">❓</span>
+                    <h3 class="font-black text-3xl md:text-4xl leading-tight text-slot uppercase">???</h3>
+                </div>
+                <div class="spin-animation flex flex-col items-center w-full absolute">
+                    <span class="text-8xl mb-4 animate-pulse delay-150">🎰</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Final Code Display -->
+        <div id="final-code-area" class="hidden flex-col items-center bg-black text-white px-16 py-8 rounded-3xl neo-border border-white shadow-[12px_12px_0px_0px_rgba(255,255,255,1)] animate-bounce mt-4">
+            <p class="text-2xl font-bold mb-2 text-delulu-cyan">SHOW THIS TO THE COUNTER:</p>
+            <h1 class="text-7xl font-black tracking-widest text-delulu-yellow" id="winning-code">CODE</h1>
+            <p class="mt-4 text-gray-400 font-bold" id="reset-timer">Resetting in 15s...</p>
+        </div>
+    </div>
+
+    <!-- MARQUEE -->
+    <div class="marquee-container">
+        <div class="marquee-content">
+            ✦ NO MATH REQUIRED PRICING ✦ DELULUPRINTER.XYZ ✦ PREMIUM QUALITY ✦ ZERO DRAMA ✦ FOLLOW US @DELULUPRINTER ✦ 
+            NO MATH REQUIRED PRICING ✦ DELULUPRINTER.XYZ ✦ PREMIUM QUALITY ✦ ZERO DRAMA ✦ FOLLOW US @DELULUPRINTER ✦
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Game State
+        let isFollowing = false;
+        let isSpinning = false;
+        let hasSpun = false;
+        let currentPrizes = [];
+        let resetInterval;
+
+        // Probabilities: 97% Tier 1, 3% Tier 2, 0.01% Tier 3
+        const prizePool = {
+            tier1: [
+                { text: "₹10 Off Order", value: 10, bg: "bg-delulu-yellow", icon: "🪙", textCol: "text-black" },
+                { text: "Free B&W Page", value: 10, bg: "bg-gray-200", icon: "📄", textCol: "text-black" },
+                { text: "₹15 Off Order", value: 15, bg: "bg-delulu-cyan", icon: "💵", textCol: "text-black" },
+                { text: "1 Free Sticker", value: 15, bg: "bg-white", icon: "✨", textCol: "text-black" }
+            ],
+            tier2: [
+                { text: "₹30 Off Order", value: 30, bg: "bg-delulu-magenta", icon: "🔥", textCol: "text-white" },
+                { text: "Free Photo", value: 80, bg: "bg-black", icon: "📸", textCol: "text-white" },
+                { text: "Sticker Sheet", value: 40, bg: "bg-delulu-green", icon: "🌟", textCol: "text-black" }
+            ],
+            tier3: [
+                { text: "50% OFF ORDER", value: 500, bg: "bg-delulu-purple", icon: "🤯", textCol: "text-white" },
+                { text: "BUY 1 GET 1 TEE", value: 250, bg: "bg-black", icon: "👕", textCol: "text-white" }
+            ]
+        };
+
+        function rollPrize() {
+            const rand = Math.random();
+            if (rand < 0.0001) return prizePool.tier3[Math.floor(Math.random() * prizePool.tier3.length)]; // 0.01%
+            if (rand < 0.0301) return prizePool.tier2[Math.floor(Math.random() * prizePool.tier2.length)]; // 3%
+            return prizePool.tier1[Math.floor(Math.random() * prizePool.tier1.length)]; // 97%
+        }
+
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function handleFollow(answer) {
+            isFollowing = answer;
+            switchScreen('screen-spin');
+            startSlotMachine();
+        }
+
+        function startSlotMachine() {
+            isSpinning = true;
+            
+            // Generate and sort prizes (index 0 is lowest value)
+            currentPrizes = [rollPrize(), rollPrize(), rollPrize()].sort((a, b) => a.value - b.value);
+
+            const title = document.getElementById('spin-title');
+            const subtitle = document.getElementById('spin-subtitle');
+            title.innerText = "SPINNING...";
+            subtitle.innerText = "Calculating delusion levels...";
+            subtitle.className = "text-2xl md:text-3xl font-bold mb-12 text-gray-600 text-center h-10 animate-pulse";
+
+            const boxes = [document.getElementById('box-0'), document.getElementById('box-1'), document.getElementById('box-2')];
+            
+            // Rapid visual shuffle effect (Slot machine style)
+            let shuffleCount = 0;
+            const dummyIcons = ["💸", "🔥", "✨", "💀", "🤡", "🚀", "🎨", "👕"];
+            const dummyColors = ["bg-delulu-yellow", "bg-delulu-cyan", "bg-delulu-magenta", "bg-delulu-green", "bg-white", "bg-black"];
+            
+            const shuffleInterval = setInterval(() => {
+                boxes.forEach((box, i) => {
+                    // Only shuffle if it hasn't "landed" yet
+                    if(shuffleCount < (15 + (i*5))) { 
+                        box.className = `h-full rounded-[2rem] neo-border shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center justify-center p-6 relative overflow-hidden ${dummyColors[Math.floor(Math.random() * dummyColors.length)]}`;
+                        box.querySelector('.spin-animation span').innerText = dummyIcons[Math.floor(Math.random() * dummyIcons.length)];
+                    }
+                });
+                
+                shuffleCount++;
+                
+                // Stop shuffling completely after longest box finishes
+                if(shuffleCount > 30) {
+                    clearInterval(shuffleInterval);
+                    revealPrizes(boxes);
+                }
+            }, 100);
+        }
+
+        function revealPrizes(boxes) {
+            boxes.forEach((box, i) => {
+                const prizeInfo = currentPrizes[i];
+                
+                // Swap visibility
+                box.querySelector('.spin-animation').classList.add('hidden');
+                const content = box.querySelector('.prize-content');
+                content.classList.remove('hidden');
+                content.classList.add('flex');
+                
+                // Apply final prize data
+                box.querySelector('.icon-slot').innerText = prizeInfo.icon;
+                box.querySelector('.text-slot').innerText = prizeInfo.text;
+                
+                // Apply final styles
+                box.className = `h-full rounded-[2rem] neo-border shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center justify-center p-6 cursor-pointer transition-all duration-300 overflow-hidden relative ${prizeInfo.bg} ${prizeInfo.textCol}`;
+                
+                // Ensure border contrast for dark backgrounds
+                if(prizeInfo.bg === 'bg-black' || prizeInfo.bg === 'bg-delulu-purple') {
+                    box.style.borderColor = "#fff";
+                } else {
+                    box.style.borderColor = "#000";
+                }
+            });
+
+            isSpinning = false;
+            hasSpun = true;
+
+            // Handle Logic based on Follow state
+            const title = document.getElementById('spin-title');
+            const subtitle = document.getElementById('spin-subtitle');
+
+            if (isFollowing) {
+                title.innerText = "CHOOSE YOUR PRIZE";
+                subtitle.innerText = "You're loyal. Tap the one you want to keep.";
+                subtitle.className = "text-2xl md:text-3xl font-black mb-12 text-delulu-green text-center h-10";
+            } else {
+                title.innerText = "NO LOYALTY DETECTED 🤡";
+                subtitle.innerText = "We picked for you. Enjoy the worst prize on the board.";
+                subtitle.className = "text-2xl md:text-3xl font-black mb-12 text-red-600 text-center h-10";
+                
+                // Auto punish - 1.5s delay for dramatic effect
+                setTimeout(() => { selectPrize(0, true); }, 1500);
+            }
+        }
+
+        function selectPrize(index, autoSelected = false) {
+            if (!hasSpun || isSpinning || document.getElementById('final-code-area').classList.contains('flex')) return;
+            
+            if (!isFollowing && !autoSelected) {
+                // If they try to tap when they shouldn't
+                const subtitle = document.getElementById('spin-subtitle');
+                subtitle.innerText = "AH AH AH! WE CHOOSE FOR NON-FOLLOWERS!";
+                subtitle.classList.add('animate-bounce');
+                return;
+            }
+
+            // Visual feedback for selection
+            for(let i=0; i<3; i++) {
+                const box = document.getElementById(`box-${i}`);
+                if (i === index) {
+                    box.classList.add('selected-prize');
+                } else {
+                    box.classList.add('disabled-prize');
+                }
+            }
+
+            // Generate Code and Show Area
+            const code = "DL-" + Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('winning-code').innerText = code;
+            document.getElementById('final-code-area').classList.remove('hidden');
+            document.getElementById('final-code-area').classList.add('flex');
+            
+            document.getElementById('spin-subtitle').innerText = "Screenshot or tell the counter your code!";
+            document.getElementById('spin-subtitle').className = "text-2xl md:text-3xl font-black mb-6 text-black text-center h-10";
+
+            // Start Kiosk Reset Timer (15 seconds)
+            startResetTimer(15);
+        }
+
+        function startResetTimer(seconds) {
+            let timeLeft = seconds;
+            const timerEl = document.getElementById('reset-timer');
+            timerEl.innerText = `System resetting in ${timeLeft}s...`;
+
+            resetInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.innerText = `System resetting in ${timeLeft}s...`;
+                
+                if(timeLeft <= 0) {
+                    clearInterval(resetInterval);
+                    resetKiosk();
+                }
+            }, 1000);
+        }
+
+        function resetKiosk() {
+            // Reset state variables
+            isFollowing = false;
+            isSpinning = false;
+            hasSpun = false;
+            currentPrizes = [];
+
+            // Hide Code Area
+            document.getElementById('final-code-area').classList.add('hidden');
+            document.getElementById('final-code-area').classList.remove('flex');
+
+            // Reset Boxes visually
+            for(let i=0; i<3; i++) {
+                const box = document.getElementById(`box-${i}`);
+                box.className = `h-full rounded-[2rem] neo-border shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] bg-white flex flex-col items-center justify-center p-6 relative overflow-hidden`;
+                box.style.borderColor = "#000";
+                
+                box.querySelector('.spin-animation').classList.remove('hidden');
+                box.querySelector('.spin-animation span').innerText = '🎰';
+                box.querySelector('.prize-content').classList.add('hidden');
+                box.querySelector('.prize-content').classList.remove('flex');
+            }
+
+            // Go back to screen 1
+            switchScreen('screen-idle');
+        }
+
+    </script>
+</body>
+</html>
