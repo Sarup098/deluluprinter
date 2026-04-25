@@ -356,12 +356,23 @@
             icon.classList.add('animate-spin');
             lucide.createIcons();
 
+            // PERFORMANCE FIX: Temporarily remove expensive radial background and box shadow for capture
+            const originalBg = wrapper.style.backgroundImage;
+            const originalShadow = wrapper.style.boxShadow;
+            wrapper.style.backgroundImage = 'none';
+            wrapper.style.boxShadow = 'none';
+
             // Using html2canvas to capture the designated area
             html2canvas(wrapper, {
-                scale: 2, // High quality 
+                scale: 1.5, // Reduced slightly from 2x. 1.5x is much faster and still perfect for A4 printing
                 backgroundColor: '#fafaf8',
+                logging: false, // Disabling console logs speeds up processing
                 useCORS: true
             }).then(canvas => {
+                // Restore expensive styles immediately after capture
+                wrapper.style.backgroundImage = originalBg;
+                wrapper.style.boxShadow = originalShadow;
+
                 // Create a temporary link element to trigger the download
                 const link = document.createElement('a');
                 link.download = 'Delulu-Printer-Pricing.png';
@@ -376,6 +387,10 @@
                 lucide.createIcons();
             }).catch(err => {
                 console.error("Error saving image:", err);
+                // Restore expensive styles on error too
+                wrapper.style.backgroundImage = originalBg;
+                wrapper.style.boxShadow = originalShadow;
+
                 btnText.innerText = "Failed!";
                 icon.classList.remove('animate-spin');
                 icon.setAttribute('data-lucide', 'x');
