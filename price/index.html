@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Add html2canvas for image saving functionality -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --a4-width: 210mm;
@@ -69,6 +71,8 @@
                 /* Strip background pattern for cleaner printing */
                 background-image: none; 
             }
+            /* Hide the download button when printing */
+            #downloadBtn { display: none !important; }
             /* Ensure neo shadows print properly */
             .neo-shadow { box-shadow: 4px 4px 0px 0px rgba(0,0,0,1) !important; }
             .receipt-shadow { box-shadow: 6px 6px 0px 0px rgba(255,0,255,0.3) !important; }
@@ -103,7 +107,7 @@
 </head>
 <body class="text-black antialiased selection:bg-black selection:text-white pb-0">
 
-    <div class="a4-wrapper">
+    <div class="a4-wrapper" id="capture-area">
         
         <!-- HEADER -->
         <header class="text-center mb-6 pt-4 md:pt-0 shrink-0">
@@ -330,8 +334,62 @@
 
     </div>
 
+    <!-- Floating Save Image Button -->
+    <button id="downloadBtn" onclick="saveAsImage()" class="fixed bottom-6 right-6 bg-delulu-cyan text-black px-5 py-3 rounded-full font-bold flex items-center gap-2 neo-border neo-shadow z-50 group hover:-translate-y-1 transition-all">
+        <i data-lucide="download" class="w-5 h-5 group-hover:animate-bounce"></i>
+        <span id="downloadText">Save Flyer</span>
+    </button>
+
     <script>
         lucide.createIcons();
+
+        function saveAsImage() {
+            const wrapper = document.getElementById('capture-area');
+            const btnText = document.getElementById('downloadText');
+            const icon = document.querySelector('#downloadBtn i');
+            
+            // UI Feedback to show it's working
+            const originalText = btnText.innerText;
+            btnText.innerText = "Saving...";
+            icon.classList.remove('group-hover:animate-bounce');
+            icon.setAttribute('data-lucide', 'loader');
+            icon.classList.add('animate-spin');
+            lucide.createIcons();
+
+            // Using html2canvas to capture the designated area
+            html2canvas(wrapper, {
+                scale: 2, // High quality 
+                backgroundColor: '#fafaf8',
+                useCORS: true
+            }).then(canvas => {
+                // Create a temporary link element to trigger the download
+                const link = document.createElement('a');
+                link.download = 'Delulu-Printer-Pricing.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                // Restore Button UI
+                btnText.innerText = originalText;
+                icon.classList.remove('animate-spin');
+                icon.setAttribute('data-lucide', 'download');
+                icon.classList.add('group-hover:animate-bounce');
+                lucide.createIcons();
+            }).catch(err => {
+                console.error("Error saving image:", err);
+                btnText.innerText = "Failed!";
+                icon.classList.remove('animate-spin');
+                icon.setAttribute('data-lucide', 'x');
+                lucide.createIcons();
+                
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    btnText.innerText = originalText;
+                    icon.setAttribute('data-lucide', 'download');
+                    icon.classList.add('group-hover:animate-bounce');
+                    lucide.createIcons();
+                }, 2000);
+            });
+        }
     </script>
 </body>
 </html>
