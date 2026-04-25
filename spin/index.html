@@ -13,8 +13,8 @@
             background-color: #fafaf8;
             background-image: radial-gradient(#d1d5db 2px, transparent 2px);
             background-size: 32px 32px;
-            overflow: hidden; /* Prevents scrolling for kiosk mode */
-            user-select: none; /* Prevents text highlighting */
+            overflow: hidden;
+            user-select: none;
         }
         
         .neo-border { border: 6px solid #000; }
@@ -36,18 +36,11 @@
         .bg-delulu-green { background-color: #00e676; }
         .bg-delulu-purple { background-color: #d500f9; }
 
-        /* Animations */
         @keyframes pulse-fast {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
         }
         .animate-kiosk-pulse { animation: pulse-fast 1.5s infinite; }
-
-        @keyframes slot-spin {
-            0% { transform: translateY(-50px) scale(0.9); opacity: 0; }
-            50% { transform: translateY(0px) scale(1.1); opacity: 1; }
-            100% { transform: translateY(50px) scale(0.9); opacity: 0; }
-        }
 
         .marquee-container {
             overflow: hidden;
@@ -76,7 +69,6 @@
             100% { transform: translateX(-50%); }
         }
 
-        /* UI States */
         .screen { display: none; }
         .screen.active { display: flex; }
 
@@ -91,8 +83,114 @@
         .selected-prize {
             transform: scale(1.05);
             box-shadow: 16px 16px 0px 0px rgba(0,0,0,1) !important;
-            border-color: #000;
+            border-color: #000 !important;
             z-index: 10;
+        }
+
+        /* --- NEW CASINO SLOT MACHINE STYLES --- */
+        .casino-machine {
+            background: #111;
+            border: 12px solid #ffde00;
+            border-radius: 3rem;
+            padding: 2rem;
+            box-shadow: 
+                inset 0 0 40px rgba(0,0,0,0.8),
+                0 20px 0 #b39b00,
+                0 30px 40px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .payline {
+            position: absolute;
+            top: 50%;
+            left: -10px;
+            right: -10px;
+            height: 6px;
+            background: rgba(255, 0, 0, 0.8);
+            z-index: 20;
+            box-shadow: 0 0 15px red, 0 0 5px red;
+            pointer-events: none;
+            transform: translateY(-50%);
+            border-radius: 10px;
+        }
+
+        .slot-blur {
+            filter: blur(4px) brightness(1.1);
+        }
+
+        @keyframes slotFlash {
+            0% { background-color: #fff; box-shadow: inset 0 0 100px #fff, 0 0 50px #fff; z-index: 30;}
+            100% { background-color: transparent; box-shadow: none; z-index: 1;}
+        }
+        
+        .slot-stop-flash {
+            animation: slotFlash 0.5s ease-out;
+        }
+
+        .arcade-btn {
+            background-color: #ff0044;
+            color: white;
+            box-shadow: 0 12px 0 #990029, 0 15px 20px rgba(0,0,0,0.4);
+            transition: all 0.1s;
+        }
+        
+        .arcade-btn:active, .arcade-btn.pressed {
+            transform: translateY(12px);
+            box-shadow: 0 0 0 #990029, 0 0 5px rgba(0,0,0,0.4);
+        }
+        
+        .light-bulb {
+            width: 20px; height: 20px; border-radius: 50%;
+            background: #fff; box-shadow: 0 0 10px #fff;
+            animation: blink 0.5s infinite alternate;
+        }
+        
+        @keyframes blink { 0% { opacity: 0.2; } 100% { opacity: 1; } }
+
+        /* Casino Slot Reel Styles */
+        .slot-box {
+            height: 300px;
+            overflow: hidden;
+            position: relative;
+            background: #fff;
+        }
+        
+        .slot-box::before, .slot-box::after {
+            content: '';
+            position: absolute;
+            left: 0; right: 0;
+            height: 40px;
+            z-index: 5;
+            pointer-events: none;
+        }
+        .slot-box::before {
+            top: 0;
+            background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+        }
+        .slot-box::after {
+            bottom: 0;
+            background: linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+        }
+
+        .reel-strip {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            /* The transition timing is the secret sauce for the "near miss" slip */
+            transition: transform cubic-bezier(0.1, 0.85, 0.15, 1);
+        }
+
+        .reel-item {
+            height: 300px; /* Must match .slot-box */
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            text-align: center;
+            padding: 1rem;
+            border-bottom: 2px dashed rgba(0,0,0,0.1);
         }
     </style>
 </head>
@@ -103,8 +201,13 @@
         <div class="bg-black text-white px-6 py-2 rounded-full font-black text-2xl neo-border border-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
             deluluprinter.xyz
         </div>
-        <div class="bg-delulu-yellow px-6 py-2 rounded-full font-bold text-xl neo-border shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex items-center gap-2">
-            <i data-lucide="zap" class="w-6 h-6"></i> In-Store Kiosk
+        <div class="flex gap-4">
+            <div id="respin-counter" class="hidden bg-delulu-magenta text-white px-6 py-2 rounded-full font-bold text-xl neo-border shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] items-center gap-2">
+                Respin Debt: ₹<span id="debt-amount">0</span>
+            </div>
+            <div class="bg-delulu-yellow px-6 py-2 rounded-full font-bold text-xl neo-border shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] flex items-center gap-2">
+                <i data-lucide="zap" class="w-6 h-6"></i> In-Store Kiosk
+            </div>
         </div>
     </div>
 
@@ -141,52 +244,98 @@
 
     <!-- SCREEN 3: SPIN & RESULT -->
     <div id="screen-spin" class="screen flex-col items-center justify-center w-full max-w-6xl px-8 z-10 relative">
-        <h2 id="spin-title" class="text-5xl md:text-7xl font-black mb-4 text-center">The Wheel of Delusion</h2>
-        <p id="spin-subtitle" class="text-2xl md:text-3xl font-bold mb-12 text-gray-600 text-center h-10">Generating prizes...</p>
+        <div class="flex justify-between items-end w-full mb-4">
+            <div class="text-left w-1/3">
+                <div id="delulu-score-container" class="hidden bg-white neo-border px-4 py-2 rounded-xl inline-block shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <p class="text-sm font-bold text-gray-500 uppercase">Luck Meter</p>
+                    <p class="text-3xl font-black text-delulu-purple"><span id="delulu-score">0</span>%</p>
+                </div>
+            </div>
+            <div class="text-center w-1/3">
+                <h2 id="spin-title" class="text-5xl md:text-7xl font-black text-center uppercase tracking-tighter">The Machine</h2>
+            </div>
+            <div class="text-right w-1/3"></div>
+        </div>
+        
+        <p id="spin-subtitle" class="text-2xl md:text-3xl font-bold mb-6 text-gray-600 text-center h-10">Hold on tight...</p>
 
-        <!-- Slot Machine Boxes -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 w-full h-[300px]">
+        <!-- The Casino Machine Wrapper -->
+        <div class="casino-machine w-full mb-8">
+            <!-- Flashing Lights Top -->
+            <div class="absolute -top-4 left-10 right-10 flex justify-between z-30">
+                <div class="light-bulb" style="animation-delay: 0s;"></div>
+                <div class="light-bulb" style="animation-delay: 0.2s;"></div>
+                <div class="light-bulb" style="animation-delay: 0.4s;"></div>
+                <div class="light-bulb" style="animation-delay: 0.1s;"></div>
+                <div class="light-bulb" style="animation-delay: 0.5s;"></div>
+                <div class="light-bulb" style="animation-delay: 0.3s;"></div>
+            </div>
             
-            <!-- Box 0 -->
-            <div id="box-0" class="h-full rounded-[2rem] neo-border shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] bg-white flex flex-col items-center justify-center p-6 cursor-pointer transition-all duration-300 overflow-hidden relative" onclick="selectPrize(0)">
-                <div class="prize-content hidden flex-col items-center text-center w-full">
-                    <span class="text-7xl mb-4 icon-slot">❓</span>
-                    <h3 class="font-black text-3xl md:text-4xl leading-tight text-slot uppercase">???</h3>
-                </div>
-                <div class="spin-animation flex flex-col items-center w-full absolute">
-                    <span class="text-8xl mb-4 animate-pulse">🎰</span>
-                </div>
-            </div>
+            <!-- Red Payline (hidden until stop) -->
+            <div class="payline hidden" id="payline"></div>
 
-            <!-- Box 1 -->
-            <div id="box-1" class="h-full rounded-[2rem] neo-border shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] bg-white flex flex-col items-center justify-center p-6 cursor-pointer transition-all duration-300 overflow-hidden relative" onclick="selectPrize(1)">
-                <div class="prize-content hidden flex-col items-center text-center w-full">
-                    <span class="text-7xl mb-4 icon-slot">❓</span>
-                    <h3 class="font-black text-3xl md:text-4xl leading-tight text-slot uppercase">???</h3>
+            <!-- Slot Machine Boxes -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full relative z-10">
+                
+                <!-- Box 0 -->
+                <div id="box-0" class="slot-box rounded-[2rem] border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] cursor-pointer transition-all duration-300" onclick="selectPrize(0)">
+                    <div class="reel-strip" id="reel-0">
+                        <div class="reel-item bg-gray-100 text-black">
+                            <span class="text-7xl mb-4">🎰</span>
+                            <h3 class="font-black text-3xl uppercase">WAITING</h3>
+                        </div>
+                    </div>
                 </div>
-                <div class="spin-animation flex flex-col items-center w-full absolute">
-                    <span class="text-8xl mb-4 animate-pulse delay-75">🎰</span>
-                </div>
-            </div>
 
-            <!-- Box 2 -->
-            <div id="box-2" class="h-full rounded-[2rem] neo-border shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] bg-white flex flex-col items-center justify-center p-6 cursor-pointer transition-all duration-300 overflow-hidden relative" onclick="selectPrize(2)">
-                <div class="prize-content hidden flex-col items-center text-center w-full">
-                    <span class="text-7xl mb-4 icon-slot">❓</span>
-                    <h3 class="font-black text-3xl md:text-4xl leading-tight text-slot uppercase">???</h3>
+                <!-- Box 1 -->
+                <div id="box-1" class="slot-box rounded-[2rem] border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] cursor-pointer transition-all duration-300" onclick="selectPrize(1)">
+                    <div class="reel-strip" id="reel-1">
+                        <div class="reel-item bg-gray-100 text-black">
+                            <span class="text-7xl mb-4">🎰</span>
+                            <h3 class="font-black text-3xl uppercase">WAITING</h3>
+                        </div>
+                    </div>
                 </div>
-                <div class="spin-animation flex flex-col items-center w-full absolute">
-                    <span class="text-8xl mb-4 animate-pulse delay-150">🎰</span>
-                </div>
-            </div>
 
+                <!-- Box 2 -->
+                <div id="box-2" class="slot-box rounded-[2rem] border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] cursor-pointer transition-all duration-300" onclick="selectPrize(2)">
+                    <div class="reel-strip" id="reel-2">
+                        <div class="reel-item bg-gray-100 text-black">
+                            <span class="text-7xl mb-4">🎰</span>
+                            <h3 class="font-black text-3xl uppercase">WAITING</h3>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- Flashing Lights Bottom -->
+            <div class="absolute -bottom-4 left-10 right-10 flex justify-between z-30">
+                <div class="light-bulb" style="animation-delay: 0.4s;"></div>
+                <div class="light-bulb" style="animation-delay: 0.1s;"></div>
+                <div class="light-bulb" style="animation-delay: 0.3s;"></div>
+                <div class="light-bulb" style="animation-delay: 0.5s;"></div>
+                <div class="light-bulb" style="animation-delay: 0.2s;"></div>
+                <div class="light-bulb" style="animation-delay: 0s;"></div>
+            </div>
         </div>
 
-        <!-- Final Code Display -->
-        <div id="final-code-area" class="hidden flex-col items-center bg-black text-white px-16 py-8 rounded-3xl neo-border border-white shadow-[12px_12px_0px_0px_rgba(255,255,255,1)] animate-bounce mt-4">
-            <p class="text-2xl font-bold mb-2 text-delulu-cyan">SHOW THIS TO THE COUNTER:</p>
-            <h1 class="text-7xl font-black tracking-widest text-delulu-yellow" id="winning-code">CODE</h1>
-            <p class="mt-4 text-gray-400 font-bold" id="reset-timer">Resetting in 15s...</p>
+        <!-- Action Area (Code / Respin) -->
+        <div id="final-action-area" class="hidden w-full max-w-4xl flex gap-6">
+            
+            <!-- Code Display -->
+            <div class="flex-1 flex-col justify-center items-center bg-black text-white px-8 py-6 rounded-3xl neo-border border-white shadow-[12px_12px_0px_0px_rgba(255,255,255,1)]">
+                <p class="text-xl font-bold mb-1 text-delulu-cyan">SHOW THIS CODE AT COUNTER:</p>
+                <h1 class="text-5xl lg:text-6xl font-black tracking-widest text-delulu-yellow" id="winning-code">CODE</h1>
+                <p class="mt-2 text-gray-400 font-bold" id="reset-timer">Resetting in 15s...</p>
+            </div>
+
+            <!-- Respin Option (Arcade Style) -->
+            <button id="respin-btn" onclick="executeRespin()" class="flex-1 flex-col justify-center items-center arcade-btn px-8 py-6 rounded-3xl border-4 border-black group relative overflow-hidden">
+                <div class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                <h2 class="text-4xl font-black mb-1 relative z-10 text-white shadow-black drop-shadow-md">RESPIN? 🎰</h2>
+                <p class="text-xl font-bold text-white/90 relative z-10 bg-black/30 px-3 py-1 rounded-full">+₹10 (VIP 50/50 ODDS)</p>
+            </button>
         </div>
     </div>
 
@@ -206,32 +355,57 @@
         let isSpinning = false;
         let hasSpun = false;
         let currentPrizes = [];
+        let respinCount = 0;
         let resetInterval;
+        let meterInterval; // NEW: Tracks the crazy jumping numbers
 
-        // Probabilities: 97% Tier 1, 3% Tier 2, 0.01% Tier 3
+        // Expanded Prize Pool
         const prizePool = {
             tier1: [
-                { text: "₹10 Off Order", value: 10, bg: "bg-delulu-yellow", icon: "🪙", textCol: "text-black" },
-                { text: "Free B&W Page", value: 10, bg: "bg-gray-200", icon: "📄", textCol: "text-black" },
-                { text: "₹15 Off Order", value: 15, bg: "bg-delulu-cyan", icon: "💵", textCol: "text-black" },
-                { text: "1 Free Sticker", value: 15, bg: "bg-white", icon: "✨", textCol: "text-black" }
+                { text: "Stickers at ₹20", bg: "bg-delulu-yellow", icon: "✨", textCol: "text-black" },
+                { text: "₹5 Off Any Print", bg: "bg-gray-200", icon: "🪙", textCol: "text-black" },
+                { text: "Free B&W Page", bg: "bg-white", icon: "📄", textCol: "text-black" },
+                { text: "₹10 Off Order", bg: "bg-delulu-cyan", icon: "💵", textCol: "text-black" },
+                { text: "1 Free Die-Cut", bg: "bg-delulu-green", icon: "👾", textCol: "text-black" },
+                { text: "Passport Pics ₹45", bg: "bg-delulu-magenta", icon: "📸", textCol: "text-white" },
+                { text: "Polaroids at ₹60", bg: "bg-delulu-yellow", icon: "🖼️", textCol: "text-black" },
+                { text: "₹5 Off Tote Bag", bg: "bg-white", icon: "🛍️", textCol: "text-black" },
+                { text: "Free Meme Sticker", bg: "bg-delulu-cyan", icon: "🤡", textCol: "text-black" },
+                { text: "Glossy Photo ₹70", bg: "bg-delulu-magenta", icon: "✨", textCol: "text-white" },
+                { text: "Premium Stick ₹35", bg: "bg-delulu-green", icon: "💎", textCol: "text-black" },
+                { text: "₹10 Off Apparel", bg: "bg-black", icon: "👕", textCol: "text-white" }
             ],
             tier2: [
-                { text: "₹30 Off Order", value: 30, bg: "bg-delulu-magenta", icon: "🔥", textCol: "text-white" },
-                { text: "Free Photo", value: 80, bg: "bg-black", icon: "📸", textCol: "text-white" },
-                { text: "Sticker Sheet", value: 40, bg: "bg-delulu-green", icon: "🌟", textCol: "text-black" }
+                { text: "A4 T-Shirt ₹200", bg: "bg-black", icon: "👕", textCol: "text-white" },
+                { text: "₹20 Off Order", bg: "bg-delulu-magenta", icon: "🔥", textCol: "text-white" },
+                { text: "Free Stick Sheet", bg: "bg-delulu-cyan", icon: "✨", textCol: "text-black" },
+                { text: "Polaroid Set ₹50", bg: "bg-delulu-yellow", icon: "📸", textCol: "text-black" },
+                { text: "Free Passport Set", bg: "bg-delulu-green", icon: "😎", textCol: "text-black" },
+                { text: "A5 T-Shirt ₹120", bg: "bg-white", icon: "👕", textCol: "text-black" },
+                { text: "Glossy Photo ₹50", bg: "bg-delulu-magenta", icon: "🖼️", textCol: "text-white" }
             ],
             tier3: [
-                { text: "50% OFF ORDER", value: 500, bg: "bg-delulu-purple", icon: "🤯", textCol: "text-white" },
-                { text: "BUY 1 GET 1 TEE", value: 250, bg: "bg-black", icon: "👕", textCol: "text-white" }
+                { text: "50% OFF ENTIRE ORDER", bg: "bg-delulu-purple", icon: "🤯", textCol: "text-white" },
+                { text: "BUY 1 GET 1 T-SHIRT", bg: "bg-black", icon: "👕", textCol: "text-white" },
+                { text: "FREE A4 T-SHIRT PRINT", bg: "bg-delulu-magenta", icon: "✨", textCol: "text-white" },
+                { text: "FREE POLAROID SET", bg: "bg-delulu-green", icon: "📸", textCol: "text-black" },
+                { text: "₹100 STORE CREDIT", bg: "bg-delulu-yellow", icon: "💳", textCol: "text-black" }
             ]
         };
 
-        function rollPrize() {
+        function rollPrize(isRespin) {
             const rand = Math.random();
-            if (rand < 0.0001) return prizePool.tier3[Math.floor(Math.random() * prizePool.tier3.length)]; // 0.01%
-            if (rand < 0.0301) return prizePool.tier2[Math.floor(Math.random() * prizePool.tier2.length)]; // 3%
-            return prizePool.tier1[Math.floor(Math.random() * prizePool.tier1.length)]; // 97%
+            // Normal: 90% Tier 1, 9% Tier 2, 1% Tier 3
+            // Respin: 50% Tier 1, 40% Tier 2, 10% Tier 3 (Casino VIP Odds)
+            if (isRespin) {
+                if (rand < 0.10) return {...prizePool.tier3[Math.floor(Math.random() * prizePool.tier3.length)], tier: 3};
+                if (rand < 0.50) return {...prizePool.tier2[Math.floor(Math.random() * prizePool.tier2.length)], tier: 2};
+                return {...prizePool.tier1[Math.floor(Math.random() * prizePool.tier1.length)], tier: 1};
+            } else {
+                if (rand < 0.01) return {...prizePool.tier3[Math.floor(Math.random() * prizePool.tier3.length)], tier: 3};
+                if (rand < 0.10) return {...prizePool.tier2[Math.floor(Math.random() * prizePool.tier2.length)], tier: 2};
+                return {...prizePool.tier1[Math.floor(Math.random() * prizePool.tier1.length)], tier: 1};
+            }
         }
 
         function switchScreen(screenId) {
@@ -245,121 +419,231 @@
             startSlotMachine();
         }
 
+        function executeRespin() {
+            if(isSpinning) return;
+            
+            const btn = document.getElementById('respin-btn');
+            btn.classList.add('pressed');
+            setTimeout(() => btn.classList.remove('pressed'), 150);
+
+            clearInterval(resetInterval);
+            clearInterval(meterInterval); // Stop meter just in case
+            document.getElementById('final-action-area').classList.add('hidden');
+            document.getElementById('final-action-area').classList.remove('flex');
+            document.getElementById('delulu-score-container').classList.add('hidden');
+            document.getElementById('payline').classList.add('hidden');
+            
+            for(let i=0; i<3; i++) {
+                document.getElementById(`box-${i}`).classList.remove('selected-prize', 'disabled-prize');
+            }
+
+            respinCount++;
+            
+            document.getElementById('respin-counter').classList.remove('hidden');
+            document.getElementById('respin-counter').classList.add('flex');
+            document.getElementById('debt-amount').innerText = respinCount * 10;
+            
+            hasSpun = false;
+            startSlotMachine();
+        }
+
+        function buildReelHTML(targetPrize, isThirdReel) {
+            // Build a massive strip of 63 items for the 20-second slot effect
+            let html = `<div class="reel-item bg-gray-100 text-black"><span class="text-7xl mb-4">🎰</span><h3 class="font-black text-3xl uppercase">SPINNING...</h3></div>`;
+
+            // Fill reel with 60 random hypes to make the extremely long spin possible
+            for(let i = 0; i < 60; i++) {
+                const isHype = Math.random() > 0.4; // High chance of seeing Tier 3s blur past
+                const filler = isHype ? prizePool.tier3[Math.floor(Math.random() * prizePool.tier3.length)] : prizePool.tier1[Math.floor(Math.random() * prizePool.tier1.length)];
+                
+                html += `
+                    <div class="reel-item ${filler.bg} ${filler.textCol}">
+                        <span class="text-7xl mb-4">${filler.icon}</span>
+                        <h3 class="font-black text-3xl md:text-4xl leading-tight uppercase">${filler.text}</h3>
+                    </div>`;
+            }
+
+            // ITEM 61: THE NEAR MISS TEASE
+            // Hangs on this 50% OFF during that agonizing 6-second slow down before slipping to Item 62.
+            const tease = (isThirdReel && targetPrize.tier !== 3) ? prizePool.tier3[0] : prizePool.tier2[Math.floor(Math.random() * prizePool.tier2.length)];
+            html += `
+                <div class="reel-item ${tease.bg} ${tease.textCol}">
+                    <span class="text-7xl mb-4">${tease.icon}</span>
+                    <h3 class="font-black text-3xl md:text-4xl leading-tight uppercase">${tease.text}</h3>
+                </div>`;
+
+            // ITEM 62: ACTUAL WINNING TARGET
+            html += `
+                <div class="reel-item ${targetPrize.bg} ${targetPrize.textCol}">
+                    <span class="text-7xl mb-4">${targetPrize.icon}</span>
+                    <h3 class="font-black text-3xl md:text-4xl leading-tight uppercase">${targetPrize.text}</h3>
+                </div>`;
+
+            return html;
+        }
+
+        // Keep track of text update timeouts so we can clear them if needed
+        let textUpdateTimeouts = [];
+
         function startSlotMachine() {
             isSpinning = true;
             
-            // Generate and sort prizes (index 0 is lowest value)
-            currentPrizes = [rollPrize(), rollPrize(), rollPrize()].sort((a, b) => a.value - b.value);
+            // Clear any old text updates
+            textUpdateTimeouts.forEach(clearTimeout);
+            textUpdateTimeouts = [];
+
+            // Generate final prizes
+            currentPrizes = [rollPrize(respinCount > 0), rollPrize(respinCount > 0), rollPrize(respinCount > 0)];
+            currentPrizes.sort((a, b) => a.tier - b.tier); // Worst prize at index 0 for non-followers
 
             const title = document.getElementById('spin-title');
             const subtitle = document.getElementById('spin-subtitle');
-            title.innerText = "SPINNING...";
+            title.innerText = respinCount > 0 ? "VIP SPIN ACTIVATED!" : "SPINNING...";
+            title.className = respinCount > 0 ? "text-5xl md:text-7xl font-black text-center uppercase tracking-tighter text-delulu-magenta animate-pulse" : "text-5xl md:text-7xl font-black text-center uppercase tracking-tighter";
             subtitle.innerText = "Calculating delusion levels...";
-            subtitle.className = "text-2xl md:text-3xl font-bold mb-12 text-gray-600 text-center h-10 animate-pulse";
+            subtitle.className = "text-2xl md:text-3xl font-bold mb-6 text-gray-600 text-center h-10 animate-pulse";
 
-            const boxes = [document.getElementById('box-0'), document.getElementById('box-1'), document.getElementById('box-2')];
-            
-            // Rapid visual shuffle effect (Slot machine style)
-            let shuffleCount = 0;
-            const dummyIcons = ["💸", "🔥", "✨", "💀", "🤡", "🚀", "🎨", "👕"];
-            const dummyColors = ["bg-delulu-yellow", "bg-delulu-cyan", "bg-delulu-magenta", "bg-delulu-green", "bg-white", "bg-black"];
-            
-            const shuffleInterval = setInterval(() => {
-                boxes.forEach((box, i) => {
-                    // Only shuffle if it hasn't "landed" yet
-                    if(shuffleCount < (15 + (i*5))) { 
-                        box.className = `h-full rounded-[2rem] neo-border shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center justify-center p-6 relative overflow-hidden ${dummyColors[Math.floor(Math.random() * dummyColors.length)]}`;
-                        box.querySelector('.spin-animation span').innerText = dummyIcons[Math.floor(Math.random() * dummyIcons.length)];
-                    }
-                });
-                
-                shuffleCount++;
-                
-                // Stop shuffling completely after longest box finishes
-                if(shuffleCount > 30) {
-                    clearInterval(shuffleInterval);
-                    revealPrizes(boxes);
+            // Make the Delulu Score go crazy during the spin
+            document.getElementById('delulu-score-container').classList.remove('hidden');
+            meterInterval = setInterval(() => {
+                if(isSpinning) {
+                    document.getElementById('delulu-score').innerText = Math.floor(Math.random() * 99) + 1;
                 }
-            }, 100);
-        }
+            }, 50);
 
-        function revealPrizes(boxes) {
-            boxes.forEach((box, i) => {
-                const prizeInfo = currentPrizes[i];
-                
-                // Swap visibility
-                box.querySelector('.spin-animation').classList.add('hidden');
-                const content = box.querySelector('.prize-content');
-                content.classList.remove('hidden');
-                content.classList.add('flex');
-                
-                // Apply final prize data
-                box.querySelector('.icon-slot').innerText = prizeInfo.icon;
-                box.querySelector('.text-slot').innerText = prizeInfo.text;
-                
-                // Apply final styles
-                box.className = `h-full rounded-[2rem] neo-border shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center justify-center p-6 cursor-pointer transition-all duration-300 overflow-hidden relative ${prizeInfo.bg} ${prizeInfo.textCol}`;
-                
-                // Ensure border contrast for dark backgrounds
-                if(prizeInfo.bg === 'bg-black' || prizeInfo.bg === 'bg-delulu-purple') {
-                    box.style.borderColor = "#fff";
-                } else {
-                    box.style.borderColor = "#000";
+            // Dynamic text updates to keep user engaged during the massive 20 second wait
+            textUpdateTimeouts.push(setTimeout(() => { if(isSpinning) subtitle.innerText = "Building the tension..."; }, 5000));
+            textUpdateTimeouts.push(setTimeout(() => { if(isSpinning) subtitle.innerText = "Hold your breath..."; }, 10000));
+            textUpdateTimeouts.push(setTimeout(() => { if(isSpinning) subtitle.innerText = "Wait for it..."; }, 14000));
+            textUpdateTimeouts.push(setTimeout(() => { 
+                if(isSpinning) {
+                    subtitle.innerText = "SO CLOSE! DON'T LOOK AWAY!";
+                    subtitle.classList.remove('text-gray-600');
+                    subtitle.classList.add('text-red-600', 'scale-110');
                 }
-            });
+            }, 17000));
 
-            isSpinning = false;
-            hasSpun = true;
-
-            // Handle Logic based on Follow state
-            const title = document.getElementById('spin-title');
-            const subtitle = document.getElementById('spin-subtitle');
-
-            if (isFollowing) {
-                title.innerText = "CHOOSE YOUR PRIZE";
-                subtitle.innerText = "You're loyal. Tap the one you want to keep.";
-                subtitle.className = "text-2xl md:text-3xl font-black mb-12 text-delulu-green text-center h-10";
-            } else {
-                title.innerText = "NO LOYALTY DETECTED 🤡";
-                subtitle.innerText = "We picked for you. Enjoy the worst prize on the board.";
-                subtitle.className = "text-2xl md:text-3xl font-black mb-12 text-red-600 text-center h-10";
+            // Trigger CSS Transitions (Staggered Stops over 20 Seconds)
+            for(let i=0; i<3; i++) {
+                const reel = document.getElementById(`reel-${i}`);
+                const box = document.getElementById(`box-${i}`);
                 
-                // Auto punish - 1.5s delay for dramatic effect
-                setTimeout(() => { selectPrize(0, true); }, 1500);
+                reel.style.transition = 'none';
+                reel.style.transform = 'translateY(0)';
+                box.classList.add('slot-blur'); // Add motion blur
+                
+                // Inject HTML, setting flag if it's the dramatic 3rd reel
+                reel.innerHTML = buildReelHTML(currentPrizes[i], i === 2);
+                void reel.offsetWidth; // Reflow
+
+                // Reel Durations: 8s, 14s, 20s
+                // This guarantees the 3rd reel spins alone for the last 6 seconds.
+                const duration = 8 + (i * 6);
+                
+                // The cubic-bezier defines the extreme slow-down at the end
+                reel.style.transition = `transform ${duration}s cubic-bezier(0.1, 0.85, 0.1, 1)`;
+                
+                // Translate down exactly 62 items (62 * 300px = 18600px)
+                reel.style.transform = `translateY(-18600px)`; 
+                
+                // When reel stops...
+                setTimeout(() => {
+                    box.classList.remove('slot-blur');
+                    box.classList.add('slot-stop-flash'); // Flash white "thud" effect
+                    setTimeout(() => box.classList.remove('slot-stop-flash'), 500);
+                    
+                    if (i === 2) revealPrizes(); // Trigger final reveal after full 20s
+                }, duration * 1000);
             }
         }
 
-        function selectPrize(index, autoSelected = false) {
-            if (!hasSpun || isSpinning || document.getElementById('final-code-area').classList.contains('flex')) return;
+        function revealPrizes() {
+            isSpinning = false;
+            hasSpun = true;
             
-            if (!isFollowing && !autoSelected) {
-                // If they try to tap when they shouldn't
-                const subtitle = document.getElementById('spin-subtitle');
-                subtitle.innerText = "AH AH AH! WE CHOOSE FOR NON-FOLLOWERS!";
-                subtitle.classList.add('animate-bounce');
+            clearInterval(meterInterval); // Stop the crazy numbers!
+
+            // Strike the Red Payline
+            document.getElementById('payline').classList.remove('hidden');
+
+            let totalTier = currentPrizes.reduce((sum, p) => sum + p.tier, 0);
+            let scoreBase = (totalTier / 9) * 100;
+            let randomNoise = Math.floor(Math.random() * 20);
+            let finalScore = Math.min(99, Math.floor(scoreBase + randomNoise));
+            if(totalTier === 3 && respinCount === 0) finalScore = Math.floor(Math.random() * 15) + 1;
+
+            const scoreContainer = document.getElementById('delulu-score-container');
+            document.getElementById('delulu-score').innerText = finalScore; // Lock in final score
+            scoreContainer.classList.remove('hidden'); // Ensure it stays visible
+
+            const title = document.getElementById('spin-title');
+            const subtitle = document.getElementById('spin-subtitle');
+            title.className = "text-5xl md:text-7xl font-black text-center uppercase tracking-tighter text-black";
+
+            if (isFollowing) {
+                title.innerText = "CHOOSE ONE";
+                // Addictive Copywriting for Near Miss
+                if(finalScore < 30) {
+                    subtitle.innerText = "OOF! You were ONE MILLIMETER away from 50% OFF! That hurts. Respin?";
+                    subtitle.className = "text-2xl md:text-3xl font-black mb-6 text-delulu-magenta text-center h-10";
+                } else {
+                    subtitle.innerText = "You're loyal. Tap the payline box you want to keep!";
+                    subtitle.className = "text-2xl md:text-3xl font-black mb-6 text-delulu-green text-center h-10";
+                }
+            } else {
+                title.innerText = "NO LOYALTY 🤡";
+                subtitle.innerText = "Since you don't follow, we forced the worst prize on you.";
+                subtitle.className = "text-2xl md:text-3xl font-black mb-6 text-red-600 text-center h-10 animate-bounce";
+                setTimeout(() => { selectPrize(0, true); }, 1500);
                 return;
             }
 
-            // Visual feedback for selection
+            document.getElementById('final-action-area').classList.remove('hidden');
+            document.getElementById('final-action-area').classList.add('flex');
+            document.getElementById('winning-code').parentElement.classList.add('opacity-30', 'pointer-events-none');
+        }
+
+        function selectPrize(index, autoSelected = false) {
+            if (!hasSpun || isSpinning) return;
+            if (document.getElementById('winning-code').parentElement.classList.contains('opacity-100')) return;
+            
+            if (!isFollowing && !autoSelected) {
+                const subtitle = document.getElementById('spin-subtitle');
+                subtitle.innerText = "WE PICK FOR NON-FOLLOWERS!";
+                return;
+            }
+
+            // Visual selection
             for(let i=0; i<3; i++) {
                 const box = document.getElementById(`box-${i}`);
                 if (i === index) {
                     box.classList.add('selected-prize');
+                    // Give the selected box a solid black outline to stand out from machine border
+                    box.style.borderWidth = '8px';
                 } else {
                     box.classList.add('disabled-prize');
                 }
             }
-
-            // Generate Code and Show Area
-            const code = "DL-" + Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('winning-code').innerText = code;
-            document.getElementById('final-code-area').classList.remove('hidden');
-            document.getElementById('final-code-area').classList.add('flex');
             
+            document.getElementById('payline').classList.add('hidden'); // Hide payline after selection
+
+            // Generate Code
+            let codeStr = "DL-" + Math.floor(1000 + Math.random() * 9000);
+            if(respinCount > 0) codeStr += `-R${respinCount}`;
+            
+            const codeArea = document.getElementById('winning-code').parentElement;
+            document.getElementById('winning-code').innerText = codeStr;
+            
+            document.getElementById('final-action-area').classList.remove('hidden');
+            document.getElementById('final-action-area').classList.add('flex');
+            codeArea.classList.remove('opacity-30', 'pointer-events-none');
+            codeArea.classList.add('opacity-100');
+            
+            document.getElementById('respin-btn').classList.add('hidden');
+
             document.getElementById('spin-subtitle').innerText = "Screenshot or tell the counter your code!";
             document.getElementById('spin-subtitle').className = "text-2xl md:text-3xl font-black mb-6 text-black text-center h-10";
 
-            // Start Kiosk Reset Timer (15 seconds)
             startResetTimer(15);
         }
 
@@ -380,29 +664,37 @@
         }
 
         function resetKiosk() {
-            // Reset state variables
             isFollowing = false;
             isSpinning = false;
             hasSpun = false;
+            respinCount = 0;
             currentPrizes = [];
+            
+            clearInterval(meterInterval); // Reset the meter interval
 
-            // Hide Code Area
-            document.getElementById('final-code-area').classList.add('hidden');
-            document.getElementById('final-code-area').classList.remove('flex');
-
-            // Reset Boxes visually
+            document.getElementById('final-action-area').classList.add('hidden');
+            document.getElementById('final-action-area').classList.remove('flex');
+            document.getElementById('delulu-score-container').classList.add('hidden');
+            document.getElementById('respin-counter').classList.add('hidden');
+            document.getElementById('respin-counter').classList.remove('flex');
+            document.getElementById('respin-btn').classList.remove('hidden');
+            document.getElementById('payline').classList.add('hidden');
+            
             for(let i=0; i<3; i++) {
                 const box = document.getElementById(`box-${i}`);
-                box.className = `h-full rounded-[2rem] neo-border shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] bg-white flex flex-col items-center justify-center p-6 relative overflow-hidden`;
-                box.style.borderColor = "#000";
+                box.classList.remove('selected-prize', 'disabled-prize');
+                box.style.borderWidth = '4px';
                 
-                box.querySelector('.spin-animation').classList.remove('hidden');
-                box.querySelector('.spin-animation span').innerText = '🎰';
-                box.querySelector('.prize-content').classList.add('hidden');
-                box.querySelector('.prize-content').classList.remove('flex');
+                const reel = document.getElementById(`reel-${i}`);
+                reel.style.transition = 'none';
+                reel.style.transform = 'translateY(0)';
+                reel.innerHTML = `
+                    <div class="reel-item bg-gray-100 text-black">
+                        <span class="text-7xl mb-4">🎰</span>
+                        <h3 class="font-black text-3xl uppercase">WAITING</h3>
+                    </div>`;
             }
 
-            // Go back to screen 1
             switchScreen('screen-idle');
         }
 
