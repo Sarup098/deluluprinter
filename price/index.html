@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delulu Printer - Pricing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #fafaf8;
+            /* Subtle dot pattern background */
+            background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        
+        .neo-border {
+            border: 4px solid #000;
+        }
+        
+        .neo-shadow {
+            box-shadow: 6px 6px 0px 0px rgba(0,0,0,1);
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .neo-shadow:hover {
+            box-shadow: 10px 10px 0px 0px rgba(0,0,0,1);
+            transform: translate(-4px, -4px);
+        }
+
+        .receipt-shadow {
+            box-shadow: 8px 8px 0px 0px rgba(255,0,255,0.3);
+        }
+
+        /* Custom Colors from the theme */
+        .bg-delulu-yellow { background-color: #ffde00; }
+        .bg-delulu-cyan { background-color: #00f0ff; }
+        .bg-delulu-magenta { background-color: #ff00ff; }
+        .bg-delulu-green { background-color: #00e676; }
+        .bg-delulu-teal { background-color: #1de9b6; }
+        .bg-delulu-orange { background-color: #ff9100; }
+        .bg-delulu-purple { background-color: #d500f9; }
+        .bg-delulu-blue { background-color: #2962ff; }
+    </style>
+</head>
+<body class="text-black antialiased overflow-x-hidden selection:bg-black selection:text-white pb-0">
+
+    <!-- Header Section -->
+    <header class="max-w-6xl mx-auto px-4 pt-16 pb-12 text-center">
+        <div class="inline-flex items-center justify-center gap-2 bg-yellow-300 neo-border rounded-full px-6 py-2 mb-8 neo-shadow">
+            <span class="font-bold text-sm md:text-base">Warning: Shockingly affordable prices ahead</span>
+            <span class="text-xl">🚨</span>
+        </div>
+
+        <h1 class="text-5xl md:text-7xl font-black leading-tight mb-6 tracking-tight">
+            Print your assignments, photos,<br class="hidden md:block" />
+            and shirts without going 
+            <span class="bg-delulu-cyan inline-block px-3 py-1 neo-border shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rotate-2">broke.</span>
+        </h1>
+
+        <h2 class="text-3xl md:text-4xl font-bold mt-10 mb-2">No Math Required Pricing.</h2>
+        <p class="text-gray-600 text-lg md:text-xl font-medium">Premium quality, zero drama. Here's exactly what you'll pay.</p>
+    </header>
+
+    <!-- Pricing Grid Section -->
+    <main class="max-w-6xl mx-auto px-4 pb-20">
+        <!-- 3x3 Grid for the 9 items -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+            <!-- Card 1: Standard A4 -->
+            <div class="bg-delulu-yellow neo-border rounded-2xl p-6 relative neo-shadow flex flex-col h-full">
+                <i data-lucide="file-text" class="w-8 h-8 mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">The "Whatever" A4</h3>
+                <p class="text-sm font-medium mb-6 opacity-90">Color? B&W? Standard A4 Paper. Doesn't matter.</p>
+                <div class="mt-auto">
+                    <div class="flex items-end gap-1 mb-4 border-b-2 border-black/20 pb-4">
+                        <span class="text-5xl font-black">₹10</span>
+                        <span class="text-lg font-bold mb-1">/page</span>
+                    </div>
+                    <ul class="text-sm font-bold space-y-2">
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Standard A4 Paper</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Full Color included</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Zero hidden fees</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 2: Regular Stickers -->
+            <div class="bg-delulu-cyan neo-border rounded-2xl p-6 relative neo-shadow flex flex-col h-full">
+                <i data-lucide="sticky-note" class="w-8 h-8 mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">Regular Sticker A4</h3>
+                <p class="text-sm font-medium mb-6 opacity-90">Slap your memes everywhere.</p>
+                <div class="mt-auto">
+                    <div class="flex items-end gap-1 mb-4 border-b-2 border-black/20 pb-4">
+                        <span class="text-5xl font-black">₹25</span>
+                        <span class="text-lg font-bold mb-1">/sheet</span>
+                    </div>
+                    <ul class="text-sm font-bold space-y-2">
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Matte finish</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Great for laptops</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Fit as many on A4</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 3: Premium Stickers -->
+            <div class="bg-delulu-magenta text-white neo-border border-white rounded-2xl p-6 relative neo-shadow flex flex-col h-full" style="border-color: #000;">
+                <i data-lucide="sparkles" class="w-8 h-8 mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">Premium Stickers</h3>
+                <p class="text-sm font-medium mb-6 opacity-90">For when you need to be fancy.</p>
+                <div class="mt-auto">
+                    <div class="flex items-end gap-1 mb-4 border-b-2 border-white/30 pb-4">
+                        <span class="text-5xl font-black">₹40</span>
+                        <span class="text-lg font-bold mb-1">/sheet</span>
+                    </div>
+                    <ul class="text-sm font-bold space-y-2">
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> High durability</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Glossy/matte finish</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Super vibrant colors</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 4: Glossy Photos -->
+            <div class="bg-white neo-border rounded-2xl p-6 relative neo-shadow flex flex-col h-full">
+                <div class="absolute -top-3 -right-3 bg-black text-white px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-md border-2 border-black z-10">
+                    Best Quality
+                </div>
+                <i data-lucide="image" class="w-8 h-8 mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">Glossy Photos</h3>
+                <p class="text-sm font-medium mb-6 opacity-90">Studio quality memories on premium paper.</p>
+                <div class="mt-auto">
+                    <div class="flex items-end gap-1 mb-4 border-b-2 border-black/20 pb-4">
+                        <span class="text-5xl font-black">₹80</span>
+                        <span class="text-lg font-bold mb-1">/page</span>
+                    </div>
+                    <ul class="text-sm font-bold space-y-2">
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Thick photo paper</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> High-res printing</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Frame-ready quality</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 5: Passport Photos -->
+            <div class="bg-delulu-green neo-border rounded-2xl p-6 relative neo-shadow flex flex-col h-full">
+                <i data-lucide="users" class="w-8 h-8 mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">Passport Photos</h3>
+                <p class="text-sm font-medium mb-6 opacity-90">Set of 9. Because you always lose them.</p>
+                <div class="mt-auto">
+                    <div class="flex items-end gap-1 mb-4 border-b-2 border-black/20 pb-4">
+                        <span class="text-5xl font-black">₹50</span>
+                        <span class="text-lg font-bold mb-1">/set</span>
+                    </div>
+                    <ul class="text-sm font-bold space-y-2">
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> 9 pieces included</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Precisely sized</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Fast processing</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 6: Sticker Passports -->
+            <div class="bg-delulu-teal neo-border rounded-2xl p-6 relative neo-shadow flex flex-col h-full">
+                <i data-lucide="user-check" class="w-8 h-8 mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">Sticker Passports</h3>
+                <p class="text-sm font-medium mb-6 opacity-90">Set of 9. Just peel and stick on forms.</p>
+                <div class="mt-auto">
+                    <div class="flex items-end gap-1 mb-4 border-b-2 border-black/20 pb-4">
+                        <span class="text-5xl font-black">₹60</span>
+                        <span class="text-lg font-bold mb-1">/set</span>
+                    </div>
+                    <ul class="text-sm font-bold space-y-2">
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> 9 pieces included</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Self-adhesive back</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Great for IDs</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 7: Small Apparel -->
+            <div class="bg-delulu-orange neo-border rounded-2xl p-6 relative neo-shadow flex flex-col h-full">
+                <i data-lucide="shirt" class="w-8 h-8 mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">Small Apparel (A5)</h3>
+                <p class="text-sm font-medium mb-6 opacity-90">T-shirts, Totes, Hoodies, anything!</p>
+                <div class="mt-auto">
+                    <div class="flex items-end gap-1 mb-4 border-b-2 border-black/20 pb-4">
+                        <span class="text-5xl font-black">₹150</span>
+                        <span class="text-lg font-bold mb-1">/print</span>
+                    </div>
+                    <ul class="text-sm font-bold space-y-2">
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Up to A5 size graphic</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Soft feel finish</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Durable print</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 8: Full-Page Apparel -->
+            <div class="bg-delulu-purple text-white neo-border border-white rounded-2xl p-6 relative neo-shadow flex flex-col h-full" style="border-color: #000;">
+                <i data-lucide="shirt" class="w-8 h-8 mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">Full Apparel (A4)</h3>
+                <p class="text-sm font-medium mb-6 opacity-90">Big graphics for T-shirts, Totes, Hoodies.</p>
+                <div class="mt-auto">
+                    <div class="flex items-end gap-1 mb-4 border-b-2 border-white/30 pb-4">
+                        <span class="text-5xl font-black">₹250</span>
+                        <span class="text-lg font-bold mb-1">/print</span>
+                    </div>
+                    <ul class="text-sm font-bold space-y-2">
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Full A4 size graphic</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Breathable ink</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Vibrant colors</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Card 9: Polaroid Prints -->
+            <div class="bg-delulu-blue text-white neo-border border-white rounded-2xl p-6 relative neo-shadow flex flex-col h-full" style="border-color: #000;">
+                <i data-lucide="camera" class="w-8 h-8 mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2">Polaroid Style</h3>
+                <p class="text-sm font-medium mb-6 opacity-90">Set of 9 prints. Aesthetic vibes only.</p>
+                <div class="mt-auto">
+                    <div class="flex items-end gap-1 mb-4 border-b-2 border-white/30 pb-4">
+                        <span class="text-5xl font-black">₹70</span>
+                        <span class="text-lg font-bold mb-1">/set</span>
+                    </div>
+                    <ul class="text-sm font-bold space-y-2">
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> 9 pieces included</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> Classic white border</li>
+                        <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4"></i> High quality finish</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer Banner -->
+    <div class="w-full text-center py-6">
+        <h2 class="text-4xl md:text-6xl font-black italic tracking-widest text-black mb-8">deluluprinter.xyz</h2>
+    </div>
+
+    <!-- Bottom Receipt Section (QR removed, Receipt Centered) -->
+    <footer class="bg-[#111] py-16 px-4 mt-8">
+        <div class="max-w-md mx-auto relative">
+            <!-- Receipt Card -->
+            <div class="bg-white rounded-xl p-8 border-4 border-delulu-magenta receipt-shadow transform -rotate-1">
+                <h3 class="text-2xl font-black mb-6">The Math We Skip:</h3>
+                
+                <div class="space-y-4 font-medium text-gray-700">
+                    <div class="flex justify-between items-center border-b border-dashed border-gray-300 pb-2">
+                        <span>Base A4 page</span>
+                        <span>₹??</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-dashed border-gray-300 pb-2">
+                        <span>Oh, it's color?</span>
+                        <span class="text-red-500">+₹??</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-dashed border-gray-300 pb-2">
+                        <span>Wait, is that an image?</span>
+                        <span class="text-red-500">+₹??</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-dashed border-gray-300 pb-2">
+                        <span>Confusion fee</span>
+                        <span class="text-red-500">+₹??</span>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-between items-center bg-gray-100 p-4 rounded-lg neo-border">
+                    <span class="font-bold text-delulu-green text-xl">Our Price</span>
+                    <span class="font-black text-2xl">Just ₹10 🚀</span>
+                </div>
+            </div>
+            
+            <!-- Decorative elements behind receipt -->
+            <div class="absolute -z-10 top-10 -right-10 w-20 h-20 bg-delulu-yellow rounded-full blur-xl opacity-50"></div>
+            <div class="absolute -z-10 -bottom-10 -left-10 w-32 h-32 bg-delulu-cyan rounded-full blur-xl opacity-30"></div>
+        </div>
+        
+        <div class="text-center text-gray-500 mt-16 text-sm font-medium">
+            <p>© 2026 Delulu Printer. Keeping it real (and affordable).</p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
