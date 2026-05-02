@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -31,6 +30,9 @@
                         'brutal': '6px 6px 0px 0px rgba(17, 17, 17, 1)',
                         'brutal-sm': '3px 3px 0px 0px rgba(17, 17, 17, 1)',
                         'brutal-hover': '0px 0px 0px 0px rgba(17, 17, 17, 1)',
+                    },
+                    animation: {
+                        'wiggle-slow': 'wiggle 3s ease-in-out infinite',
                     }
                 }
             }
@@ -104,33 +106,38 @@
 </head>
 <body class="text-brand-black antialiased selection:bg-brand-magenta selection:text-white pb-24 min-h-screen flex flex-col">
 
-    <!-- GLOBAL/LOCAL PROMO BANNER -->
-    <div class="w-full bg-brand-cyan border-b-4 border-brand-black px-3 py-2 flex items-center justify-center text-center z-50 sticky top-0">
-        <p class="font-bold text-xs md:text-sm flex items-center justify-center gap-2 flex-wrap">
-            <i class="ph-fill ph-scooter text-lg animate-bounce"></i>
-            <span>Order online 🛵, send a friend 🤝, OR walk-in at <strong class="bg-black text-white px-2 py-0.5 rounded uppercase tracking-wider whitespace-nowrap">Shreeraj Hostel</strong>!</span>
-        </p>
-    </div>
-
-    <!-- App Header Nav -->
-    <nav class="w-full bg-white/95 backdrop-blur-md border-b-2 border-brand-black sticky top-[36px] md:top-[40px] z-40 shadow-sm">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-2 cursor-pointer" onclick="resetWizard()">
-                <i class="ph-fill ph-printer text-2xl text-brand-magenta"></i>
-                <span class="font-display font-black text-lg md:text-xl tracking-tight">deluluprinter.xyz</span>
-            </div>
-            <div class="flex items-center gap-3">
-                <button id="navBackBtn" onclick="goBack()" class="hidden brutal-btn bg-white px-3 py-1.5 rounded-lg font-bold text-xs flex items-center gap-1 border-2">
-                    <i class="ph-bold ph-arrow-left"></i> Back
-                </button>
-                <button onclick="resetWizard()" class="bg-gray-100 hover:bg-gray-200 border-2 border-brand-black px-3 py-1.5 rounded-lg font-bold text-xs transition">
-                    Start Over <i class="ph-bold ph-arrow-counter-clockwise"></i>
-                </button>
-            </div>
+    <!-- UNIFIED FIXED HEADER WITH BREATHING ROOM -->
+    <header class="fixed top-0 w-full z-50 flex flex-col shadow-sm">
+        <!-- GLOBAL/LOCAL PROMO BANNER -->
+        <div class="w-full bg-brand-cyan border-b-4 border-brand-black px-4 py-3 flex items-center justify-center text-center">
+            <p class="font-bold text-xs md:text-sm flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 w-full">
+                <span class="flex items-center gap-1 justify-center"><i class="ph-fill ph-scooter text-lg animate-bounce"></i> Order online 🛵 or send a friend 🤝</span>
+                <span class="hidden sm:inline"> | </span>
+                <span class="mt-1 sm:mt-0">Walk-in at <strong class="bg-black text-white px-2 py-0.5 rounded uppercase tracking-wider whitespace-nowrap">Shreeraj Hostel</strong>!</span>
+            </p>
         </div>
-    </nav>
 
-    <div class="max-w-4xl mx-auto px-4 pt-6 md:pt-10 flex-grow w-full flex flex-col">
+        <!-- App Header Nav -->
+        <nav class="w-full bg-white/95 backdrop-blur-md border-b-2 border-brand-black">
+            <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="resetWizard()">
+                    <i class="ph-fill ph-printer text-2xl md:text-3xl text-brand-magenta"></i>
+                    <span class="font-display font-black text-xl md:text-2xl tracking-tight hover:text-brand-magenta transition-colors">deluluprinter.xyz</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button id="navBackBtn" onclick="goBack()" class="hidden brutal-btn bg-white px-3 py-2 rounded-lg font-bold text-xs flex items-center gap-1 border-2">
+                        <i class="ph-bold ph-arrow-left"></i> Back
+                    </button>
+                    <button onclick="resetWizard()" class="bg-gray-100 hover:bg-gray-200 border-2 border-brand-black px-3 py-2 rounded-lg font-bold text-xs transition shadow-[2px_2px_0px_#111] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px]">
+                        Start Over <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT (Padded down to account for fixed header) -->
+    <div class="pt-40 md:pt-44 max-w-4xl mx-auto px-4 flex-grow w-full flex flex-col">
 
         <!-- ==========================================
              VIEW 1: THE START SCREEN (Dynamic Hero Carousel)
@@ -148,19 +155,19 @@
 
                 <!-- Slide 0: The Hook -->
                 <div id="slide-0" class="absolute inset-0 slide-visible flex flex-col items-center justify-center text-center">
-                    <div class="inline-block bg-brand-yellow border-2 border-brand-black px-4 py-1 rounded-full font-bold text-xs mb-6 shadow-brutal-sm rotate-[-2deg]">
+                    <div class="inline-block bg-brand-yellow border-2 border-brand-black px-4 py-2 rounded-full font-bold text-xs md:text-sm mb-6 shadow-brutal-sm rotate-[-2deg]">
                         Warning: Shockingly affordable prices ahead 🚨
                     </div>
                     <h1 class="font-display text-4xl md:text-6xl font-black leading-tight mb-4 tracking-tighter">
                         Print your assignments <br/> without going <span class="bg-brand-cyan px-2 pb-1 border-4 border-brand-black shadow-brutal inline-block rotate-2">broke.</span>
                     </h1>
-                    <p class="text-base md:text-lg font-medium text-gray-600 max-w-xl mx-auto">
+                    <p class="text-base md:text-lg font-medium text-gray-600 max-w-xl mx-auto px-2">
                         No math pricing. Just premium quality prints starting at just ₹10. Save your pocket money for momos. 🥟
                     </p>
                 </div>
 
                 <!-- Slide 1: The Problem (Math we skip) -->
-                <div id="slide-1" class="absolute inset-0 slide-hidden flex flex-col items-center justify-center text-center">
+                <div id="slide-1" class="absolute inset-0 slide-hidden flex flex-col items-center justify-center text-center px-2">
                     <h2 class="font-display text-3xl md:text-4xl font-black mb-3 text-brand-magenta leading-tight">Printing shouldn't be a luxury.</h2>
                     <p class="text-sm md:text-base text-gray-600 font-bold mb-6 max-w-lg mx-auto">Because printer ink isn't actually made of liquid gold. We keep it simple.</p>
                     <div class="bg-white text-brand-black p-5 rounded-2xl border-4 border-brand-black shadow-brutal-sm transform rotate-2 max-w-[280px] w-full mx-auto">
@@ -178,7 +185,7 @@
                 </div>
 
                 <!-- Slide 2: Delulu Card Gamification -->
-                <div id="slide-2" class="absolute inset-0 slide-hidden flex flex-col items-center justify-center text-center">
+                <div id="slide-2" class="absolute inset-0 slide-hidden flex flex-col items-center justify-center text-center px-2">
                     <div class="inline-block bg-black text-white px-3 py-1 rounded-full font-bold text-[10px] mb-3 uppercase tracking-widest border border-white">
                         Level Up Your Prints 🎮
                     </div>
@@ -378,7 +385,7 @@
 
 
         <!-- ==========================================
-             VIEW 3: THE ORDER HUB (Estimator & Delivery)
+             VIEW 3: THE ORDER HUB (Estimator & Fork)
              ========================================== -->
         <div id="view-order" class="app-view">
             <div class="bg-purple-100 border-2 border-purple-300 rounded-xl p-3 mb-6 flex gap-3 items-center cursor-pointer select-none shadow-sm" onclick="newFunFact()">
@@ -391,7 +398,7 @@
                 <h2 class="font-display text-3xl font-black mb-1 flex items-center justify-center gap-2 flex-wrap" id="orderHubTitle">
                     Let's get this printed.
                 </h2>
-                <p class="text-gray-600 font-bold text-sm">Estimate the damage and choose delivery.</p>
+                <p class="text-gray-600 font-bold text-sm">Estimate the damage to proceed.</p>
             </div>
 
             <!-- Estimator Box -->
@@ -436,85 +443,42 @@
             </div>
 
             <!-- Notes -->
-            <div class="mb-6 bg-white border-4 border-brand-black rounded-3xl p-5 shadow-brutal">
+            <div class="mb-8 bg-white border-4 border-brand-black rounded-3xl p-5 shadow-brutal">
                 <label class="block font-black text-base mb-1 flex items-center gap-2"><i class="ph-bold ph-chat-circle-text text-brand-cyan text-xl"></i> Any extra notes?</label>
                 <p class="text-[10px] font-bold text-gray-500 mb-3">Let's talk. We actually read this.</p>
                 <textarea id="hubNotes" rows="2" class="w-full bg-gray-50 border-2 border-black rounded-xl p-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-yellow transition-all" placeholder="e.g. Please print double-sided..."></textarea>
             </div>
 
-            <!-- Delivery Options -->
-            <div class="mb-8 bg-brand-yellow border-4 border-brand-black rounded-3xl p-5 shadow-brutal">
-                <label class="block font-black text-base mb-3 flex items-center gap-2"><i class="ph-bold ph-package text-xl"></i> How are we getting this to you?</label>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <label class="cursor-pointer">
-                        <input type="radio" name="hubDelivery" value="pickup" class="peer sr-only" checked onchange="updateHubDelivery()">
-                        <div class="bg-white border-2 border-black rounded-xl p-3 text-center peer-checked:bg-black peer-checked:text-white transition-colors flex flex-row sm:flex-col items-center justify-center gap-2 sm:gap-0 h-full">
-                            <i class="ph-bold ph-storefront text-2xl sm:mb-1"></i>
-                            <div class="text-left sm:text-center">
-                                <div class="font-bold text-sm">Walk In</div>
-                                <div class="text-[10px] opacity-70">Pick up at hostel</div>
-                            </div>
+            <!-- Fork in the Road (Lazy vs Studio) - Friction Removed! -->
+            <div class="space-y-4 pt-2 border-t-4 border-dashed border-gray-300">
+                <div class="text-center mb-6 mt-4">
+                    <div class="inline-block bg-black text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase mb-3">Step 3</div>
+                    <h3 class="font-display text-2xl md:text-3xl font-black">How do you want to format this?</h3>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Option B: Lazy WA -->
+                    <button onclick="sendLazyWhatsApp()" class="brutal-btn bg-brand-green text-white rounded-3xl p-6 text-left group relative overflow-hidden focus:outline-none hover:bg-[#1fbc5b]">
+                        <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500 text-black"><i class="ph-fill ph-sleeping text-8xl"></i></div>
+                        <h4 class="font-black text-2xl mb-2 relative z-10">Feeling lazy? 😴</h4>
+                        <p class="font-semibold text-white/90 text-sm relative z-10 mb-4">Dump your files on our WhatsApp. We'll format it for you perfectly.</p>
+                        <div class="inline-flex items-center gap-2 bg-black text-brand-green px-4 py-2 rounded-full text-xs font-bold relative z-10">
+                            <i class="ph-bold ph-whatsapp text-lg"></i> Checkout Instantly ->
                         </div>
-                    </label>
-                    <label class="cursor-pointer">
-                        <input type="radio" name="hubDelivery" value="friend" class="peer sr-only" onchange="updateHubDelivery()">
-                        <div class="bg-white border-2 border-black rounded-xl p-3 text-center peer-checked:bg-black peer-checked:text-white transition-colors flex flex-row sm:flex-col items-center justify-center gap-2 sm:gap-0 h-full">
-                            <i class="ph-bold ph-users text-2xl sm:mb-1"></i>
-                            <div class="text-left sm:text-center">
-                                <div class="font-bold text-sm">Send Friend</div>
-                                <div class="text-[10px] opacity-70">To pick it up</div>
-                            </div>
+                    </button>
+
+                    <!-- Option A: Magic Studio -->
+                    <button onclick="goToStudio()" class="brutal-btn bg-brand-cyan rounded-3xl p-6 text-left group relative overflow-hidden focus:outline-none">
+                        <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500"><i class="ph-fill ph-magic-wand text-8xl"></i></div>
+                        <h4 class="font-black text-2xl mb-2 relative z-10">Got trust issues? ✨</h4>
+                        <p class="font-semibold text-gray-800 text-sm relative z-10 mb-4">Format it yourself exactly how you want it using our Magic Studio canvas.</p>
+                        <div class="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-full text-xs font-bold relative z-10">
+                            Open Studio Editor <i class="ph-bold ph-arrow-right"></i>
                         </div>
-                    </label>
-                    <label class="cursor-pointer">
-                        <input type="radio" name="hubDelivery" value="online" class="peer sr-only" onchange="updateHubDelivery()">
-                        <div class="bg-white border-2 border-black rounded-xl p-3 text-center peer-checked:bg-black peer-checked:text-white transition-colors flex flex-row sm:flex-col items-center justify-center gap-2 sm:gap-0 h-full">
-                            <i class="ph-bold ph-moped text-2xl sm:mb-1"></i>
-                            <div class="text-left sm:text-center">
-                                <div class="font-bold text-sm">Deliver It</div>
-                                <div class="text-[10px] opacity-70">Extra charges apply</div>
-                            </div>
-                        </div>
-                    </label>
+                    </button>
                 </div>
             </div>
 
-            <button onclick="handleProceed()" class="brutal-btn bg-black text-white w-full py-5 rounded-3xl font-black text-xl flex items-center justify-center gap-2">
-                Continue to Format <i class="ph-bold ph-arrow-right"></i>
-            </button>
-            <p class="text-center text-[10px] font-bold text-gray-400 mt-4">Need professional design help? <a href="https://arteviastudio.in/sarup/" target="_blank" class="text-brand-magenta hover:underline">Let's talk branding & graphics.</a></p>
-        </div>
-
-
-        <!-- ==========================================
-             VIEW 4: THE FORK (Lazy vs Studio)
-             ========================================== -->
-        <div id="view-fork" class="app-view">
-            <div class="text-center mb-8">
-                <div class="inline-block bg-black text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase mb-3">Step 3</div>
-                <h3 class="font-display text-3xl md:text-4xl font-black">How do you want to format this?</h3>
-                <p class="text-sm font-bold text-gray-500 mt-2">Almost done. Choose your fighter.</p>
-            </div>
-            
-            <div class="grid grid-cols-1 gap-5 max-w-lg mx-auto">
-                <button onclick="sendLazyWhatsApp()" class="brutal-btn bg-brand-green text-white rounded-3xl p-6 text-left group relative overflow-hidden focus:outline-none">
-                    <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500 text-black"><i class="ph-fill ph-sleeping text-8xl"></i></div>
-                    <h4 class="font-black text-2xl mb-2 relative z-10">Feeling lazy? 😴</h4>
-                    <p class="font-semibold text-white/90 text-sm relative z-10 mb-4">Dump your files on our WhatsApp. We'll format it for you perfectly.</p>
-                    <div class="inline-flex items-center gap-2 bg-black text-brand-green px-4 py-2 rounded-full text-xs font-bold relative z-10">
-                        <i class="ph-bold ph-whatsapp text-lg"></i> Send to WhatsApp -> Done Yayyyy!
-                    </div>
-                </button>
-
-                <button onclick="goToStudio()" class="brutal-btn bg-brand-cyan rounded-3xl p-6 text-left group relative overflow-hidden focus:outline-none">
-                    <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500"><i class="ph-fill ph-magic-wand text-8xl"></i></div>
-                    <h4 class="font-black text-2xl mb-2 relative z-10">Got trust issues? ✨</h4>
-                    <p class="font-semibold text-gray-800 text-sm relative z-10 mb-4">Format it yourself exactly how you want it using our Magic Studio canvas.</p>
-                    <div class="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-full text-xs font-bold relative z-10">
-                        Open Studio Editor <i class="ph-bold ph-arrow-right"></i>
-                    </div>
-                </button>
-            </div>
         </div>
 
 
@@ -548,7 +512,7 @@
                             </div>
                             <p id="fileCount" class="text-[10px] font-bold text-gray-500 text-center">0 images loaded</p>
                             <p class="text-[10px] font-black text-brand-blue mt-1 hidden text-center" id="uploadLoading">
-                                <i class="ph-bold ph-spinner animate-spin mr-1"></i> Optimizing...
+                                <i class="ph-bold ph-spinner animate-spin mr-1"></i> Loading Native Image...
                             </p>
                         </div>
 
@@ -634,13 +598,13 @@
     <footer class="bg-brand-black text-white py-12 border-t-4 border-brand-magenta mt-16 w-full">
         <div class="max-w-4xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
             <div>
-                <div class="flex items-center justify-center md:justify-start gap-2 mb-1">
+                <div class="flex items-center justify-center md:justify-start gap-2 mb-1 cursor-pointer" onclick="resetWizard()">
                     <i class="ph-fill ph-printer text-2xl text-brand-magenta"></i>
                     <span class="font-display font-black text-xl">deluluprinter.xyz</span>
                 </div>
                 <p class="text-gray-400 text-xs font-semibold">Local roots. Global aesthetics. Premium prints.</p>
             </div>
-            <a href="https://arteviastudio.in/" target="_blank" class="bg-gray-900 px-3 py-2 rounded-xl border-2 border-gray-700 hover:bg-gray-800 transition block">
+            <a href="https://arteviastudio.in/" target="_blank" class="bg-gray-900 px-3 py-2 rounded-xl border-2 border-gray-700 hover:bg-gray-800 transition block shadow-brutal-sm">
                 <p class="text-[10px] text-gray-400 font-bold mb-0.5">Powered by</p>
                 <p class="font-black text-brand-cyan text-sm hover:underline">Artevia Studio Engine</p>
             </a>
@@ -650,7 +614,7 @@
     <!-- Modals & Toasts -->
     <div id="toast" class="fixed top-20 right-4 bg-brand-black text-white px-5 py-3 rounded-xl brutal-border shadow-brutal font-black z-50 flex items-center hidden">
         <i class="ph-fill ph-whatsapp-logo text-brand-green text-2xl mr-2"></i>
-        <span id="toastMsg" class="text-sm">Opening WhatsApp in <span id="countdown" class="text-brand-yellow text-lg ml-1">3</span>...</span>
+        <span id="toastMsg" class="text-sm">Opening WhatsApp in <span id="countdown" class="text-brand-yellow text-lg ml-1">...</span></span>
     </div>
 
     <!-- Delulu Card Gamified Popup (>₹100) -->
@@ -675,8 +639,7 @@
         let originalTotal = 0;
         let discountedTotal = 0;
         let discountApplied = false;
-        let deliveryPreference = "pickup";
-        let pendingWaMessage = ""; // Holds WA message while popup is showing
+        let pendingWaMessage = ""; 
         let heroInterval;
 
         const prices = {
@@ -747,6 +710,7 @@
         const clearImagesBtn = document.getElementById('clearImagesBtn');
         const uploadLoading = document.getElementById('uploadLoading');
         const fileCount = document.getElementById('fileCount');
+        const addImagesLabel = document.getElementById('addImagesLabel');
         
         const orientationSelect = document.getElementById('orientation');
         const stickerShapeSelect = document.getElementById('stickerShape');
@@ -770,20 +734,20 @@
             if(heroInterval) clearInterval(heroInterval);
             
             heroInterval = setInterval(() => {
-                // Hide current
-                document.getElementById(`slide-${currentSlide}`).classList.replace('slide-visible', 'slide-hidden');
-                document.getElementById(`dot-${currentSlide}`).classList.replace('bg-brand-black', 'bg-gray-300');
+                const curSlide = document.getElementById(`slide-${currentSlide}`);
+                const curDot = document.getElementById(`dot-${currentSlide}`);
+                if(curSlide) curSlide.classList.replace('slide-visible', 'slide-hidden');
+                if(curDot) curDot.classList.replace('bg-brand-black', 'bg-gray-300');
                 
-                // Next
                 currentSlide = (currentSlide + 1) % totalSlides;
                 
-                // Show next
-                document.getElementById(`slide-${currentSlide}`).classList.replace('slide-hidden', 'slide-visible');
-                document.getElementById(`dot-${currentSlide}`).classList.replace('bg-gray-300', 'bg-brand-black');
+                const nextSlide = document.getElementById(`slide-${currentSlide}`);
+                const nextDot = document.getElementById(`dot-${currentSlide}`);
+                if(nextSlide) nextSlide.classList.replace('slide-hidden', 'slide-visible');
+                if(nextDot) nextDot.classList.replace('bg-gray-300', 'bg-brand-black');
             }, 4000);
         }
         
-        // Start carousel on load
         startHeroCarousel();
 
 
@@ -791,7 +755,6 @@
         let viewHistory = ['view-start'];
 
         function goToView(viewId) {
-            // Hide all safely
             Object.values(views).forEach(v => {
                 if (v && v.classList) {
                     v.classList.remove('active');
@@ -799,20 +762,16 @@
                 }
             });
 
-            // Show target
             const target = views[viewId.replace('view-', '')]; 
             if (target && target.classList) {
                 setTimeout(() => {
                     target.style.display = 'block';
-                    void target.offsetWidth; // Trigger reflow
+                    void target.offsetWidth; 
                     target.classList.add('active');
-                    
-                    // Smooth scroll to top of viewport
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 }, 300);
             }
 
-            // Update History
             if (viewId === 'view-start') {
                 viewHistory = ['view-start'];
                 if(navBackBtn) navBackBtn.classList.add('hidden');
@@ -894,11 +853,6 @@
             goToView('view-order');
         }
 
-        function updateHubDelivery() {
-            const selected = document.querySelector('input[name="hubDelivery"]:checked');
-            if(selected) deliveryPreference = selected.value;
-        }
-
         function changeQty(amt) {
             if(!hubQty) return;
             let val = parseInt(hubQty.value) || 1;
@@ -916,7 +870,6 @@
             currentMode = vibe;
             const qty = parseInt(hubQty.value) || 0;
             
-            // Update label
             if (vibe === 'polaroid' || vibe === 'maps' || vibe.includes('apparel')) {
                 hubQtyLabel.textContent = "How many items/copies do you need?";
             } else if (vibe === 'passport' || vibe === 'sticker_passport') {
@@ -925,7 +878,6 @@
                 hubQtyLabel.textContent = "How many pages do you need?";
             }
 
-            // Calculate Base
             let baseTotal = 0;
             if (vibe === 'polaroid') {
                 const fullPages = Math.floor(qty / 9);
@@ -940,7 +892,6 @@
                 baseTotal = qty * prices[vibe];
             }
 
-            // Buy More Save More
             discountApplied = false;
             let finalTotal = baseTotal;
             let htmlOutput = "";
@@ -969,8 +920,7 @@
             if (originalTotal === 0) { alert('Please enter a valid quantity!'); return; }
             
             const vibe = currentMode;
-            if (!productsData[vibe].hasStudio) {
-                // Skips the fork, goes straight to WhatsApp because studio doesn't support it
+            if (!productsData[vibe] || !productsData[vibe].hasStudio) {
                 sendLazyWhatsApp();
             } else {
                 goToView('view-fork');
@@ -982,68 +932,67 @@
             if (originalTotal >= 100) {
                 pendingWaMessage = message;
                 const popup = document.getElementById('delulu-popup');
-                popup.classList.remove('hidden');
-                popup.classList.add('flex');
-                setTimeout(() => {
-                    const innerBox = popup.querySelector('div');
-                    innerBox.classList.remove('scale-95', 'opacity-0');
-                    innerBox.classList.add('scale-100', 'opacity-100');
-                }, 10);
+                if(popup) {
+                    popup.classList.remove('hidden');
+                    popup.classList.add('flex');
+                    setTimeout(() => {
+                        const innerBox = popup.querySelector('div');
+                        if(innerBox) {
+                            innerBox.classList.remove('scale-95', 'opacity-0');
+                            innerBox.classList.add('scale-100', 'opacity-100');
+                        }
+                    }, 10);
+                } else {
+                    triggerWhatsApp(message);
+                }
             } else {
                 triggerWhatsApp(message);
             }
         }
 
-        document.getElementById('btn-accept-delulu').addEventListener('click', () => {
-            document.getElementById('delulu-popup').classList.add('hidden');
-            let msg = pendingWaMessage + `\n\n🎟 *YES! I'm interested in the FREE Delulu Card! Put me in the system!* 💳✨`;
-            triggerWhatsApp(msg);
-        });
+        const btnAccept = document.getElementById('btn-accept-delulu');
+        if(btnAccept) {
+            btnAccept.addEventListener('click', () => {
+                document.getElementById('delulu-popup').classList.add('hidden');
+                let msg = pendingWaMessage + `\n\n🎟 *YES! I'm interested in the FREE Delulu Card! Put me in the system!* 💳✨`;
+                triggerWhatsApp(msg);
+            });
+        }
 
-        document.getElementById('btn-decline-delulu').addEventListener('click', () => {
-            document.getElementById('delulu-popup').classList.add('hidden');
-            triggerWhatsApp(pendingWaMessage);
-        });
+        const btnDecline = document.getElementById('btn-decline-delulu');
+        if(btnDecline) {
+            btnDecline.addEventListener('click', () => {
+                document.getElementById('delulu-popup').classList.add('hidden');
+                triggerWhatsApp(pendingWaMessage);
+            });
+        }
 
         function triggerWhatsApp(message) {
-            if(!toast) return;
-            toast.classList.remove('hidden');
-            toast.classList.add('toast-enter');
-            let timeLeft = 3;
-            if(countdownEl) countdownEl.textContent = timeLeft;
-            
             const url = `https://wa.me/919907488075?text=${encodeURIComponent(message)}`;
-            
-            const timer = setInterval(() => {
-                timeLeft--;
-                if(countdownEl) countdownEl.textContent = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    toast.classList.add('hidden');
-                    toast.classList.remove('toast-enter');
-                    // iOS Fix: location.href works properly bypassing popup blockers
-                    window.location.href = url;
-                }
-            }, 1000);
+            if(toast) {
+                toast.classList.remove('hidden');
+                toast.classList.add('toast-enter');
+                if(countdownEl) countdownEl.textContent = "Redirecting";
+            }
+            // Instant redirect for iOS Safari security policies
+            setTimeout(() => {
+                window.location.href = url;
+            }, 100);
         }
 
         // --- PATH: LAZY WA ---
         function sendLazyWhatsApp() {
             if (originalTotal === 0) { alert('Please enter a valid quantity!'); return; }
             
-            const typeName = productsData[currentMode].name;
+            const typeName = productsData[currentMode] ? productsData[currentMode].name : currentMode;
             const qty = hubQty ? hubQty.value : 1;
             const notes = hubNotes ? hubNotes.value.trim() : '';
-            const qtyLabel = (currentMode === 'polaroid' || currentMode === 'maps' || currentMode.includes('apparel')) ? 'items/copies' : (currentMode.includes('passport') ? 'sets' : 'pages');
+            const qtyLabel = (currentMode === 'polaroid' || currentMode === 'maps' || (currentMode && currentMode.includes('apparel'))) ? 'items/copies' : ((currentMode && currentMode.includes('passport')) ? 'sets' : 'pages');
 
             let msg = `Heyy! ✨\n\nI need ${qty} ${qtyLabel} of *${typeName}*.\n\nEstimated damage is ₹${originalTotal}${discountApplied ? ' (got that 15% OFF! 🎉)' : ''}.\n\n`;
             
             if (notes) msg += `*Notes:* ${notes}\n\n`;
-            
-            if (deliveryPreference === 'pickup') msg += `📍 I'll walk in and pick this up at Shreeraj Hostel!\n`;
-            else if (deliveryPreference === 'friend') msg += `🤝 A friend will pick this up for me at Shreeraj Hostel!\n`;
-            else msg += `🛵 I'd like to order online for delivery.\n`;
-
+            msg += `📍 I'm ordering from deluluprinter.xyz!\n`;
             msg += `\nHere are my photos/files... 🚀`;
 
             checkDeluluAndSend(msg);
@@ -1087,27 +1036,31 @@
         }
 
         // --- STUDIO CANVAS ENGINE ---
+        // Native FileReader for iOS compatibility (No third party workers)
         if(imageInput) {
             imageInput.addEventListener('change', async () => {
                 const files = Array.from(imageInput.files);
                 if (files.length === 0) return;
 
                 if(uploadLoading) uploadLoading.classList.remove('hidden');
-                if(document.getElementById('addImagesLabel')) document.getElementById('addImagesLabel').classList.add('opacity-50', 'pointer-events-none');
+                if(addImagesLabel) addImagesLabel.classList.add('opacity-50', 'pointer-events-none');
                 if(generateBtn) generateBtn.classList.add('opacity-50', 'pointer-events-none');
 
                 try {
                     for (let i = 0; i < files.length; i++) {
                         const file = files[i];
-                        const options = { maxSizeMB: 1, maxWidthOrHeight: 1500, useWebWorker: true };
-                        const compressedFile = await browserImageCompression(file, options);
-                        
+                        if(i % 2 === 0) newFunFact(); 
+
                         const img = await new Promise((resolve, reject) => {
-                            const iObj = new Image();
-                            const url = URL.createObjectURL(compressedFile);
-                            iObj.onload = () => { URL.revokeObjectURL(url); resolve(iObj); };
-                            iObj.onerror = reject;
-                            iObj.src = url;
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const iObj = new Image();
+                                iObj.onload = () => resolve(iObj);
+                                iObj.onerror = () => reject(new Error("Image decode error"));
+                                iObj.src = e.target.result;
+                            };
+                            reader.onerror = () => reject(new Error("File read error"));
+                            reader.readAsDataURL(file);
                         });
                         globalImages.push(img);
                     }
@@ -1115,11 +1068,11 @@
                     if(fileCount) fileCount.textContent = `${globalImages.length} image(s) loaded`;
                     if(clearImagesBtn) clearImagesBtn.classList.remove('hidden');
                 } catch (error) {
-                    alert("Error loading images.");
+                    alert("Error loading images. Please try again.");
                 } finally {
                     imageInput.value = '';
                     if(uploadLoading) uploadLoading.classList.add('hidden');
-                    if(document.getElementById('addImagesLabel')) document.getElementById('addImagesLabel').classList.remove('opacity-50', 'pointer-events-none');
+                    if(addImagesLabel) addImagesLabel.classList.remove('opacity-50', 'pointer-events-none');
                     if(generateBtn) generateBtn.classList.remove('opacity-50', 'pointer-events-none');
                 }
             });
@@ -1339,7 +1292,7 @@
                     alert('Error processing: ' + error.message);
                     if(placeholderText) placeholderText.classList.remove('hidden');
                 } finally {
-                    generateBtn.disabled = false;
+                    if(generateBtn) generateBtn.disabled = false;
                     if(loading) loading.classList.add('hidden');
                     if(loadingOverlay) loadingOverlay.classList.add('hidden');
                 }
@@ -1351,18 +1304,14 @@
                 alert('Generate a preview first!'); return;
             }
             
-            const typeName = productsData[currentMode].name;
+            const typeName = productsData[currentMode] ? productsData[currentMode].name : currentMode;
             const notes = hubNotes ? hubNotes.value.trim() : '';
-            const qtyLabel = (currentMode === 'polaroid' || currentMode === 'maps' || currentMode.includes('apparel')) ? 'items/copies' : (currentMode.includes('passport') ? 'sets' : 'pages');
+            const qtyLabel = (currentMode === 'polaroid' || currentMode === 'maps' || (currentMode && currentMode.includes('apparel'))) ? 'items/copies' : ((currentMode && currentMode.includes('passport')) ? 'sets' : 'pages');
 
             let msg = `Heyy! ✨\n\nI formatted ${calculatedPages} ${qtyLabel} of *${typeName}* using the Magic Studio.\n\nEstimated damage was ₹${originalTotal}${discountApplied ? ' (got that 15% OFF! 🎉)' : ''}.\n\n`;
             
             if (notes) msg += `*Notes:* ${notes}\n\n`;
-            
-            if (deliveryPreference === 'pickup') msg += `📍 I'll walk in and pick this up at Shreeraj Hostel!\n`;
-            else if (deliveryPreference === 'friend') msg += `🤝 A friend will pick this up for me at Shreeraj Hostel!\n`;
-            else msg += `🛵 I'd like to order online for delivery.\n`;
-
+            msg += `📍 I'm ordering from deluluprinter.xyz!\n`;
             msg += `\nHere is my generated A4 sheet... 🚀`;
             
             checkDeluluAndSend(msg);
