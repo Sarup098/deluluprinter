@@ -2,17 +2,19 @@
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>deluluprinter.xyz | Unfairly Cheap Prints</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>deluluprinter.xyz | Unfairly Cheap Prints fr fr</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Space Grotesk', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
                     },
                     colors: {
                         brand: {
@@ -20,12 +22,15 @@
                             magenta: '#FF00FF',
                             yellow: '#FFEA00',
                             black: '#111111',
-                            green: '#25D366' // WhatsApp Green
+                            green: '#25D366', 
+                            purple: '#d500f9',
+                            blue: '#2962ff'
                         }
                     },
                     boxShadow: {
                         'brutal': '6px 6px 0px 0px rgba(17, 17, 17, 1)',
-                        'brutal-hover': '2px 2px 0px 0px rgba(17, 17, 17, 1)',
+                        'brutal-sm': '3px 3px 0px 0px rgba(17, 17, 17, 1)',
+                        'brutal-hover': '0px 0px 0px 0px rgba(17, 17, 17, 1)',
                     }
                 }
             }
@@ -34,360 +39,1250 @@
     <style>
         body {
             background-color: #FAFAFA;
-            background-image: radial-gradient(#E5E7EB 1px, transparent 1px);
-            background-size: 20px 20px;
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
-        .brutal-transition {
-            transition: all 0.2s ease-in-out;
+        .brutal-btn {
+            border: 3px solid #111;
+            box-shadow: 4px 4px 0px 0px #111;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .brutal-transition:hover {
+        .brutal-btn:hover:not(:disabled) {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px 0px #111;
+        }
+        .brutal-btn:active:not(:disabled) {
             transform: translate(4px, 4px);
-            box-shadow: 2px 2px 0px 0px rgba(17, 17, 17, 1);
+            box-shadow: 0px 0px 0px 0px #111;
         }
+        
+        .app-view {
+            display: none;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .app-view.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .canvas-bg {
+            background-color: #f1f5f9;
+            background-image: 
+                linear-gradient(45deg, #e2e8f0 25%, transparent 25%), 
+                linear-gradient(-45deg, #e2e8f0 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #e2e8f0 75%), 
+                linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .toast-enter { animation: slideUp 0.4s ease forwards; }
     </style>
 </head>
-<body class="text-brand-black antialiased overflow-x-hidden selection:bg-brand-magenta selection:text-white">
+<body class="text-brand-black antialiased selection:bg-brand-magenta selection:text-white pb-24 min-h-screen flex flex-col">
 
-    <!-- Navigation -->
-    <nav class="fixed w-full top-0 z-50 bg-[#FAFAFA]/90 backdrop-blur-sm border-b-2 border-brand-black">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <i class="ph-fill ph-printer text-3xl text-brand-magenta"></i>
-                <a href="/" class="font-bold text-xl md:text-2xl tracking-tight hover:text-brand-magenta transition-colors">deluluprinter.xyz</a>
+    <!-- GLOBAL/LOCAL PROMO BANNER -->
+    <div class="w-full bg-brand-cyan border-b-4 border-brand-black px-3 py-2 flex items-center justify-center text-center z-50 sticky top-0">
+        <p class="font-bold text-xs md:text-sm flex items-center justify-center gap-2 flex-wrap">
+            <i class="ph-fill ph-scooter text-lg animate-bounce"></i>
+            <span>Order online 🛵, send a friend 🤝, OR walk-in at <strong class="bg-black text-white px-2 py-0.5 rounded uppercase tracking-wider">Shreeraj Hostel</strong>!</span>
+        </p>
+    </div>
+
+    <!-- App Header Nav -->
+    <nav class="w-full bg-white/95 backdrop-blur-md border-b-2 border-brand-black sticky top-[36px] md:top-[40px] z-40 shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="resetWizard()">
+                <i class="ph-fill ph-printer text-2xl text-brand-magenta"></i>
+                <span class="font-display font-black text-lg md:text-xl tracking-tight">deluluprinter.xyz</span>
             </div>
-            <div class="hidden md:flex items-center gap-6">
-                <a href="/create/" class="font-bold hover:text-brand-magenta transition flex items-center gap-1">
-                    <i class="ph-bold ph-magic-wand"></i> Auto-Format Tool
-                </a>
-                <a href="/price/" class="font-bold hover:text-brand-magenta transition flex items-center gap-1">
-                    <i class="ph-bold ph-book-open"></i> Full Catalog
-                </a>
-                <button onclick="openModal()" class="flex items-center gap-2 bg-brand-black text-white px-5 py-2 rounded-full font-semibold hover:bg-gray-800 transition ml-4">
-                    <span>Order Now</span>
-                    <i class="ph-bold ph-arrow-right"></i>
+            <div class="flex items-center gap-3">
+                <button id="navBackBtn" onclick="goBack()" class="hidden brutal-btn bg-white px-3 py-1.5 rounded-lg font-bold text-xs flex items-center gap-1 border-2">
+                    <i class="ph-bold ph-arrow-left"></i> Back
+                </button>
+                <button onclick="resetWizard()" class="bg-gray-100 hover:bg-gray-200 border-2 border-brand-black px-3 py-1.5 rounded-lg font-bold text-xs transition">
+                    Start Over <i class="ph-bold ph-arrow-counter-clockwise"></i>
                 </button>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="pt-32 pb-16 md:pt-48 md:pb-24 px-4 max-w-6xl mx-auto">
-        <div class="text-center max-w-4xl mx-auto">
-            <div class="inline-block bg-brand-yellow border-2 border-brand-black px-4 py-1 rounded-full font-bold text-sm mb-6 shadow-[3px_3px_0px_0px_rgba(17,17,17,1)] rotate-[-2deg]">
-                Warning: Shockingly affordable prices ahead 🚨
-            </div>
-            <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold leading-tight mb-6">
-                Print your school assignments without going <span class="bg-brand-cyan px-2 border-2 border-brand-black shadow-brutal inline-block rotate-1">broke.</span>
-            </h1>
-            <p class="text-lg sm:text-xl md:text-2xl text-gray-700 mb-10 max-w-2xl mx-auto">
-                Why does printer ink sometimes feel like it's made of liquid gold? We keep it simple. Get premium quality prints for just ₹10 and save your pocket money for momos. 
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <a href="#pricing" class="bg-white border-2 border-brand-black px-8 py-4 text-lg font-bold shadow-brutal brutal-transition rounded-xl w-full sm:w-auto text-center">
-                    See Our Prices
-                </a>
-                <button onclick="openModal()" class="bg-brand-green text-white border-2 border-brand-black px-8 py-4 text-lg font-bold shadow-brutal brutal-transition rounded-xl flex items-center justify-center gap-2 w-full sm:w-auto">
-                    <i class="ph-bold ph-whatsapp text-2xl"></i>
-                    WhatsApp Us
-                </button>
-            </div>
-            <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-2 text-gray-600 font-semibold bg-white/50 py-2 px-4 rounded-full border border-gray-200 inline-flex">
-                <span>Got messy photos?</span>
-                <a href="/create/" class="text-brand-magenta hover:text-brand-black hover:underline decoration-2 underline-offset-4 flex items-center gap-1 transition-all">
-                    Try our Auto-Arrange Tool <i class="ph-bold ph-magic-wand"></i>
-                </a>
-            </div>
-        </div>
-    </section>
+    <div class="max-w-4xl mx-auto px-4 pt-6 md:pt-10 flex-grow w-full">
 
-    <!-- The "Problem" Section -->
-    <section class="py-16 px-4 border-y-2 border-brand-black bg-brand-black text-white">
-        <div class="max-w-6xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                <div>
-                    <h2 class="text-4xl md:text-5xl font-bold mb-6 text-brand-yellow">Printing shouldn't be a luxury.</h2>
-                    <p class="text-lg md:text-xl text-gray-300 mb-4">
-                        Ever tried getting a simple school project printed and wondered if you accidentally bought a small plot of land instead? Yeah, us too.
-                    </p>
-                    <p class="text-lg md:text-xl text-gray-300">
-                        We hate complicated math. No extra charge for a drop of color. No extra charge for double-sided magic. <span class="text-brand-cyan font-bold">Mostly everything on normal paper is just ₹10.</span> Simple, affordable, delulu-free.
-                    </p>
+        <!-- ==========================================
+             VIEW 1: THE START SCREEN (Hero + Soul)
+             ========================================== -->
+        <div id="view-start" class="app-view active">
+            
+            <!-- Hero -->
+            <section class="text-center pt-2 md:pt-6 mb-12 relative">
+                <div class="absolute top-0 right-0 hidden md:block">
+                    <div class="bg-brand-magenta text-white font-black text-xs px-3 py-1 rounded-lg border-2 border-black rotate-[12deg] shadow-brutal-sm">
+                        15% OFF over ₹500! 💸
+                    </div>
                 </div>
-                <div class="relative">
-                    <div class="bg-white text-brand-black p-8 rounded-2xl border-4 border-brand-magenta transform rotate-2">
-                        <h3 class="text-2xl font-bold mb-4 border-b-2 border-gray-200 pb-2">The Math We Skip:</h3>
-                        <ul class="space-y-3 text-lg font-semibold text-gray-600">
-                            <li class="flex justify-between"><span>Base B&W page</span> <span>₹??</span></li>
-                            <li class="flex justify-between"><span>Oh, it's color?</span> <span class="text-red-500">+₹??</span></li>
-                            <li class="flex justify-between"><span>Wait, is that an image?</span> <span class="text-red-500">+₹??</span></li>
-                            <li class="flex justify-between"><span>Confusion fee</span> <span class="text-red-500">+₹??</span></li>
-                        </ul>
-                        <div class="mt-4 pt-4 border-t-2 border-gray-200 flex justify-between font-bold text-2xl text-brand-green">
-                            <span>Our Price</span>
-                            <span>Just ₹10 🚀</span>
+
+                <div class="inline-block bg-brand-yellow border-2 border-brand-black px-4 py-1 rounded-full font-bold text-xs mb-6 shadow-brutal-sm rotate-[-2deg]">
+                    Warning: Shockingly affordable prices ahead 🚨
+                </div>
+                
+                <h1 class="font-display text-4xl md:text-6xl font-black leading-tight mb-4 tracking-tighter">
+                    Print your assignments <br/> without going <span class="bg-brand-cyan px-2 pb-1 border-4 border-brand-black shadow-brutal inline-block rotate-2">broke.</span>
+                </h1>
+                
+                <p class="text-base md:text-lg font-medium text-gray-600 max-w-xl mx-auto mb-10">
+                    Why does printer ink feel like it's made of liquid gold? We keep it simple. Premium prints starting at just ₹10. Save your pocket money for momos. 🥟
+                </p>
+
+                <button onclick="goToView('view-products')" class="brutal-btn bg-brand-green text-white font-black text-2xl px-10 py-5 rounded-3xl animate-pulse hover:animate-none w-full sm:w-auto">
+                    START HERE 🚀
+                </button>
+            </section>
+
+            <!-- The Problem (Math We Skip) -->
+            <section class="mb-12">
+                <div class="bg-brand-black text-white p-6 md:p-10 rounded-3xl border-4 border-brand-black shadow-brutal relative overflow-hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center relative z-10">
+                        <div>
+                            <h2 class="font-display text-3xl md:text-4xl font-black mb-4 text-brand-yellow leading-tight">Printing shouldn't be a luxury.</h2>
+                            <p class="text-sm md:text-base text-gray-300 font-medium mb-4">Ever tried getting a project printed and wondered if you accidentally bought a small plot of land instead? Yeah, us too.</p>
+                            <p class="text-sm md:text-base text-gray-300 font-medium">We hate complicated math. Mostly everything on normal paper is just ₹10. Simple, affordable, delulu-free.</p>
+                        </div>
+                        <div class="relative">
+                            <div class="bg-white text-brand-black p-5 md:p-6 rounded-2xl border-4 border-brand-magenta transform rotate-2">
+                                <h3 class="font-display text-xl font-black mb-3 border-b-2 border-gray-200 pb-2">The Math We Skip:</h3>
+                                <ul class="space-y-2 font-bold text-sm text-gray-600">
+                                    <li class="flex justify-between"><span>Base B&W page</span> <span>₹??</span></li>
+                                    <li class="flex justify-between"><span>Oh, it's color?</span> <span class="text-red-500">+₹??</span></li>
+                                    <li class="flex justify-between"><span>Wait, is that an image?</span> <span class="text-red-500">+₹??</span></li>
+                                    <li class="flex justify-between"><span>Confusion fee</span> <span class="text-red-500">+₹??</span></li>
+                                </ul>
+                                <div class="mt-4 pt-3 border-t-2 border-gray-200 flex justify-between font-black text-xl text-brand-green">
+                                    <span>Our Price</span>
+                                    <span>Just ₹10 🚀</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
+            </section>
 
-    <!-- Pricing Section -->
-    <section id="pricing" class="py-24 px-4 max-w-6xl mx-auto">
-        <div class="text-center mb-16">
-            <h2 class="text-4xl md:text-5xl font-bold mb-4">No Math Required Pricing.</h2>
-            <p class="text-xl text-gray-600">Premium quality, zero drama. Here's exactly what you'll pay.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            <!-- Card 1 -->
-            <div class="bg-brand-yellow border-2 border-brand-black rounded-2xl p-6 shadow-brutal brutal-transition flex flex-col h-full">
-                <div class="mb-4">
-                    <i class="ph-duotone ph-file-text text-5xl mb-2"></i>
-                    <h3 class="text-2xl font-bold">The "Whatever" Page</h3>
-                    <p class="text-sm font-semibold mt-2 opacity-80">Color? B&W? Photocopy? Doesn't matter.</p>
-                </div>
-                <div class="mt-auto pt-6">
-                    <div class="flex items-baseline gap-1">
-                        <span class="text-5xl font-bold">₹10</span>
-                        <span class="font-bold opacity-80">/page</span>
+            <!-- Gamification: Delulu Card -->
+            <section class="mb-12">
+                <div class="bg-brand-yellow text-brand-black border-4 border-brand-black rounded-3xl p-6 md:p-10 shadow-brutal flex flex-col md:flex-row gap-6 items-center">
+                    <div class="flex-1 text-center md:text-left">
+                        <div class="inline-block bg-black text-white px-3 py-1 rounded-full font-bold text-[10px] mb-3 uppercase tracking-widest border border-white">
+                            Level Up Your Prints 🎮
+                        </div>
+                        <h2 class="font-display text-3xl font-black mb-3 leading-tight">
+                            Unlock the <span class="text-brand-magenta underline decoration-4">Delulu Card</span> 💳✨
+                        </h2>
+                        <p class="font-semibold text-sm mb-4 text-gray-800">
+                            Collect punches like Pokémon cards and earn basically free money for your ICSE assignments or dorm aesthetics.
+                        </p>
+                        <div class="bg-white/60 p-3 rounded-xl border-2 border-black inline-block text-left w-full md:w-auto">
+                            <ul class="space-y-2 font-bold text-sm">
+                                <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-brand-green text-xl"></i> Spend ₹100 = 1 Box Filled</li>
+                                <li class="flex items-center gap-2"><i class="ph-fill ph-check-circle text-brand-green text-xl"></i> Fill 8 Boxes = Boss Level</li>
+                                <li class="flex items-center gap-2"><i class="ph-fill ph-gift text-brand-magenta text-xl"></i> Claim ₹80 FREE Prints!</li>
+                            </ul>
+                        </div>
                     </div>
-                    <ul class="mt-4 space-y-2 text-sm font-semibold border-t-2 border-brand-black/20 pt-4">
-                        <li>✓ Standard A4 Paper</li>
-                        <li>✓ Full Color included</li>
-                        <li>✓ Zero hidden fees</li>
-                    </ul>
                 </div>
-            </div>
+            </section>
 
-            <!-- Card 2 -->
-            <div class="bg-brand-cyan border-2 border-brand-black rounded-2xl p-6 shadow-brutal brutal-transition flex flex-col h-full">
-                <div class="mb-4">
-                    <i class="ph-duotone ph-sticker text-5xl mb-2"></i>
-                    <h3 class="text-2xl font-bold">Regular Stickers</h3>
-                    <p class="text-sm font-semibold mt-2 opacity-80">Slap your memes everywhere.</p>
-                </div>
-                <div class="mt-auto pt-6">
-                    <div class="flex items-baseline gap-1">
-                        <span class="text-5xl font-bold">₹25</span>
-                        <span class="font-bold opacity-80">/page</span>
-                    </div>
-                    <ul class="mt-4 space-y-2 text-sm font-semibold border-t-2 border-brand-black/20 pt-4">
-                        <li>✓ Matte finish</li>
-                        <li>✓ Great for laptops</li>
-                        <li>✓ Print as many as fit on A4</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Card 3 -->
-            <div class="bg-brand-magenta text-white border-2 border-brand-black rounded-2xl p-6 shadow-brutal brutal-transition flex flex-col h-full">
-                <div class="mb-4">
-                    <i class="ph-duotone ph-sparkle text-5xl mb-2"></i>
-                    <h3 class="text-2xl font-bold">Premium Stickers</h3>
-                    <p class="text-sm font-semibold mt-2 opacity-80">For when you need to be fancy.</p>
-                </div>
-                <div class="mt-auto pt-6">
-                    <div class="flex items-baseline gap-1">
-                        <span class="text-5xl font-bold">₹40</span>
-                        <span class="font-bold opacity-80">/page</span>
-                    </div>
-                    <ul class="mt-4 space-y-2 text-sm font-semibold border-t-2 border-white/30 pt-4">
-                        <li>✓ High durability</li>
-                        <li>✓ Premium glossy/matte finish</li>
-                        <li>✓ Super vibrant colors</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Card 4 -->
-            <div class="bg-white border-2 border-brand-black rounded-2xl p-6 shadow-brutal brutal-transition flex flex-col h-full relative overflow-hidden">
-                <div class="absolute top-0 right-0 bg-brand-black text-white text-xs font-bold px-3 py-1 rounded-bl-xl z-10">BEST QUALITY</div>
-                <div class="mb-4 relative z-20">
-                    <i class="ph-duotone ph-image text-5xl mb-2"></i>
-                    <h3 class="text-2xl font-bold">Glossy Photos</h3>
-                    <p class="text-sm font-semibold mt-2 opacity-80 text-gray-600">Studio quality memories.</p>
-                </div>
-                <div class="mt-auto pt-6 relative z-20">
-                    <div class="flex items-baseline gap-1">
-                        <span class="text-5xl font-bold">₹80</span>
-                        <span class="font-bold opacity-80 text-gray-600">/page</span>
-                    </div>
-                    <ul class="mt-4 space-y-2 text-sm font-semibold text-gray-700 border-t-2 border-brand-black/20 pt-4">
-                        <li>✓ Thick photo paper</li>
-                        <li>✓ High-res printing</li>
-                        <li>✓ Frame-ready quality</li>
-                    </ul>
-                </div>
-            </div>
         </div>
 
-        <!-- Full Catalog Button -->
-        <div class="mt-12 text-center">
-            <a href="/price/" class="inline-flex items-center gap-2 bg-white border-2 border-brand-black px-8 py-4 text-lg font-bold shadow-brutal brutal-transition hover:translate-x-1 hover:translate-y-1 rounded-xl">
-                <i class="ph-bold ph-book-open text-2xl"></i> See Full Catalog & Prices
-            </a>
+
+        <!-- ==========================================
+             VIEW 2: THE VIBE CHECK (Products)
+             ========================================== -->
+        <div id="view-products" class="app-view">
+            <div class="text-center mb-8">
+                <div class="inline-block bg-black text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase mb-3">Step 1</div>
+                <h2 class="font-display text-3xl md:text-4xl font-black leading-tight mb-2 tracking-tighter">
+                    What are we printing today? ✨
+                </h2>
+                <p class="text-gray-600 font-bold text-sm">Pick your vibe. We handle the rest.</p>
+            </div>
+
+            <!-- Hero Products (The Big 4) -->
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <button onclick="selectProduct('normal')" class="brutal-btn bg-brand-cyan rounded-2xl p-4 flex flex-col h-full text-left bg-opacity-100 focus:outline-none">
+                    <div class="text-brand-black mb-2"><i class="ph-duotone ph-file-image text-4xl"></i></div>
+                    <h3 class="text-base font-black leading-tight mb-1">Normal Prints</h3>
+                    <p class="text-[10px] font-bold opacity-80 mb-3">Color or B&W A4</p>
+                    <div class="mt-auto text-xl font-black text-brand-black">₹10<span class="text-[10px]">/pg</span></div>
+                </button>
+
+                <!-- Swapped Glossy for Stickers here! -->
+                <button onclick="selectProduct('stickers')" class="brutal-btn bg-brand-magenta text-white rounded-2xl p-4 flex flex-col h-full text-left relative overflow-hidden focus:outline-none">
+                    <div class="absolute top-0 right-0 bg-brand-yellow text-black text-[9px] font-black px-2 py-1 border-b-2 border-l-2 border-black rounded-bl-lg">BEST SELLER</div>
+                    <div class="text-white mb-2"><i class="ph-duotone ph-sticker text-4xl"></i></div>
+                    <h3 class="text-base font-black leading-tight mb-1">A4 Stickers</h3>
+                    <p class="text-[10px] font-bold opacity-90 mb-3">Custom shapes. Slap memes everywhere.</p>
+                    <div class="mt-auto text-xl font-black text-white">₹25<span class="text-[10px]">/pg</span></div>
+                </button>
+
+                <button onclick="selectProduct('passport')" class="brutal-btn bg-white rounded-2xl p-4 flex flex-col h-full text-left focus:outline-none">
+                    <div class="text-brand-black mb-2"><i class="ph-duotone ph-identification-card text-4xl"></i></div>
+                    <h3 class="text-base font-black leading-tight mb-1">Passport Size</h3>
+                    <p class="text-[10px] font-bold opacity-80 mb-3">Set of 9 copies</p>
+                    <div class="mt-auto text-xl font-black text-brand-black">₹50<span class="text-[10px]">/set</span></div>
+                </button>
+
+                <button onclick="selectProduct('polaroid')" class="brutal-btn bg-brand-purple text-white rounded-2xl p-4 flex flex-col h-full text-left relative overflow-hidden focus:outline-none">
+                    <div class="absolute top-0 right-0 bg-brand-yellow text-black text-[9px] font-black px-2 py-1 border-b-2 border-l-2 border-black rounded-bl-lg">AESTHETIC</div>
+                    <div class="text-white mb-2"><i class="ph-duotone ph-camera text-4xl"></i></div>
+                    <h3 class="text-base font-black leading-tight mb-1">Polaroids</h3>
+                    <p class="text-[10px] font-bold opacity-90 mb-3">Vintage aesthetic frames</p>
+                    <div class="mt-auto text-xl font-black text-white">₹10<span class="text-[10px]">/ea</span></div>
+                </button>
+            </div>
+
+            <!-- Full Catalog Toggle -->
+            <div class="text-center mt-8">
+                <button onclick="toggleCatalog()" id="catalogToggleBtn" class="bg-gray-200 text-black border-2 border-black font-bold py-3 px-6 rounded-full transition-colors flex items-center justify-center gap-2 mx-auto shadow-brutal-sm w-full sm:w-auto">
+                    <i class="ph-bold ph-list-magnifying-glass text-lg"></i> View Secret Menu
+                </button>
+            </div>
+
+            <!-- Expanded Catalog -->
+            <div id="fullCatalog" class="hidden mt-6 space-y-3 pb-8">
+                <h3 class="font-display text-xl font-black text-brand-magenta text-center mb-4">The Secret Menu 🤫</h3>
+                
+                <!-- Glossy moved here -->
+                <button onclick="selectProduct('glossy')" class="w-full brutal-btn bg-white text-black rounded-xl p-3 flex items-center justify-between text-left group">
+                    <div class="flex items-center gap-3">
+                        <i class="ph-fill ph-image text-2xl text-brand-cyan"></i>
+                        <div>
+                            <h4 class="font-black text-sm">Glossy Photos</h4>
+                            <p class="text-[10px] font-bold opacity-80">Studio quality memories. High-res.</p>
+                        </div>
+                    </div>
+                    <div class="text-right whitespace-nowrap pl-2">
+                        <span class="font-black text-lg">₹80</span><span class="text-[10px] font-bold opacity-80">/pg</span>
+                    </div>
+                </button>
+
+                <button onclick="selectProduct('sticker_passport')" class="w-full brutal-btn bg-brand-cyan text-black rounded-xl p-3 flex items-center justify-between text-left group">
+                    <div class="flex items-center gap-3">
+                        <i class="ph-fill ph-user-focus text-2xl"></i>
+                        <div>
+                            <h4 class="font-black text-sm">Sticker Passports</h4>
+                            <p class="text-[10px] font-bold opacity-80">Just peel and stick. 9 copies.</p>
+                        </div>
+                    </div>
+                    <div class="text-right whitespace-nowrap pl-2">
+                        <span class="font-black text-lg">₹60</span><span class="text-[10px] font-bold opacity-80">/set</span>
+                    </div>
+                </button>
+
+                <button onclick="selectProduct('notes')" class="w-full brutal-btn bg-brand-green text-black rounded-xl p-3 flex items-center justify-between text-left group border-dashed">
+                    <div class="flex items-center gap-3">
+                        <i class="ph-fill ph-text-t text-2xl"></i>
+                        <div>
+                            <h4 class="font-black text-sm">Quick Notes (Text)</h4>
+                            <p class="text-[10px] font-bold opacity-80">Paste your ICSE essays. We auto-format.</p>
+                        </div>
+                    </div>
+                    <div class="text-right whitespace-nowrap pl-2">
+                        <span class="font-black text-lg">₹10</span><span class="text-[10px] font-bold">/pg</span>
+                    </div>
+                </button>
+
+                <button onclick="selectProduct('maps')" class="w-full brutal-btn bg-yellow-100 rounded-xl p-3 flex items-center justify-between text-left group">
+                    <div class="flex items-center gap-3">
+                        <i class="ph-fill ph-map-pin-line text-2xl text-brand-magenta"></i>
+                        <div>
+                            <h4 class="font-black text-sm text-brand-magenta">ICSE Map of India</h4>
+                            <p class="text-[10px] font-bold text-gray-600">Blank practice maps. Bulk discount!</p>
+                        </div>
+                    </div>
+                    <div class="text-right whitespace-nowrap pl-2">
+                        <span class="font-black text-lg text-brand-magenta">₹5</span><span class="text-[10px] font-bold text-gray-500">/ea</span>
+                    </div>
+                </button>
+
+                <button onclick="alert('Custom cards are launching next week! Message us to pre-order.')" class="w-full brutal-btn bg-white rounded-xl p-3 flex items-center justify-between text-left group opacity-70 border-dashed">
+                    <div class="flex items-center gap-3">
+                        <i class="ph-fill ph-envelope-open text-2xl text-gray-400"></i>
+                        <div>
+                            <h4 class="font-black text-sm text-gray-500">Custom Cards <span class="bg-brand-magenta text-white text-[9px] px-1.5 py-0.5 rounded ml-1">SOON</span></h4>
+                            <p class="text-[10px] font-bold text-gray-400">Birthdays, anniversaries.</p>
+                        </div>
+                    </div>
+                </button>
+
+                <button onclick="selectProduct('apparel5')" class="w-full brutal-btn bg-white rounded-xl p-3 flex items-center justify-between text-left group">
+                    <div class="flex items-center gap-3">
+                        <i class="ph-fill ph-t-shirt text-2xl"></i>
+                        <div>
+                            <h4 class="font-black text-sm">Apparel Print (A5)</h4>
+                            <p class="text-[10px] font-bold opacity-80">Custom designs on T-shirts.</p>
+                        </div>
+                    </div>
+                    <div class="text-right whitespace-nowrap pl-2">
+                        <span class="font-black text-lg">₹150</span><span class="text-[10px] font-bold">/ea</span>
+                    </div>
+                </button>
+
+                <button onclick="selectProduct('apparel4')" class="w-full brutal-btn bg-gray-900 text-white rounded-xl p-3 flex items-center justify-between text-left group border-gray-900">
+                    <div class="flex items-center gap-3">
+                        <i class="ph-fill ph-t-shirt text-2xl text-brand-cyan"></i>
+                        <div>
+                            <h4 class="font-black text-sm">Apparel Print (A4)</h4>
+                            <p class="text-[10px] font-bold text-gray-400">Massive graphics. Main character.</p>
+                        </div>
+                    </div>
+                    <div class="text-right whitespace-nowrap pl-2">
+                        <span class="font-black text-lg text-brand-cyan">₹250</span><span class="text-[10px] font-bold text-gray-400">/ea</span>
+                    </div>
+                </button>
+
+            </div>
         </div>
-    </section>
 
-    <!-- How it Works & CTA -->
-    <section class="py-20 bg-[#e0e7ff] border-t-2 border-brand-black px-4 relative overflow-hidden">
-        <!-- Decorative blobs -->
-        <div class="absolute top-[-50px] left-[-50px] w-64 h-64 bg-brand-yellow rounded-full blur-3xl opacity-50 pointer-events-none"></div>
-        <div class="absolute bottom-[-50px] right-[-50px] w-64 h-64 bg-brand-magenta rounded-full blur-3xl opacity-30 pointer-events-none"></div>
 
-        <div class="max-w-4xl mx-auto text-center relative z-10">
-            <h2 class="text-3xl sm:text-4xl md:text-6xl font-bold mb-8">Ready to print without crying over the bill?</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 text-left">
-                <div class="bg-white border-2 border-brand-black p-6 rounded-xl shadow-[4px_4px_0px_0px_rgba(17,17,17,1)]">
-                    <div class="w-10 h-10 bg-brand-cyan text-brand-black font-bold flex items-center justify-center rounded-full border-2 border-brand-black mb-4">1</div>
-                    <h4 class="font-bold text-xl mb-2">Prep & Send</h4>
-                    <p class="text-gray-600 text-sm">Use our <a href="/create/" class="text-brand-magenta font-bold hover:underline">Auto-Arrange tool</a> to format images, or just ping us directly.</p>
+        <!-- ==========================================
+             VIEW 3: THE ORDER HUB (Estimator & Delivery)
+             ========================================== -->
+        <div id="view-order" class="app-view">
+            <!-- Dynamic Fun Fact -->
+            <div class="bg-purple-100 border-2 border-purple-300 rounded-xl p-3 mb-6 flex gap-3 items-center cursor-pointer select-none shadow-sm" onclick="newFunFact()">
+                <i class="ph-fill ph-lightbulb text-2xl text-brand-purple animate-pulse"></i>
+                <p id="funFactText" class="text-xs font-bold text-purple-900 leading-tight flex-1">Fun fact: Printing your notes makes you 42% more likely to actually read them. (Trust me bro).</p>
+            </div>
+
+            <div class="text-center mb-6">
+                <div class="inline-block bg-black text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase mb-3">Step 2</div>
+                <h2 class="font-display text-3xl font-black mb-1 flex items-center justify-center gap-2 flex-wrap" id="orderHubTitle">
+                    Let's get this printed.
+                </h2>
+                <p class="text-gray-600 font-bold text-sm">Estimate the damage and choose delivery.</p>
+            </div>
+
+            <!-- Estimator Box -->
+            <div class="bg-white border-4 border-brand-black rounded-3xl p-5 shadow-brutal mb-6 relative overflow-hidden">
+                <div class="absolute -right-6 -top-6 opacity-5 text-black"><i class="ph-fill ph-calculator text-[150px]"></i></div>
+                
+                <h3 class="font-black text-lg mb-4 relative z-10 flex items-center gap-2 border-b-2 border-dashed border-gray-200 pb-2">
+                    <i class="ph-bold ph-receipt text-brand-magenta text-xl"></i> Estimate the Damage 💸
+                </h3>
+                
+                <div class="space-y-4 mb-6 relative z-10">
+                    <div class="hidden"> <!-- Hidden but keeps logic intact -->
+                        <select id="hubVibeSelect" class="w-full" onchange="calculateHubTotal()">
+                            <option value="normal">Normal Prints (₹10/pg)</option>
+                            <option value="glossy">Glossy Photos (₹80/pg)</option>
+                            <option value="passport">Passport Photos (₹50/set of 9)</option>
+                            <option value="sticker_passport">Sticker Passports (₹60/set of 9)</option>
+                            <option value="polaroid">Polaroids (₹10/ea or ₹70/page)</option>
+                            <option value="stickers">A4 Custom Stickers (₹25/pg)</option>
+                            <option value="notes">Quick Notes (Text) (₹10/pg)</option>
+                            <option value="maps">ICSE Map of India (₹5/ea)</option>
+                            <option value="apparel5">Apparel Print A5 (₹150)</option>
+                            <option value="apparel4">Apparel Print A4 (₹250)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label id="hubQtyLabel" class="block font-bold text-sm text-gray-600 mb-2">How many pages/copies?</label>
+                        <div class="flex items-center gap-3">
+                            <button onclick="changeQty(-1)" class="w-12 h-12 brutal-btn bg-gray-200 rounded-xl font-black text-xl flex items-center justify-center">-</button>
+                            <input type="number" id="hubQty" min="1" value="1" class="flex-1 bg-gray-50 border-2 border-black font-black text-xl rounded-xl h-12 text-center outline-none focus:bg-brand-yellow/20" oninput="calculateHubTotal()">
+                            <button onclick="changeQty(1)" class="w-12 h-12 brutal-btn bg-gray-200 rounded-xl font-black text-xl flex items-center justify-center">+</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-white border-2 border-brand-black p-6 rounded-xl shadow-[4px_4px_0px_0px_rgba(17,17,17,1)]">
-                    <div class="w-10 h-10 bg-brand-magenta text-white font-bold flex items-center justify-center rounded-full border-2 border-brand-black mb-4">2</div>
-                    <h4 class="font-bold text-xl mb-2">Tell Us What</h4>
-                    <p class="text-gray-600 text-sm">Need it normal? Sticker? Glossy? Just say the word.</p>
-                </div>
-                <div class="bg-white border-2 border-brand-black p-6 rounded-xl shadow-[4px_4px_0px_0px_rgba(17,17,17,1)]">
-                    <div class="w-10 h-10 bg-brand-yellow text-brand-black font-bold flex items-center justify-center rounded-full border-2 border-brand-black mb-4">3</div>
-                    <h4 class="font-bold text-xl mb-2">Pick It Up</h4>
-                    <p class="text-gray-600 text-sm">We'll print it lightning fast. You pay. Everyone is happy.</p>
+
+                <div class="bg-gray-50 p-4 rounded-xl border-2 border-black flex justify-between items-center relative z-10">
+                    <span class="font-black text-lg text-gray-600">Total:</span>
+                    <div class="text-right" id="hubTotalOutput">
+                        <span class="font-black text-4xl text-brand-green">₹10</span>
+                    </div>
                 </div>
             </div>
 
-            <button onclick="openModal()" class="flex sm:inline-flex justify-center items-center gap-3 bg-brand-green text-white border-2 border-brand-black px-6 sm:px-10 py-4 sm:py-5 text-lg sm:text-xl font-bold shadow-[6px_6px_0px_0px_rgba(17,17,17,1)] hover:shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] hover:translate-x-1 hover:translate-y-1 transition-all rounded-2xl w-full sm:w-auto">
-                <i class="ph-bold ph-whatsapp text-3xl"></i>
-                Send Files on WhatsApp
+            <!-- Notes -->
+            <div class="mb-6 bg-white border-4 border-brand-black rounded-3xl p-5 shadow-brutal">
+                <label class="block font-black text-base mb-1 flex items-center gap-2"><i class="ph-bold ph-chat-circle-text text-brand-cyan text-xl"></i> Any extra notes?</label>
+                <p class="text-[10px] font-bold text-gray-500 mb-3">Let's talk. We actually read this.</p>
+                <textarea id="hubNotes" rows="2" class="w-full bg-gray-50 border-2 border-black rounded-xl p-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-yellow transition-all" placeholder="e.g. Please print double-sided..."></textarea>
+            </div>
+
+            <!-- Delivery Options -->
+            <div class="mb-8 bg-brand-yellow border-4 border-brand-black rounded-3xl p-5 shadow-brutal">
+                <label class="block font-black text-base mb-3 flex items-center gap-2"><i class="ph-bold ph-package text-xl"></i> How are we getting this to you?</label>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <label class="cursor-pointer">
+                        <input type="radio" name="hubDelivery" value="pickup" class="peer sr-only" checked onchange="updateHubDelivery()">
+                        <div class="bg-white border-2 border-black rounded-xl p-3 text-center peer-checked:bg-black peer-checked:text-white transition-colors flex flex-row sm:flex-col items-center justify-center gap-2 sm:gap-0 h-full">
+                            <i class="ph-bold ph-storefront text-2xl sm:mb-1"></i>
+                            <div class="text-left sm:text-center">
+                                <div class="font-bold text-sm">Walk In</div>
+                                <div class="text-[10px] opacity-70">Pick up at hostel</div>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="hubDelivery" value="friend" class="peer sr-only" onchange="updateHubDelivery()">
+                        <div class="bg-white border-2 border-black rounded-xl p-3 text-center peer-checked:bg-black peer-checked:text-white transition-colors flex flex-row sm:flex-col items-center justify-center gap-2 sm:gap-0 h-full">
+                            <i class="ph-bold ph-users text-2xl sm:mb-1"></i>
+                            <div class="text-left sm:text-center">
+                                <div class="font-bold text-sm">Send Friend</div>
+                                <div class="text-[10px] opacity-70">To pick it up</div>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="hubDelivery" value="online" class="peer sr-only" onchange="updateHubDelivery()">
+                        <div class="bg-white border-2 border-black rounded-xl p-3 text-center peer-checked:bg-black peer-checked:text-white transition-colors flex flex-row sm:flex-col items-center justify-center gap-2 sm:gap-0 h-full">
+                            <i class="ph-bold ph-moped text-2xl sm:mb-1"></i>
+                            <div class="text-left sm:text-center">
+                                <div class="font-bold text-sm">Deliver It</div>
+                                <div class="text-[10px] opacity-70">Extra charges apply</div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Proceed Button (Fork Logic) -->
+            <button onclick="handleProceed()" class="brutal-btn bg-black text-white w-full py-5 rounded-3xl font-black text-xl flex items-center justify-center gap-2">
+                Continue to Format <i class="ph-bold ph-arrow-right"></i>
             </button>
-            <p class="mt-4 font-semibold text-gray-600">Quick replies. High quality. No nonsense.</p>
+
         </div>
-    </section>
+
+
+        <!-- ==========================================
+             VIEW 4: THE FORK (Lazy vs Studio)
+             ========================================== -->
+        <div id="view-fork" class="app-view">
+            <div class="text-center mb-8">
+                <div class="inline-block bg-black text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase mb-3">Step 3</div>
+                <h3 class="font-display text-3xl md:text-4xl font-black">How do you want to format this?</h3>
+                <p class="text-sm font-bold text-gray-500 mt-2">Almost done. Choose your fighter.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-5 max-w-lg mx-auto">
+                <!-- Option B: Lazy WA -->
+                <button onclick="sendLazyWhatsApp()" class="brutal-btn bg-brand-green text-white rounded-3xl p-6 text-left group relative overflow-hidden focus:outline-none">
+                    <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500 text-black"><i class="ph-fill ph-sleeping text-8xl"></i></div>
+                    <h4 class="font-black text-2xl mb-2 relative z-10">Feeling lazy? 😴</h4>
+                    <p class="font-semibold text-white/90 text-sm relative z-10 mb-4">Dump your files on our WhatsApp. We'll format it for you perfectly.</p>
+                    <div class="inline-flex items-center gap-2 bg-black text-brand-green px-4 py-2 rounded-full text-xs font-bold relative z-10">
+                        <i class="ph-bold ph-whatsapp text-lg"></i> Send to WhatsApp -> Done Yayyyy!
+                    </div>
+                </button>
+
+                <!-- Option A: Magic Studio -->
+                <button onclick="goToStudio()" class="brutal-btn bg-brand-cyan rounded-3xl p-6 text-left group relative overflow-hidden focus:outline-none">
+                    <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500"><i class="ph-fill ph-magic-wand text-8xl"></i></div>
+                    <h4 class="font-black text-2xl mb-2 relative z-10">Got trust issues? ✨</h4>
+                    <p class="font-semibold text-gray-800 text-sm relative z-10 mb-4">Format it yourself exactly how you want it using our Magic Studio canvas.</p>
+                    <div class="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-full text-xs font-bold relative z-10">
+                        Open Studio Editor <i class="ph-bold ph-arrow-right"></i>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+
+        <!-- ==========================================
+             VIEW 5: THE MAGIC STUDIO (Canvas Editor)
+             ========================================== -->
+        <div id="view-studio" class="app-view">
+            <div class="text-center mb-6">
+                <div class="inline-block bg-black text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase mb-2">Editor</div>
+                <h2 class="font-display text-3xl font-black mb-1 flex items-center justify-center gap-2">The Magic Studio 🪄</h2>
+                <p class="text-gray-600 font-bold text-xs">Upload, format, preview, checkout.</p>
+            </div>
+
+            <!-- Single Column Mobile, 2 Col Desktop -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- LEFT: CONTROLS -->
+                <div class="lg:col-span-4 flex flex-col gap-4 bg-white text-black p-5 rounded-3xl border-4 border-brand-black shadow-[6px_6px_0px_0px_#FFEA00]">
+                    
+                    <div>
+                        <label class="block font-black text-xs uppercase tracking-wider text-gray-500 mb-2">Add Content</label>
+                        
+                        <div id="imageUploadArea">
+                            <input type="file" id="imageInput" multiple accept="image/*" class="hidden">
+                            <div class="flex gap-2 mb-2">
+                                <label for="imageInput" id="addImagesLabel" class="flex-1 brutal-btn bg-brand-cyan hover:bg-cyan-300 text-center py-3 rounded-xl font-black cursor-pointer flex items-center justify-center gap-2 text-sm">
+                                    <i class="ph-bold ph-upload-simple text-lg"></i> Upload Photos
+                                </label>
+                                <button id="clearImagesBtn" class="hidden brutal-btn bg-red-400 text-white w-12 rounded-xl flex items-center justify-center" title="Clear All">
+                                    <i class="ph-bold ph-trash text-lg"></i>
+                                </button>
+                            </div>
+                            <p id="fileCount" class="text-[10px] font-bold text-gray-500 text-center">0 images loaded</p>
+                            <p class="text-[10px] font-black text-brand-blue mt-1 hidden text-center" id="uploadLoading">
+                                <i class="ph-bold ph-spinner animate-spin mr-1"></i> Optimizing...
+                            </p>
+                        </div>
+
+                        <div id="textUploadArea" class="hidden">
+                            <textarea id="notesInput" rows="4" class="w-full bg-gray-50 border-2 border-black rounded-xl p-3 font-medium text-sm focus:outline-none focus:bg-brand-yellow/10 transition-colors shadow-inner" placeholder="Paste your text here..."></textarea>
+                        </div>
+                    </div>
+
+                    <div id="settingsArea">
+                        <label class="block font-black text-xs uppercase tracking-wider text-gray-500 mb-2">Tweaks</label>
+                        <div class="space-y-2">
+                            <div id="orientationWrapper" class="flex justify-between items-center bg-gray-50 p-2 rounded-xl border-2 border-gray-200">
+                                <span class="font-bold text-xs">Orientation</span>
+                                <select id="orientation" class="bg-white border-2 border-black font-bold text-xs rounded-lg p-1 outline-none cursor-pointer">
+                                    <option value="portrait">Portrait</option>
+                                    <option value="landscape">Landscape</option>
+                                </select>
+                            </div>
+                            <div id="stickerOptions" class="hidden flex justify-between items-center bg-fuchsia-50 p-2 rounded-xl border-2 border-fuchsia-200">
+                                <span class="font-bold text-xs text-fuchsia-900">Sticker Cut</span>
+                                <select id="stickerShape" class="bg-white border-2 border-black font-bold text-xs rounded-lg p-1 outline-none cursor-pointer">
+                                    <option value="square">Square</option>
+                                    <option value="rounded">Rounded</option>
+                                    <option value="circle">Circle</option>
+                                    <option value="heart">Heart</option>
+                                </select>
+                            </div>
+                            <div id="polaroidOptions" class="hidden flex justify-between items-center bg-orange-50 p-2 rounded-xl border-2 border-orange-200">
+                                <span class="font-bold text-xs text-orange-900">Frame Style</span>
+                                <select id="polaroidStyle" class="bg-white border-2 border-black font-bold text-xs rounded-lg p-1 outline-none cursor-pointer">
+                                    <option value="square">Classic</option>
+                                    <option value="tall">Tall</option>
+                                    <option value="wide">Wide</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="generateBtn" class="brutal-btn bg-black text-white w-full py-3 rounded-xl font-black text-sm mt-auto flex items-center justify-center gap-2 group">
+                        <i class="ph-bold ph-magic-wand text-brand-yellow group-hover:rotate-12 transition-transform"></i> Generate Preview
+                    </button>
+                    
+                    <div id="loading" class="hidden flex flex-col items-center justify-center py-2 text-brand-magenta">
+                        <i class="ph-bold ph-spinner animate-spin text-2xl mb-1"></i>
+                        <span class="font-bold text-[10px]">Processing High-Res A4...</span>
+                    </div>
+                </div>
+
+                <!-- RIGHT: PREVIEW & CHECKOUT -->
+                <div class="lg:col-span-8 flex flex-col gap-4">
+                    <div class="flex-grow bg-white rounded-3xl border-4 border-brand-black shadow-brutal p-3 flex flex-col relative overflow-hidden">
+                        <div class="flex justify-between items-center mb-3 border-b-2 border-gray-100 pb-2 px-1">
+                            <h3 class="font-black text-sm text-gray-800 flex items-center gap-1"><i class="ph-fill ph-eye text-brand-cyan"></i> Live A4 Sheet</h3>
+                            <a id="downloadBtn" class="hidden bg-gray-200 hover:bg-gray-300 text-black font-bold py-1 px-2 rounded text-[10px] transition-colors items-center gap-1" download="Delulu_Print.jpg">
+                                Save <i class="ph-bold ph-download-simple"></i>
+                            </a>
+                        </div>
+                        
+                        <div class="flex-grow canvas-bg border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center relative min-h-[300px] md:min-h-[400px] overflow-hidden p-2">
+                            <div id="placeholderText" class="text-center text-gray-400">
+                                <i class="ph-duotone ph-file-dashed text-4xl mb-1"></i>
+                                <p class="font-bold text-xs">Generate to see preview.</p>
+                            </div>
+                            <div id="loadingOverlay" class="hidden flex flex-col items-center justify-center text-brand-black absolute inset-0 bg-white/80 backdrop-blur z-10">
+                                <i class="ph-bold ph-spinner animate-spin text-4xl mb-2 text-brand-magenta"></i>
+                                <span class="font-black text-xs">Generating Output...</span>
+                            </div>
+                            <img id="previewImg" class="hidden max-w-full max-h-full object-contain shadow-[0_0_10px_rgba(0,0,0,0.15)] border border-gray-200 bg-white">
+                        </div>
+                    </div>
+
+                    <button onclick="sendStudioWhatsApp()" id="waStudioBtn" class="brutal-btn bg-brand-green text-white w-full py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-2 hover:bg-[#1fbc5b]">
+                        <i class="ph-bold ph-whatsapp text-2xl"></i> Looks perfect. Check Out!
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
 
     <!-- Footer -->
-    <footer class="bg-brand-black text-white py-8 border-t-4 border-brand-yellow">
-        <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-2">
-                <i class="ph-fill ph-printer text-2xl text-brand-yellow"></i>
-                <span class="font-bold text-xl">deluluprinter.xyz</span>
+    <footer class="bg-brand-black text-white py-8 border-t-4 border-brand-magenta mt-16 w-full">
+        <div class="max-w-4xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+            <div>
+                <div class="flex items-center justify-center md:justify-start gap-2 mb-1">
+                    <i class="ph-fill ph-printer text-2xl text-brand-magenta"></i>
+                    <span class="font-display font-black text-xl">deluluprinter.xyz</span>
+                </div>
+                <p class="text-gray-400 text-xs font-semibold">Local roots. Global aesthetics. Premium prints.</p>
             </div>
-            <div class="flex gap-4 md:hidden mt-2">
-                <a href="/create/" class="text-brand-cyan text-sm font-bold hover:underline">Auto-Format</a>
-                <a href="/price/" class="text-brand-magenta text-sm font-bold hover:underline">Pricing</a>
-            </div>
-            <div class="text-gray-400 text-sm text-center md:text-right mt-4 md:mt-0">
-                <p>Because great prints shouldn't cost a fortune.</p>
-                <p class="mt-1">Proudly supporting students, artists, and everyone in between.</p>
+            <div class="bg-gray-900 px-3 py-2 rounded-xl border-2 border-gray-700">
+                <p class="text-[10px] text-gray-400 font-bold mb-0.5">Powered by</p>
+                <p class="font-black text-brand-cyan text-sm">Artevia Studio Engine</p>
             </div>
         </div>
     </footer>
 
-    <!-- Floating WhatsApp Button -->
-    <button onclick="openModal()" class="fixed bottom-6 right-6 bg-brand-green text-white p-4 rounded-full border-2 border-brand-black shadow-[4px_4px_0px_0px_rgba(17,17,17,1)] hover:shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all z-50 flex items-center justify-center group cursor-pointer">
-        <i class="ph-bold ph-whatsapp text-3xl group-hover:scale-110 transition-transform"></i>
-        <!-- Ping animation -->
-        <span class="absolute -top-1 -right-1 flex h-4 w-4">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-yellow opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-4 w-4 bg-brand-yellow border border-brand-black"></span>
-        </span>
-    </button>
-
-    <!-- Order Modal -->
-    <div id="wa-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-brand-black/80 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-white border-4 border-brand-black p-6 rounded-2xl shadow-[8px_8px_0px_0px_rgba(17,17,17,1)] max-w-md w-full transform scale-95 transition-transform duration-300 relative">
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-brand-black hover:text-brand-magenta transition-colors">
-                <i class="ph-bold ph-x text-2xl"></i>
-            </button>
-            <h3 class="text-2xl font-bold mb-4 pr-6">What do you need printed?</h3>
-            
-            <!-- Auto-Arrange Prompt inside Modal -->
-            <div class="mb-5 bg-brand-yellow border-2 border-brand-black rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-[2px_2px_0px_0px_rgba(17,17,17,1)]">
-                <div class="flex items-center gap-2">
-                    <i class="ph-fill ph-magic-wand text-2xl text-brand-magenta"></i>
-                    <span class="text-sm font-bold text-gray-800 leading-tight">Got messy photos?<br><span class="text-xs font-semibold text-gray-600">Format them before sending!</span></span>
-                </div>
-                <a href="/create/" class="w-full sm:w-auto text-center bg-brand-black text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-gray-800 transition-colors whitespace-nowrap">
-                    Auto-Arrange Tool
-                </a>
-            </div>
-
-            <form onsubmit="sendToWhatsApp(event)">
-                <div class="mb-4">
-                    <label class="block font-bold mb-2 text-gray-700">Select Print Type:</label>
-                    <select id="print-type" class="w-full border-2 border-brand-black rounded-xl p-3 font-semibold bg-[#FAFAFA] focus:outline-none focus:border-brand-magenta focus:ring-2 focus:ring-brand-magenta/50 cursor-pointer">
-                        <option value="Normal Page">The "Whatever" Page (₹10/page)</option>
-                        <option value="Regular Stickers">Regular Stickers (₹25/page)</option>
-                        <option value="Premium Stickers">Premium Stickers (₹40/page)</option>
-                        <option value="Glossy Photos">Glossy Photos (₹80/page)</option>
-                        <option value="Other">Something else (from Full Catalog)</option>
-                    </select>
-                </div>
-                <div class="mb-6">
-                    <label class="block font-bold mb-2 text-gray-700">Special Requests (Optional):</label>
-                    <textarea id="special-requests" rows="3" placeholder="e.g. Please print pages 1-5 only, double-sided, or I want 3 copies of each." class="w-full border-2 border-brand-black rounded-xl p-3 bg-[#FAFAFA] focus:outline-none focus:border-brand-magenta focus:ring-2 focus:ring-brand-magenta/50 resize-none font-medium"></textarea>
-                </div>
-                <div class="flex gap-3">
-                    <button type="button" onclick="closeModal()" class="flex-1 bg-gray-200 border-2 border-brand-black font-bold py-3 rounded-xl hover:bg-gray-300 transition-colors">Cancel</button>
-                    <button type="submit" class="flex-[2] bg-brand-green text-white border-2 border-brand-black font-bold py-3 rounded-xl shadow-[4px_4px_0px_0px_rgba(17,17,17,1)] hover:shadow-[2px_2px_0px_0px_rgba(17,17,17,1)] hover:translate-x-1 hover:translate-y-1 transition-all flex justify-center items-center gap-2">
-                        <i class="ph-bold ph-whatsapp text-xl"></i> Send to Chat
-                    </button>
-                </div>
-            </form>
-        </div>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-20 right-4 bg-brand-black text-white px-5 py-3 rounded-xl brutal-border shadow-brutal font-black z-50 flex items-center hidden">
+        <i class="ph-fill ph-whatsapp-logo text-brand-green text-2xl mr-2"></i>
+        <span id="toastMsg" class="text-sm">Opening WhatsApp in <span id="countdown" class="text-brand-yellow text-lg ml-1">3</span>...</span>
     </div>
 
-    <!-- Smooth scroll behavior for internal links -->
+    <!-- JS LOGIC -->
     <script>
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+        // --- GLOBAL STATE ---
+        let currentMode = null; 
+        let globalImages = []; 
+        let calculatedPages = 0;
+        let originalTotal = 0;
+        let discountedTotal = 0;
+        let discountApplied = false;
+        let deliveryPreference = "pickup";
+
+        const prices = {
+            normal: 10,
+            glossy: 80,
+            passport: 50, 
+            sticker_passport: 60,
+            polaroidFull: 70, 
+            polaroidSingle: 10, 
+            stickers: 25, 
+            notes: 10,
+            maps: 5,
+            apparel5: 150,
+            apparel4: 250
+        };
+
+        const productsData = {
+            normal: { name: 'Normal Prints', hasStudio: true },
+            glossy: { name: 'Glossy Photos', hasStudio: true },
+            passport: { name: 'Passport Size', hasStudio: true },
+            sticker_passport: { name: 'Sticker Passports', hasStudio: true },
+            polaroid: { name: 'Polaroids', hasStudio: true },
+            stickers: { name: 'A4 Stickers', hasStudio: true },
+            notes: { name: 'Quick Notes', hasStudio: true },
+            maps: { name: 'ICSE Maps', hasStudio: false },
+            apparel5: { name: 'Apparel A5', hasStudio: false },
+            apparel4: { name: 'Apparel A4', hasStudio: false }
+        };
+
+        const funFacts = [
+            "Fun fact: 90% of printer jams happen when you're late for class. We fixed that.",
+            "Fun fact: Printing your notes makes you 42% more likely to actually read them.",
+            "Fun fact: We use premium ink so your prints survive the test of time.",
+            "Fun fact: Shreeraj Hostel has the best print vibes in Martam.",
+            "Fun fact: You're saving so much money right now.",
+            "Fun fact: If you buy 8 full pages of polaroids, your room will look like a Pinterest board."
+        ];
+
+        // --- ELEMENTS ---
+        const views = {
+            start: document.getElementById('view-start'),
+            products: document.getElementById('view-products'),
+            order: document.getElementById('view-order'),
+            fork: document.getElementById('view-fork'),
+            studio: document.getElementById('view-studio')
+        };
+        const navBackBtn = document.getElementById('navBackBtn');
+        const fullCatalog = document.getElementById('fullCatalog');
+        const catalogToggleBtn = document.getElementById('catalogToggleBtn');
+
+        // Order Hub Elements
+        const orderHubTitle = document.getElementById('orderHubTitle');
+        const hubVibeSelect = document.getElementById('hubVibeSelect');
+        const hubQty = document.getElementById('hubQty');
+        const hubQtyLabel = document.getElementById('hubQtyLabel');
+        const hubTotalOutput = document.getElementById('hubTotalOutput');
+        const hubNotes = document.getElementById('hubNotes');
+
+        // Studio Elements
+        const imageUploadArea = document.getElementById('imageUploadArea');
+        const textUploadArea = document.getElementById('textUploadArea');
+        const orientationWrapper = document.getElementById('orientationWrapper');
+        const stickerOptions = document.getElementById('stickerOptions');
+        const polaroidOptions = document.getElementById('polaroidOptions');
+        
+        const imageInput = document.getElementById('imageInput');
+        const notesInput = document.getElementById('notesInput');
+        const clearImagesBtn = document.getElementById('clearImagesBtn');
+        const uploadLoading = document.getElementById('uploadLoading');
+        const fileCount = document.getElementById('fileCount');
+        
+        const orientationSelect = document.getElementById('orientation');
+        const stickerShapeSelect = document.getElementById('stickerShape');
+        const polaroidStyleSelect = document.getElementById('polaroidStyle');
+        
+        const generateBtn = document.getElementById('generateBtn');
+        const loading = document.getElementById('loading');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const previewImg = document.getElementById('previewImg');
+        const placeholderText = document.getElementById('placeholderText');
+        const downloadBtn = document.getElementById('downloadBtn');
+        
+        const toast = document.getElementById('toast');
+        const countdownEl = document.getElementById('countdown');
+        const funFactText = document.getElementById('funFactText');
+
+        // --- CORE NAVIGATION ---
+        let viewHistory = ['view-start'];
+
+        function goToView(viewId) {
+            // Hide all safely
+            Object.values(views).forEach(v => {
+                if (v && v.classList) {
+                    v.classList.remove('active');
+                    setTimeout(() => { if(v && v.style) v.style.display = 'none'; }, 300); 
+                }
             });
-        });
 
-        // Modal Logic
-        function openModal() {
-            const modal = document.getElementById('wa-modal');
-            modal.classList.remove('hidden');
-            // Slight delay to allow display block to apply before transitioning opacity
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modal.children[0].classList.remove('scale-95');
-            }, 10);
+            // Show target
+            const target = views[viewId.replace('view-', '')]; 
+            if (target && target.classList) {
+                setTimeout(() => {
+                    target.style.display = 'block';
+                    void target.offsetWidth; // Trigger reflow
+                    target.classList.add('active');
+                    
+                    // Smooth scroll to top of viewport
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 300);
+            }
+
+            // Update History
+            if (viewId === 'view-start') {
+                viewHistory = ['view-start'];
+                if(navBackBtn) navBackBtn.classList.add('hidden');
+            } else {
+                if (viewHistory[viewHistory.length - 1] !== viewId) {
+                    viewHistory.push(viewId);
+                }
+                if(navBackBtn) navBackBtn.classList.remove('hidden');
+            }
         }
 
-        function closeModal() {
-            const modal = document.getElementById('wa-modal');
-            modal.classList.add('opacity-0');
-            modal.children[0].classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                // Reset form on close
-                document.getElementById('special-requests').value = '';
-                document.getElementById('print-type').selectedIndex = 0;
-            }, 300);
+        function goBack() {
+            if (viewHistory.length > 1) {
+                viewHistory.pop(); 
+                const prevView = viewHistory[viewHistory.length - 1];
+                
+                Object.values(views).forEach(v => {
+                    if (v && v.classList) {
+                        v.classList.remove('active');
+                        v.style.display = 'none';
+                    }
+                });
+                
+                const target = views[prevView.replace('view-', '')];
+                if (target && target.classList) {
+                    target.style.display = 'block';
+                    void target.offsetWidth;
+                    target.classList.add('active');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+
+                if (viewHistory.length === 1 && navBackBtn) navBackBtn.classList.add('hidden');
+            }
         }
 
-        function sendToWhatsApp(event) {
-            event.preventDefault();
-            const typeSelect = document.getElementById('print-type');
-            const selectedOption = typeSelect.options[typeSelect.selectedIndex].text;
-            const specialRequests = document.getElementById('special-requests').value.trim();
+        function resetWizard() {
+            currentMode = null;
+            globalImages = [];
+            if(notesInput) notesInput.value = '';
+            if(hubQty) hubQty.value = 1;
+            if(hubNotes) hubNotes.value = '';
             
-            let message = `Hi! I want these photos/files printed in *${selectedOption}*.`;
+            if(clearImagesBtn) clearImagesBtn.classList.add('hidden');
+            if(fileCount) fileCount.textContent = '0 images loaded';
+            if(previewImg) previewImg.classList.add('hidden');
+            if(downloadBtn) downloadBtn.classList.add('hidden');
+            if(placeholderText) placeholderText.classList.remove('hidden');
             
-            if (specialRequests) {
-                message += `\n\n*Special Requests:*\n${specialRequests}`;
+            goToView('view-start');
+        }
+
+        function toggleCatalog() {
+            if (!fullCatalog || !catalogToggleBtn) return;
+            if (fullCatalog.classList.contains('hidden')) {
+                fullCatalog.classList.remove('hidden');
+                fullCatalog.classList.add('animate-[slideUp_0.3s_ease-out_forwards]');
+                catalogToggleBtn.innerHTML = `<i class="ph-bold ph-caret-up text-lg"></i> Hide Secret Menu`;
+            } else {
+                fullCatalog.classList.add('hidden');
+                catalogToggleBtn.innerHTML = `<i class="ph-bold ph-list-magnifying-glass text-lg"></i> View Secret Menu`;
+            }
+        }
+
+        function newFunFact() {
+            if(funFactText) funFactText.textContent = funFacts[Math.floor(Math.random() * funFacts.length)];
+        }
+
+        // --- STEP 1 -> 2: SELECT PRODUCT TO ORDER HUB ---
+        function selectProduct(mode) {
+            currentMode = mode;
+            if(hubVibeSelect) hubVibeSelect.value = mode;
+            
+            if(productsData[mode] && orderHubTitle) {
+                const pData = productsData[mode];
+                // orderHubTitle.innerHTML = `You chose: <span class="text-brand-magenta">${pData.name}</span>. ✨`;
+            }
+
+            calculateHubTotal();
+            newFunFact();
+            goToView('view-order');
+        }
+
+        function updateHubDelivery() {
+            const selected = document.querySelector('input[name="hubDelivery"]:checked');
+            if(selected) deliveryPreference = selected.value;
+        }
+
+        function changeQty(amt) {
+            if(!hubQty) return;
+            let val = parseInt(hubQty.value) || 1;
+            val += amt;
+            if (val < 1) val = 1;
+            hubQty.value = val;
+            calculateHubTotal();
+        }
+
+        // --- ORDER HUB (Estimator) ---
+        function calculateHubTotal() {
+            if(!hubVibeSelect || !hubQty || !hubQtyLabel || !hubTotalOutput) return;
+            
+            const vibe = hubVibeSelect.value;
+            currentMode = vibe;
+            const qty = parseInt(hubQty.value) || 0;
+            
+            // Update label
+            if (vibe === 'polaroid' || vibe === 'maps' || vibe.includes('apparel')) {
+                hubQtyLabel.textContent = "How many items/copies do you need?";
+            } else if (vibe === 'passport' || vibe === 'sticker_passport') {
+                hubQtyLabel.textContent = "How many sets (9 copies per set)?";
+            } else {
+                hubQtyLabel.textContent = "How many pages do you need?";
+            }
+
+            // Calculate Base
+            let baseTotal = 0;
+            if (vibe === 'polaroid') {
+                const fullPages = Math.floor(qty / 9);
+                const remain = qty % 9;
+                const remainPrice = Math.min(remain * prices.polaroidSingle, prices.polaroidFull);
+                baseTotal = (fullPages * prices.polaroidFull) + remainPrice;
+            } else if (vibe === 'maps') {
+                if (qty >= 100) baseTotal = Math.floor(qty/100)*350 + (qty%100)*5;
+                else if (qty >= 10) baseTotal = Math.floor(qty/10)*40 + (qty%10)*5;
+                else baseTotal = qty * prices.maps;
+            } else {
+                baseTotal = qty * prices[vibe];
+            }
+
+            // Buy More Save More
+            discountApplied = false;
+            let finalTotal = baseTotal;
+            let htmlOutput = "";
+
+            if (baseTotal >= 500) {
+                discountApplied = true;
+                finalTotal = baseTotal - Math.floor(baseTotal * 0.15);
+                originalTotal = finalTotal; 
+                htmlOutput = `
+                    <div class="flex flex-col items-end">
+                        <span class="text-sm line-through text-gray-400">₹${baseTotal}</span>
+                        <span class="text-[10px] font-black text-brand-magenta">15% OFF! 🎉</span>
+                        <span class="font-black text-4xl text-brand-green leading-none">₹${finalTotal}</span>
+                    </div>
+                `;
+            } else {
+                originalTotal = baseTotal;
+                htmlOutput = `<span class="font-black text-4xl text-brand-green leading-none">₹${baseTotal}</span>`;
             }
             
-            const waUrl = `https://wa.me/919907488075?text=${encodeURIComponent(message)}`;
-            window.open(waUrl, '_blank');
-            closeModal();
+            calculatedPages = qty;
+            hubTotalOutput.innerHTML = htmlOutput;
         }
+
+        function handleProceed() {
+            if (originalTotal === 0) { alert('Please enter a valid quantity!'); return; }
+            
+            const vibe = currentMode;
+            if (!productsData[vibe].hasStudio) {
+                // Skips the fork, goes straight to WhatsApp because studio doesn't support it
+                sendLazyWhatsApp();
+            } else {
+                goToView('view-fork');
+            }
+        }
+
+        // --- PATH: LAZY WA ---
+        function sendLazyWhatsApp() {
+            if (originalTotal === 0) { alert('Please enter a valid quantity!'); return; }
+            
+            const typeName = productsData[currentMode].name;
+            const qty = hubQty ? hubQty.value : 1;
+            const notes = hubNotes ? hubNotes.value.trim() : '';
+            const qtyLabel = (currentMode === 'polaroid' || currentMode === 'maps' || currentMode.includes('apparel')) ? 'items/copies' : (currentMode.includes('passport') ? 'sets' : 'pages');
+
+            let msg = `Heyy! ✨\n\nI need ${qty} ${qtyLabel} of *${typeName}*.\n\nEstimated damage is ₹${originalTotal}${discountApplied ? ' (got that 15% OFF! 🎉)' : ''}.\n\n`;
+            
+            if (notes) msg += `*Notes:* ${notes}\n\n`;
+            
+            if (deliveryPreference === 'pickup') msg += `📍 I'll walk in and pick this up at Shreeraj Hostel!\n`;
+            else if (deliveryPreference === 'friend') msg += `🤝 A friend will pick this up for me at Shreeraj Hostel!\n`;
+            else msg += `🛵 I'd like to order online for delivery.\n`;
+
+            msg += `\nHere are my photos/files... 🚀`;
+
+            triggerWhatsApp(msg);
+        }
+
+        // --- PATH: MAGIC STUDIO ---
+        function goToStudio() {
+            const vibe = currentMode;
+            
+            if (vibe === 'notes') {
+                if(imageUploadArea) imageUploadArea.classList.add('hidden');
+                if(textUploadArea) textUploadArea.classList.remove('hidden');
+                if(orientationSelect) orientationSelect.value = 'portrait';
+                if(orientationWrapper) orientationWrapper.classList.add('hidden');
+                if(stickerOptions) stickerOptions.classList.add('hidden');
+                if(polaroidOptions) polaroidOptions.classList.add('hidden');
+            } else {
+                if(imageUploadArea) imageUploadArea.classList.remove('hidden');
+                if(textUploadArea) textUploadArea.classList.add('hidden');
+                if(orientationWrapper) orientationWrapper.classList.remove('hidden');
+                
+                if (vibe === 'stickers') {
+                    if(stickerOptions) stickerOptions.classList.remove('hidden');
+                } else {
+                    if(stickerOptions) stickerOptions.classList.add('hidden');
+                }
+
+                if (vibe === 'polaroid') {
+                    if(polaroidOptions) polaroidOptions.classList.remove('hidden');
+                    if(orientationSelect) {
+                        orientationSelect.value = 'portrait'; 
+                        orientationSelect.disabled = true; 
+                    }
+                } else {
+                    if(polaroidOptions) polaroidOptions.classList.add('hidden');
+                    if(orientationSelect) orientationSelect.disabled = false;
+                }
+            }
+
+            goToView('view-studio');
+        }
+
+        // --- STUDIO CANVAS ENGINE ---
+        if(imageInput) {
+            imageInput.addEventListener('change', async () => {
+                const files = Array.from(imageInput.files);
+                if (files.length === 0) return;
+
+                if(uploadLoading) uploadLoading.classList.remove('hidden');
+                if(document.getElementById('addImagesLabel')) document.getElementById('addImagesLabel').classList.add('opacity-50', 'pointer-events-none');
+                if(generateBtn) generateBtn.classList.add('opacity-50', 'pointer-events-none');
+
+                try {
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        const options = { maxSizeMB: 1, maxWidthOrHeight: 1500, useWebWorker: true };
+                        const compressedFile = await browserImageCompression(file, options);
+                        
+                        const img = await new Promise((resolve, reject) => {
+                            const iObj = new Image();
+                            const url = URL.createObjectURL(compressedFile);
+                            iObj.onload = () => { URL.revokeObjectURL(url); resolve(iObj); };
+                            iObj.onerror = reject;
+                            iObj.src = url;
+                        });
+                        globalImages.push(img);
+                    }
+                    
+                    if(fileCount) fileCount.textContent = `${globalImages.length} image(s) loaded`;
+                    if(clearImagesBtn) clearImagesBtn.classList.remove('hidden');
+                } catch (error) {
+                    alert("Error loading images.");
+                } finally {
+                    imageInput.value = '';
+                    if(uploadLoading) uploadLoading.classList.add('hidden');
+                    if(document.getElementById('addImagesLabel')) document.getElementById('addImagesLabel').classList.remove('opacity-50', 'pointer-events-none');
+                    if(generateBtn) generateBtn.classList.remove('opacity-50', 'pointer-events-none');
+                }
+            });
+        }
+
+        if(clearImagesBtn) {
+            clearImagesBtn.addEventListener('click', () => {
+                globalImages = [];
+                if(fileCount) fileCount.textContent = '0 images loaded';
+                clearImagesBtn.classList.add('hidden');
+                if(previewImg) previewImg.classList.add('hidden');
+                if(downloadBtn) downloadBtn.classList.add('hidden');
+                if(placeholderText) placeholderText.classList.remove('hidden');
+            });
+        }
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            let words = text.split(' ');
+            let line = '';
+            for(let n = 0; n < words.length; n++) {
+                let testLine = line + words[n] + ' ';
+                let metrics = ctx.measureText(testLine);
+                if (metrics.width > maxWidth && n > 0) {
+                    ctx.fillText(line, x, y);
+                    line = words[n] + ' ';
+                    y += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, x, y);
+            return y + lineHeight;
+        }
+
+        if(generateBtn) {
+            generateBtn.addEventListener('click', async () => {
+                if (currentMode !== 'notes' && globalImages.length === 0) {
+                    alert('Drop some photos first, bestie.'); return;
+                }
+                if (currentMode === 'notes' && (!notesInput || notesInput.value.trim().length === 0)) {
+                    alert('Type some tea first!'); return;
+                }
+
+                generateBtn.disabled = true;
+                if(loading) loading.classList.remove('hidden');
+                if(loadingOverlay) loadingOverlay.classList.remove('hidden');
+                if(previewImg) previewImg.classList.add('hidden');
+                if(placeholderText) placeholderText.classList.add('hidden');
+
+                try {
+                    await new Promise(r => setTimeout(r, 100)); // UI paint tick
+
+                    let isPortrait = orientationSelect ? orientationSelect.value === 'portrait' : true;
+                    if (currentMode === 'notes') isPortrait = true;
+
+                    const canvasW = isPortrait ? 2480 : 3508;
+                    const canvasH = isPortrait ? 3508 : 2480;
+
+                    const isPassport = (currentMode === 'passport' || currentMode === 'sticker_passport');
+                    const footerH = isPassport ? 0 : 350; 
+                    const printH = canvasH - footerH; 
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = canvasW;
+                    canvas.height = canvasH;
+                    const ctx = canvas.getContext('2d');
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvasW, canvasH);
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+
+                    // ==========================================
+                    // PRINT LAYOUT ENGINE
+                    // ==========================================
+                    if (currentMode === 'notes') {
+                        ctx.fillStyle = '#000000';
+                        ctx.font = '50px "Inter", sans-serif';
+                        ctx.textBaseline = 'top';
+                        const textLines = notesInput.value.split('\n');
+                        let currentY = 150;
+                        const startX = 150;
+                        const maxW = canvasW - 300;
+                        
+                        textLines.forEach(line => {
+                            if (line.trim() === '') currentY += 50; 
+                            else currentY = wrapText(ctx, line, startX, currentY, maxW, 75);
+                        });
+
+                    } else if (isPassport) {
+                        const img = globalImages[0]; 
+                        const passW = 413; const passH = 531; 
+                        const cols = 3; const rows = 3;
+                        
+                        const targetRatio = passW / passH;
+                        const imgRatio = img.width / img.height;
+                        
+                        let sWidth = img.width, sHeight = img.height, sx = 0, sy = 0;
+                        if (imgRatio > targetRatio) {
+                            sWidth = img.height * targetRatio;
+                            sx = (img.width - sWidth) / 2;
+                        } else {
+                            sHeight = img.width / targetRatio;
+                            sy = (img.height - sHeight) / 2;
+                        }
+
+                        const gridW = (cols * passW) + ((cols - 1) * 60);
+                        const gridH = (rows * passH) + ((rows - 1) * 60);
+                        const startX = (canvasW - gridW) / 2; 
+                        const startY = 150; 
+
+                        for (let i = 0; i < 9; i++) {
+                            const col = i % cols; const row = Math.floor(i / cols);
+                            const dx = startX + col * (passW + 60);
+                            const dy = startY + row * (passH + 60);
+                            
+                            ctx.drawImage(img, sx, sy, sWidth, sHeight, dx, dy, passW, passH);
+                            ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 3;
+                            ctx.strokeRect(dx, dy, passW, passH);
+                        }
+
+                    } else if (currentMode === 'polaroid') {
+                        const cols = 3, rows = 3;
+                        const pStyle = polaroidStyleSelect ? polaroidStyleSelect.value : 'square';
+                        let frameW = 700; let frameH = 875; 
+                        if (pStyle === 'tall') frameH = 950;
+                        if (pStyle === 'wide') frameH = 750;
+
+                        const gapX = (canvasW - (cols * frameW)) / 4;
+                        const gapY = (printH - (rows * frameH)) / 4; 
+
+                        for(let i=0; i<Math.min(9, globalImages.length); i++) {
+                            const img = globalImages[i];
+                            const col = i % cols; const row = Math.floor(i / cols);
+                            const dx = gapX + col * (frameW + gapX);
+                            const dy = gapY + row * (frameH + gapY);
+
+                            ctx.fillStyle = '#ffffff'; ctx.fillRect(dx, dy, frameW, frameH);
+                            ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 2;
+                            ctx.strokeRect(dx-10, dy-10, frameW+20, frameH+20);
+
+                            let imgAreaW = 620;
+                            let imgAreaH = pStyle === 'tall' ? 720 : (pStyle === 'wide' ? 465 : 620);
+                            const margin = (frameW - imgAreaW) / 2;
+                            
+                            const targetRatio = imgAreaW / imgAreaH;
+                            const imgRatio = img.width / img.height;
+                            let sWidth = img.width, sHeight = img.height, sx = 0, sy = 0;
+                            if (imgRatio > targetRatio) {
+                                sWidth = img.height * targetRatio; sx = (img.width - sWidth) / 2;
+                            } else {
+                                sHeight = img.width / targetRatio; sy = (img.height - sHeight) / 2;
+                            }
+                            ctx.drawImage(img, sx, sy, sWidth, sHeight, dx + margin, dy + margin, imgAreaW, imgAreaH);
+                        }
+
+                    } else {
+                        // Normal, Glossy & Stickers
+                        const n = globalImages.length;
+                        let bestScore = 0; let bestC = 1, bestR = n;
+                        const gap = Math.floor(Math.min(canvasW, printH) * 0.03); 
+
+                        for (let c = 1; c <= n; c++) {
+                            let r = Math.ceil(n / c);
+                            let cellW = (canvasW - (gap * (c + 1))) / c;
+                            let cellH = (printH - (gap * (r + 1))) / r; 
+                            let score = 0;
+                            for (let img of globalImages) {
+                                let scale = Math.min(cellW / img.width, cellH / img.height);
+                                score += (img.width * scale) * (img.height * scale);
+                            }
+                            if (score > bestScore) { bestScore = score; bestC = c; bestR = r; }
+                        }
+
+                        const cellW = (canvasW - (gap * (bestC + 1))) / bestC;
+                        const cellH = (printH - (gap * (bestR + 1))) / bestR; 
+
+                        globalImages.forEach((img, i) => {
+                            const col = i % bestC; const row = Math.floor(i / bestC);
+                            const scale = Math.min(cellW / img.width, cellH / img.height);
+                            const drawW = img.width * scale * 0.95; 
+                            const drawH = img.height * scale * 0.95;
+                            const startX = gap + (col * (cellW + gap));
+                            const startY = gap + (row * (cellH + gap));
+                            const xOffset = startX + (cellW - drawW) / 2;
+                            const yOffset = startY + (cellH - drawH) / 2;
+                            ctx.drawImage(img, xOffset, yOffset, drawW, drawH);
+                        });
+                    }
+
+                    if (!isPassport) {
+                        const footerY = printH; 
+                        ctx.fillStyle = '#111111'; ctx.fillRect(0, footerY, canvasW, footerH);
+                        ctx.strokeStyle = '#FF00FF'; ctx.lineWidth = 10;
+                        ctx.beginPath(); ctx.moveTo(0, footerY); ctx.lineTo(canvasW, footerY); ctx.stroke();
+                        ctx.fillStyle = '#00FFFF'; ctx.textAlign = 'center';
+                        ctx.font = '900 60px "Space Grotesk", sans-serif';
+                        ctx.fillText("WALK INTO SHREERAJ HOSTEL FOR DEALS!", canvasW/2, footerY + 100);
+                        ctx.fillStyle = '#FFFFFF'; ctx.font = '700 40px "Inter", sans-serif';
+                        ctx.fillText("Order via deluluprinter.xyz  |  WhatsApp: 9907488075", canvasW/2, footerY + 200);
+                    }
+
+                    const finalImageUrl = canvas.toDataURL('image/jpeg', 0.85);
+                    if(previewImg) {
+                        previewImg.src = finalImageUrl;
+                        previewImg.classList.remove('hidden');
+                    }
+                    if(downloadBtn) {
+                        downloadBtn.href = finalImageUrl;
+                        downloadBtn.classList.remove('hidden');
+                        downloadBtn.style.display = 'inline-flex';
+                    }
+
+                    if (window.innerWidth < 1024 && previewImg) previewImg.scrollIntoView({behavior: 'smooth', block: 'center'});
+
+                } catch (error) {
+                    alert('Error processing: ' + error.message);
+                    if(placeholderText) placeholderText.classList.remove('hidden');
+                } finally {
+                    generateBtn.disabled = false;
+                    if(loading) loading.classList.add('hidden');
+                    if(loadingOverlay) loadingOverlay.classList.add('hidden');
+                }
+            });
+        }
+
+        function sendStudioWhatsApp() {
+            if (globalImages.length === 0 && (!notesInput || notesInput.value.trim().length === 0)) {
+                alert('Generate a preview first!'); return;
+            }
+            
+            const typeName = productsData[currentMode].name;
+            const notes = hubNotes ? hubNotes.value.trim() : '';
+            const qtyLabel = (currentMode === 'polaroid' || currentMode === 'maps' || currentMode.includes('apparel')) ? 'items/copies' : (currentMode.includes('passport') ? 'sets' : 'pages');
+
+            let msg = `Heyy! ✨\n\nI formatted ${calculatedPages} ${qtyLabel} of *${typeName}* using the Magic Studio.\n\nEstimated damage was ₹${originalTotal}${discountApplied ? ' (got that 15% OFF! 🎉)' : ''}.\n\n`;
+            
+            if (notes) msg += `*Notes:* ${notes}\n\n`;
+            
+            if (deliveryPreference === 'pickup') msg += `📍 I'll walk in and pick this up at Shreeraj Hostel!\n`;
+            else if (deliveryPreference === 'friend') msg += `🤝 A friend will pick this up for me at Shreeraj Hostel!\n`;
+            else msg += `🛵 I'd like to order online for delivery.\n`;
+
+            msg += `\nHere is my generated A4 sheet... 🚀`;
+            
+            triggerWhatsApp(msg);
+        }
+
+        // WhatsApp Trigger
+        function triggerWhatsApp(message) {
+            if(!toast) return;
+            toast.classList.remove('hidden');
+            toast.classList.add('toast-enter');
+            let timeLeft = 3;
+            if(countdownEl) countdownEl.textContent = timeLeft;
+            
+            const url = `https://wa.me/919907488075?text=${encodeURIComponent(message)}`;
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                if(countdownEl) countdownEl.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    toast.classList.add('hidden');
+                    toast.classList.remove('toast-enter');
+                    window.open(url, '_blank');
+                }
+            }, 1000);
+        }
+
     </script>
 </body>
 </html>
