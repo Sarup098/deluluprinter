@@ -248,8 +248,19 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                 <!-- Camera / Upload Section -->
-                <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-4 relative">
                     <div class="relative w-full aspect-[4/3] bg-black rounded-3xl overflow-hidden border-4 border-brand-black shadow-brutal flex items-center justify-center">
+                        
+                        <!-- Mobile Strip & Photo Tracker -->
+                        <div id="mobileStripIndicator" class="absolute top-4 right-4 bg-brand-yellow text-black px-3 py-1 rounded-full text-xs font-black shadow-brutal-sm z-20 border-2 border-black transition-all">
+                            Strip 1 • Photo 0/4
+                        </div>
+
+                        <!-- Visual Downward Scroll Hint (Flashes briefly on mobile) -->
+                        <div id="scrollHint" class="absolute bottom-4 left-0 right-0 text-center text-white font-bold text-[10px] z-20 opacity-0 transition-opacity duration-300 drop-shadow-md pointer-events-none">
+                            Scroll down for preview 👇
+                        </div>
+
                         <video id="boothVideo" autoplay playsinline class="w-full h-full object-cover"></video>
                         <div id="cameraPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center text-gray-500 bg-gray-100">
                             <i class="ph-duotone ph-camera-slash text-5xl mb-2"></i>
@@ -303,7 +314,7 @@
 
                     <div class="flex flex-col gap-3 w-full mt-auto">
                         <button id="btnSaveStrip" onclick="saveCurrentStrip()" disabled class="brutal-btn bg-black text-brand-yellow font-black text-base py-4 rounded-xl w-full flex justify-center items-center gap-2 opacity-50 transition-all">
-                            Save Strip <i class="ph-bold ph-download-simple"></i>
+                            Fill slots to save... <i class="ph-bold ph-lock"></i>
                         </button>
                         <button id="btnCheckoutStrips" onclick="checkoutPhotobooth()" class="hidden brutal-btn bg-brand-green text-white font-black text-base py-4 rounded-xl w-full flex justify-center items-center gap-2 hover:bg-[#1fbc5b] transition-all">
                             Review & Checkout <i class="ph-bold ph-check-circle"></i>
@@ -1085,19 +1096,33 @@
         }
 
         function updateBoothUI() {
+            const currentStripNum = savedStripsData.length + 1;
             document.getElementById('boothCounter').innerText = boothImages.length;
             document.getElementById('completedStripsCount').innerText = savedStripsData.length;
+            
+            const mobileIndicator = document.getElementById('mobileStripIndicator');
+            if(mobileIndicator) {
+                mobileIndicator.innerText = `Strip ${currentStripNum} • Photo ${boothImages.length}/${requiredBoothPhotos}`;
+            }
+
+            const scrollHint = document.getElementById('scrollHint');
+            if (scrollHint && boothImages.length > 0 && boothImages.length < requiredBoothPhotos) {
+                scrollHint.style.opacity = '1';
+                setTimeout(() => { scrollHint.style.opacity = '0'; }, 2000);
+            }
             
             renderLiveStripPreview();
 
             const btnSave = document.getElementById('btnSaveStrip');
             if(boothImages.length === requiredBoothPhotos) {
                 btnSave.disabled = false;
+                btnSave.innerHTML = `Save Strip #${currentStripNum} & Next <i class="ph-bold ph-arrow-right"></i>`;
                 btnSave.classList.remove('opacity-50');
                 btnSave.classList.replace('bg-black', 'bg-brand-cyan');
                 btnSave.classList.replace('text-brand-yellow', 'text-black');
             } else {
                 btnSave.disabled = true;
+                btnSave.innerHTML = `Fill slots to save... <i class="ph-bold ph-lock"></i>`;
                 btnSave.classList.add('opacity-50');
                 btnSave.classList.replace('bg-brand-cyan', 'bg-black');
                 btnSave.classList.replace('text-black', 'text-brand-yellow');
@@ -1226,8 +1251,6 @@
             boothImages.forEach(img => allRawBoothImages.push(img));
             boothImages = [];
             updateBoothUI();
-
-            btn.innerHTML = `Save Strip & Next <i class="ph-bold ph-arrow-right"></i>`;
         }
 
         async function checkoutPhotobooth() {
@@ -1269,7 +1292,7 @@
             orderPreviewSection.classList.remove('hidden');
 
             orderActionButtons.innerHTML = `
-                <button onclick="triggerWhatsApp(pendingWaMessage || 'Hey, checking out a photobooth order!')" id="waNotifyBtn" class="brutal-btn bg-brand-green text-white w-full py-4 rounded-3xl font-black text-xl flex items-center justify-center gap-2 hover:bg-[#1fbc5b]">
+                <button onclick="checkDeluluAndSend(pendingWaMessage || 'Hey, checking out a photobooth order!')" id="waNotifyBtn" class="brutal-btn bg-brand-green text-white w-full py-4 rounded-3xl font-black text-xl flex items-center justify-center gap-2 hover:bg-[#1fbc5b]">
                     <i class="ph-bold ph-whatsapp text-2xl"></i> Notify on WhatsApp
                 </button>
             `;
@@ -1281,7 +1304,7 @@
             goToView('view-order');
         }
 
-        // --- ENCRYPTED BACKUP LOGIC ---
+        // --- ENCRYPTED BACKUP LOGIC (iOS Compatible + Share API) ---
         function downloadEncryptedBackup() {
             const srcToDownload = window.compiledA4Base64 || document.getElementById('previewImg').src;
             if (!srcToDownload || !srcToDownload.startsWith('data:')) {
@@ -1360,24 +1383,59 @@
 
                     const encryptedBase64 = canvas.toDataURL('image/jpeg', 0.95);
 
-                    const link = document.createElement('a');
-                    link.download = `Artevia_Encrypted_${Math.floor(1000 + Math.random() * 9000)}.jpg`;
-                    link.href = encryptedBase64;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+                    // Web Share API & Download logic (Fix for iPhone)
+                    async function triggerSaveAndWA() {
+                        btn.innerHTML = `<i class="ph-bold ph-check"></i> Backup Ready!`;
+                        btn.classList.replace('bg-white', 'bg-brand-green');
+                        btn.classList.replace('text-black', 'text-white');
+                        btn.disabled = false;
 
-                    btn.innerHTML = origText;
-                    btn.disabled = false;
+                        const name = document.getElementById('customerName') ? document.getElementById('customerName').value.trim() : "Anonymous";
+                        const typeName = productsData[currentMode] ? productsData[currentMode].name : currentMode;
+                        let msg = `Heyy! ✨\n\nI created a *${typeName}* order online.\n\nEstimated damage is ₹${originalTotal}${discountApplied ? ' (got that 15% OFF! 🎉)' : ''}.\n\n*Name:* ${name}\n`;
+                        msg += `\n📍 I'm ordering from deluluprinter.xyz!\n`;
+                        msg += `\nI am sending you the downloaded Encrypted Backup file along with this text... 🚀`;
+                        
+                        pendingWaMessage = msg;
 
-                    const name = document.getElementById('customerName') ? document.getElementById('customerName').value.trim() : "Anonymous";
-                    const typeName = productsData[currentMode] ? productsData[currentMode].name : currentMode;
-                    let msg = `Heyy! ✨\n\nI created a *${typeName}* order online.\n\nEstimated damage is ₹${originalTotal}${discountApplied ? ' (got that 15% OFF! 🎉)' : ''}.\n\n*Name:* ${name}\n`;
-                    msg += `\n📍 I'm ordering from deluluprinter.xyz!\n`;
-                    msg += `\nI am sending you the downloaded Encrypted Backup file along with this text... 🚀`;
+                        try {
+                            const blob = await (await fetch(encryptedBase64)).blob();
+                            const file = new File([blob], `Artevia_Encrypted_${Math.floor(1000 + Math.random() * 9000)}.jpg`, { type: 'image/jpeg' });
+                            
+                            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                                await navigator.share({
+                                    files: [file],
+                                    title: 'Encrypted Print Backup',
+                                    text: 'My encrypted print file for Delulu Printer'
+                                });
+                                // User successfully shared/saved. Update main CTA
+                                const waBtn = document.getElementById('waNotifyBtn');
+                                if(waBtn) waBtn.classList.add('animate-bounce');
+                            } else {
+                                throw new Error("Share API not supported");
+                            }
+                        } catch (err) {
+                            // Fallback for Desktop/Android
+                            const link = document.createElement('a');
+                            link.download = `Artevia_Encrypted_${Math.floor(1000 + Math.random() * 9000)}.jpg`;
+                            link.href = encryptedBase64;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            
+                            alert("Backup downloaded! Please attach this image when you message us on WhatsApp.");
+                        }
+
+                        // Update main button to clearly prompt the WhatsApp step
+                        const actionDiv = document.getElementById('orderActionButtons');
+                        actionDiv.innerHTML = `
+                            <button onclick="checkDeluluAndSend(pendingWaMessage)" class="brutal-btn bg-brand-green text-white w-full py-5 rounded-3xl font-black text-xl flex items-center justify-center gap-2 animate-pulse hover:bg-[#1fbc5b]">
+                                <i class="ph-bold ph-whatsapp text-3xl"></i> Continue to WhatsApp
+                            </button>
+                        `;
+                    }
                     
-                    pendingWaMessage = msg;
-                    checkDeluluAndSend(msg); 
+                    triggerSaveAndWA();
                 }, 50);
             };
             img.src = srcToDownload;
