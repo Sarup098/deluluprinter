@@ -337,6 +337,14 @@
                     </div>
 
                     <div class="flex flex-col gap-3 w-full mt-auto">
+                        <div id="stripCopiesWrapper" class="hidden flex justify-between items-center bg-gray-50 border-2 border-gray-200 p-2 rounded-xl mb-1 shadow-inner">
+                            <span class="font-bold text-xs text-gray-600">Copies of this strip:</span>
+                            <div class="flex items-center gap-2">
+                                <button onclick="changeStripCopies(-1)" class="w-6 h-6 brutal-btn bg-white rounded font-black text-xs flex items-center justify-center">-</button>
+                                <input type="number" id="stripCopies" value="1" min="1" max="20" class="w-8 bg-transparent font-black text-sm text-center outline-none" readonly>
+                                <button onclick="changeStripCopies(1)" class="w-6 h-6 brutal-btn bg-white rounded font-black text-xs flex items-center justify-center">+</button>
+                            </div>
+                        </div>
                         <button id="btnSaveStrip" onclick="saveCurrentStrip()" disabled class="brutal-btn bg-black text-brand-yellow font-black text-base py-4 rounded-xl w-full flex justify-center items-center gap-2 opacity-50 transition-all">
                             Fill slots to save... <i class="ph-bold ph-lock"></i>
                         </button>
@@ -1127,6 +1135,14 @@
             updateBoothUI();
         }
 
+        function changeStripCopies(delta) {
+            const input = document.getElementById('stripCopies');
+            let val = parseInt(input.value) + delta;
+            if (val < 1) val = 1;
+            if (val > 20) val = 20; // Max 20 copies per click
+            input.value = val;
+        }
+
         function handleBoothUpload(event) {
             const files = event.target.files;
             if(!files || files.length === 0) return;
@@ -1184,6 +1200,7 @@
             renderLiveStripPreview();
 
             const btnSave = document.getElementById('btnSaveStrip');
+            const copyWrapper = document.getElementById('stripCopiesWrapper');
             if(boothImages.length === requiredBoothPhotos) {
                 btnSave.disabled = false;
                 btnSave.innerHTML = `Save Strip #${currentStripNum} & Next <i class="ph-bold ph-arrow-right"></i>`;
@@ -1191,6 +1208,7 @@
                 btnSave.classList.replace('bg-black', 'bg-brand-cyan');
                 btnSave.classList.replace('text-brand-yellow', 'text-black');
                 document.getElementById('boothStickerPalette').classList.remove('hidden');
+                if(copyWrapper) copyWrapper.classList.remove('hidden');
             } else {
                 btnSave.disabled = true;
                 btnSave.innerHTML = `Fill slots to save... <i class="ph-bold ph-lock"></i>`;
@@ -1198,6 +1216,7 @@
                 btnSave.classList.replace('bg-brand-cyan', 'bg-black');
                 btnSave.classList.replace('text-black', 'text-brand-yellow');
                 document.getElementById('boothStickerPalette').classList.add('hidden');
+                if(copyWrapper) copyWrapper.classList.add('hidden');
             }
 
             const btnCheckout = document.getElementById('btnCheckoutStrips');
@@ -1236,11 +1255,13 @@
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, cW, cH);
                 const isK4 = tmpl === 'kitty-4';
-                const padX = isK4 ? 40 : 50; 
-                const slotW = isK4 ? 700 : cW - (padX * 2); 
-                const slotH = isK4 ? 520 : 650; 
-                const startY = isK4 ? 60 : 100; 
-                const gapY = isK4 ? 30 : 80;
+                
+                // Adjusted precise positioning for Hello Kitty frames
+                const padX = isK4 ? 45 : 50; 
+                const slotW = isK4 ? 690 : cW - (padX * 2); 
+                const slotH = isK4 ? 460 : 650; // Shorter height for 4-pic to allow bottom graphic room
+                const startY = isK4 ? 80 : 100; 
+                const gapY = isK4 ? 25 : 80;
                 const photoCount = isK4 ? 4 : 3;
                 
                 let currentY = startY;
@@ -1333,11 +1354,18 @@
 
             const canvas = document.getElementById('liveStripCanvas');
             const finalBase64 = canvas.toDataURL('image/jpeg', 0.9);
-            savedStripsData.push(finalBase64);
+            
+            const copiesInput = document.getElementById('stripCopies');
+            const copies = copiesInput ? parseInt(copiesInput.value) : 1;
+            
+            for(let i=0; i<copies; i++) {
+                savedStripsData.push(finalBase64);
+            }
             
             boothImages.forEach(img => allRawBoothImages.push(img));
             boothImages = [];
             stripDecorations = [];
+            if(copiesInput) copiesInput.value = 1; // Reset copies back to 1
             updateBoothUI();
         }
 
