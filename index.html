@@ -337,17 +337,19 @@
                     </div>
 
                     <div class="flex flex-col gap-3 w-full mt-auto">
-                        <div id="stripCopiesWrapper" class="hidden flex justify-between items-center bg-gray-50 border-2 border-gray-200 p-2 rounded-xl mb-1 shadow-inner">
-                            <span class="font-bold text-xs text-gray-600">Copies of this strip:</span>
-                            <div class="flex items-center gap-2">
-                                <button onclick="changeStripCopies(-1)" class="w-6 h-6 brutal-btn bg-white rounded font-black text-xs flex items-center justify-center">-</button>
-                                <input type="number" id="stripCopies" value="1" min="1" max="20" class="w-8 bg-transparent font-black text-sm text-center outline-none" readonly>
-                                <button onclick="changeStripCopies(1)" class="w-6 h-6 brutal-btn bg-white rounded font-black text-xs flex items-center justify-center">+</button>
-                            </div>
-                        </div>
                         <button id="btnSaveStrip" onclick="saveCurrentStrip()" disabled class="brutal-btn bg-black text-brand-yellow font-black text-base py-4 rounded-xl w-full flex justify-center items-center gap-2 opacity-50 transition-all">
                             Fill slots to save... <i class="ph-bold ph-lock"></i>
                         </button>
+                        
+                        <div id="stripCopiesWrapper" class="hidden flex justify-between items-center bg-brand-cyan/20 border-2 border-brand-cyan p-3 rounded-xl shadow-inner mt-1">
+                            <span id="stripCopiesLabel" class="font-bold text-sm text-black">Duplicate Strip #1:</span>
+                            <div class="flex items-center gap-2">
+                                <button onclick="changeStripCopies(-1)" class="w-8 h-8 brutal-btn bg-white rounded-lg font-black text-lg flex items-center justify-center">-</button>
+                                <input type="number" id="stripCopies" value="1" min="1" max="20" class="w-10 bg-transparent font-black text-lg text-center outline-none" readonly>
+                                <button onclick="changeStripCopies(1)" class="w-8 h-8 brutal-btn bg-white rounded-lg font-black text-lg flex items-center justify-center">+</button>
+                            </div>
+                        </div>
+
                         <button id="btnCheckoutStrips" onclick="checkoutPhotobooth()" class="hidden brutal-btn bg-brand-green text-white font-black text-base py-4 rounded-xl w-full flex justify-center items-center gap-2 hover:bg-[#1fbc5b] transition-all">
                             Review & Checkout <i class="ph-bold ph-check-circle"></i>
                         </button>
@@ -1189,6 +1191,11 @@
             const mobileIndicator = document.getElementById('mobileStripIndicator');
             if(mobileIndicator) {
                 mobileIndicator.innerText = `Strip ${currentStripNum} • Photo ${boothImages.length}/${requiredBoothPhotos}`;
+            }
+
+            const copyWrapperText = document.getElementById('stripCopiesLabel');
+            if (copyWrapperText) {
+                copyWrapperText.innerText = `Duplicate Strip #${currentStripNum}:`;
             }
 
             const scrollHint = document.getElementById('scrollHint');
