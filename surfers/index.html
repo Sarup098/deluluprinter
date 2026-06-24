@@ -99,15 +99,27 @@
                     <span>Slide Under Barriers:</span>
                     <span class="bg-red-500/20 text-red-300 px-2 py-0.5 rounded text-xs font-mono">↓ S / Shift</span>
                 </div>
+                
+                <!-- SECRET DEV TOOL INSTRUCTIONS -->
+                <div class="flex justify-between items-center py-1 border-b border-slate-800/50 text-orange-400">
+                    <span>*Tune Track Height:</span>
+                    <span class="bg-orange-500/20 px-2 py-0.5 rounded text-xs font-mono">U (Up) / J (Down)</span>
+                </div>
+
                 <div class="flex justify-center items-center py-2 mt-2 bg-red-950/50 rounded text-center">
                     <span class="text-xs text-orange-300 font-bold tracking-widest uppercase">Target: RUN OVER JAKE!</span>
                 </div>
-                <p class="text-center text-xs text-slate-500 pt-2">(Swipe supported on mobile)</p>
             </div>
 
             <button id="startButton" class="w-full py-4 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-500 hover:to-orange-500 text-white font-bold rounded-xl shadow-lg shadow-red-500/30 transform active:scale-95 transition-all text-lg tracking-wider uppercase">
                 Start Rampage
             </button>
+            
+            <!-- Quick manual height tuners for mobile / mouse users -->
+            <div class="flex justify-center space-x-4 mt-6">
+                <button id="btnTrackUp" class="px-4 py-2 bg-slate-800 text-slate-300 rounded border border-slate-600 hover:bg-slate-700 text-xs font-bold uppercase">Move Track ↑</button>
+                <button id="btnTrackDown" class="px-4 py-2 bg-slate-800 text-slate-300 rounded border border-slate-600 hover:bg-slate-700 text-xs font-bold uppercase">Move Track ↓</button>
+            </div>
         </div>
     </div>
 
@@ -210,7 +222,8 @@
         let score = 0, jakesHitCount = 0;
         let isPlaying = false, isGameOver = false;
 
-        let obstacles = [], jakes = [], sceneryChunks = [], jakeMixers = [];
+        let jakes = [], jakeMixers = [];
+        let tracks = [], trackLength = 0, usableLength = 0;
         let spawnTimer = 0, spawnInterval = 1.0; 
         let clock = new THREE.Clock();
 
@@ -308,6 +321,7 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.shadowMap.enabled = true;
+            renderer.localClippingEnabled = true; // IMPORTANT: Enables runtime 3D model slicing
             
             const ambientLight = new THREE.AmbientLight(0xffffff, 1.8);
             scene.add(ambientLight);
@@ -353,79 +367,85 @@
             scene.add(playerGroup);
         }
 
-        function buildBaseTracks() {
-            for (let i = 0; i < 3; i++) {
-                const bedGeo = new THREE.BoxGeometry(2.0, 0.1, 1000);
-                const bedMat = new THREE.MeshBasicMaterial({ visible: false }); 
-                const bed = new THREE.Mesh(bedGeo, bedMat);
-                bed.position.set(lanes[i], 0, -200);
-                scene.add(bed);
-            }
-        }
-
-        // --- Creating obstacles, Jakes, and environment chunks... ---
-
-        function spawnEnvironmentChunk(zPos) {
-            const envGroup = new THREE.Group();
-
-            if (loadedModels.environment) {
-                const trackChunk = loadedModels.environment.scene.clone();
-                
-                // --- PIVOT CORRECTION FIX ---
-                // Wrap in a group to safely modify pivot points without flinging the model off-screen
-                const wrapper = new THREE.Group();
-                wrapper.add(trackChunk);
-
-                // 1. Find true center of the raw model's geometry
-                const rawBox = new THREE.Box3().setFromObject(trackChunk);
-                const rawCenter = rawBox.getCenter(new THREE.Vector3());
-                
-                // 2. Shift model so its true center is at the local origin (0,0,0)
-                trackChunk.position.set(-rawCenter.x, -rawCenter.y, -rawCenter.z);
-
-                // 3. Now safely rotate the wrapper 90 degrees
-                wrapper.rotation.y = Math.PI / 2;
-                
-                // 4. Scale it up so it forms a proper environment size
-                const zoomScale = 14.0; 
-                wrapper.scale.set(zoomScale, zoomScale, zoomScale);
-                
-                // 5. Align perfectly to the ground (Y = 0)
-                const finalBox = new THREE.Box3().setFromObject(wrapper);
-                wrapper.position.y = -finalBox.min.y - 0.2; // Sit just slightly under the train
-                
-                envGroup.add(wrapper);
+        // --- THE ENDLESS TREADMILL SYSTEM ---
+        function buildEndlessTrack() {
+            if (!loadedModels.environment) return;
+            
+            const rawTrack = loadedModels.environment.scene;
+            
+            // Wrap to safely manipulate pivot points
+            const wrapper = new THREE.Group();
+            const rawBox = new THREE.Box3().setFromObject(rawTrack);
+            const rawCenter = rawBox.getCenter(new THREE.Vector3());
+            
+            // MATH FIX: Only center the X and Z. Trust the original Y origin!
+            rawTrack.position.set(-rawCenter.x, 0, -rawCenter.z);
+            wrapper.add(rawTrack);
+            
+            // Flip 180 degrees so we start at the beginning
+            wrapper.rotation.y = -Math.PI / 2; 
+            const zoomScale = 14.0; 
+            wrapper.scale.set(zoomScale, zoomScale, zoomScale);
+            
+            // Force world matrices to update for physics grounding
+            wrapper.position.y = 0; 
+            wrapper.updateMatrixWorld(true);
+            
+            // AUTO-GROUNDING LASER: Find the actual physical floor and snap to Y=0
+            const groundRay = new THREE.Raycaster(new THREE.Vector3(0, 100, 5), new THREE.Vector3(0, -1, 0));
+            const hits = groundRay.intersectObject(wrapper, true);
+            if (hits.length > 0) {
+                console.log("Auto-grounded track. Floor detected at Y:", hits[0].point.y);
+                wrapper.position.y = -hits[0].point.y; 
             } else {
-                const floorGeo = new THREE.PlaneGeometry(30, 120);
-                const floorMat = new THREE.MeshStandardMaterial({ color: 0x111827 });
-                const floor = new THREE.Mesh(floorGeo, floorMat);
-                floor.rotation.x = -Math.PI/2;
-                envGroup.add(floor);
+                console.log("Auto-grounding missed. Defaulting to 0.");
             }
-
-            envGroup.position.set(0, 0, zPos);
-            scene.add(envGroup);
-            sceneryChunks.push({ mesh: envGroup, zPos: zPos });
-        }
-
-        // We use hurdles/barriers as obstacles since the user is a Train now
-        function spawnHurdle(laneIndex, zPos) {
-            const hurdleGroup = new THREE.Group();
-            const barGeo = new THREE.BoxGeometry(1.8, 0.4, 0.4);
-            const barMat = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.8 });
-            const bar = new THREE.Mesh(barGeo, barMat);
-            bar.position.set(0, 1.2, 0); // Jump over this
-            hurdleGroup.add(bar);
-
-            const postGeo = new THREE.CylinderGeometry(0.15, 0.15, 1.4);
-            const p1 = new THREE.Mesh(postGeo, barMat); p1.position.set(-0.8, 0.7, 0);
-            const p2 = new THREE.Mesh(postGeo, barMat); p2.position.set(0.8, 0.7, 0);
-            hurdleGroup.add(p1, p2);
-
-            hurdleGroup.position.set(lanes[laneIndex], 0, zPos);
-            scene.add(hurdleGroup);
-            // Higher height requires the train to jump
-            obstacles.push({ mesh: hurdleGroup, type: 'hurdle', lane: laneIndex, width: 1.8, height: 1.3, length: 0.6 });
+            
+            // Calculate absolute mathematical length of the track
+            const finalBox = new THREE.Box3().setFromObject(wrapper);
+            trackLength = finalBox.max.z - finalBox.min.z;
+            usableLength = trackLength * 0.70; // Cut 15% from front and 15% from back
+            
+            // Advanced Clipping Segment Generator
+            function createTrackSegment(baseWrapper) {
+                const segment = baseWrapper.clone();
+                // Create invisible laser-cut planes pointing inward
+                const pFront = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+                const pBack = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+                
+                // Deep clone materials so clipping planes don't interfere with other models
+                segment.traverse((child) => {
+                    if (child.isMesh && child.material) {
+                        if (Array.isArray(child.material)) {
+                            child.material = child.material.map(m => {
+                                const newMat = m.clone();
+                                newMat.clippingPlanes = [pFront, pBack];
+                                return newMat;
+                            });
+                        } else {
+                            child.material = child.material.clone();
+                            child.material.clippingPlanes = [pFront, pBack];
+                        }
+                    }
+                });
+                
+                segment.userData.pFront = pFront;
+                segment.userData.pBack = pBack;
+                return segment;
+            }
+            
+            // Create two identical looping segments with our clipping applied
+            const track1 = createTrackSegment(wrapper);
+            const track2 = createTrackSegment(wrapper);
+            
+            // VISIBILITY FIX: Shift the track +25 units towards the camera so it covers the player and camera perfectly!
+            const startZ = 25;
+            track1.position.set(0, track1.position.y, startZ - usableLength / 2);
+            track2.position.set(0, track2.position.y, track1.position.z - usableLength);
+            
+            scene.add(track1);
+            scene.add(track2);
+            tracks.push(track1, track2);
         }
 
         // The goal target: Jake!
@@ -465,26 +485,16 @@
             spawnTimer += dt;
             if (spawnTimer >= spawnInterval) {
                 spawnTimer = 0;
-                const spawnZ = -180; // Spawn further back because we scale env up
-                const pattern = Math.floor(Math.random() * 4);
-
-                if (pattern === 0) { // Cluster of Jakes
-                    const lane = Math.floor(Math.random() * 3);
-                    for (let j = 0; j < 3; j++) spawnJakeTarget(lane, spawnZ - (j * 6));
-                } else if (pattern === 1) { // Hurdle + Jakes
-                    const hLane = Math.floor(Math.random() * 3);
-                    spawnHurdle(hLane, spawnZ);
-                    [0,1,2].forEach(l => { if(l !== hLane && Math.random()>0.3) spawnJakeTarget(l, spawnZ - 5); });
-                } else if (pattern === 2) { // Double Hurdle, one free lane with Jake
-                    const freeLane = Math.floor(Math.random() * 3);
-                    [0,1,2].forEach(l => { if(l !== freeLane) spawnHurdle(l, spawnZ); else spawnJakeTarget(l, spawnZ); });
-                } else { // Scattered Jakes
-                    [0,1,2].forEach(l => { if(Math.random()>0.4) spawnJakeTarget(l, spawnZ - (Math.random()*10)); });
-                }
+                const spawnZ = -180; 
                 
-                // Spawn repeating environment chunks densely to prevent gaps
-                spawnEnvironmentChunk(spawnZ - 40);
-                spawnEnvironmentChunk(spawnZ - 80);
+                // Track objects are embedded, so we ONLY spawn Jakes to hit now!
+                const lane = Math.floor(Math.random() * 3);
+                spawnJakeTarget(lane, spawnZ);
+                
+                if (Math.random() > 0.5) {
+                    let secondLane = Math.floor(Math.random() * 3);
+                    if (secondLane !== lane) spawnJakeTarget(secondLane, spawnZ - 10);
+                }
             }
         }
 
@@ -492,8 +502,6 @@
             const pX = playerGroup.position.x;
             const pY = playerGroup.position.y;
             const pZ = playerGroup.position.z; 
-            const pHeight = isSliding ? 1.0 : 2.5; // Train height
-            const pLength = 2.0; // Train hit length
 
             // Plot Twist: Hitting Jake is GOOD!
             for (let i = jakes.length - 1; i >= 0; i--) {
@@ -516,16 +524,50 @@
                 }
             }
 
-            // Hitting Hurdles is BAD (Train crashes!)
-            for (let i = 0; i < obstacles.length; i++) {
-                const obs = obstacles[i];
-                if (obs.lane === currentLane) {
-                    const dz = Math.abs(obs.mesh.position.z - pZ);
-                    // Standard AABB length collision
-                    if (dz < (obs.length/2 + pLength/2)) {
-                        // If train isn't jumping high enough over hurdle
-                        if (obs.type === 'hurdle' && pY < obs.height) { handleGameOver(); return; }
+            // --- INVISIBLE RAYCASTER PHYSICS ---
+            // Checks for collisions with static barriers embedded in your Track GLB
+            const raycaster = new THREE.Raycaster();
+            
+            // Raycaster height fixed so we don't shoot over the hurdles
+            const trainFront = new THREE.Vector3(pX, pY + 0.8, pZ - 2.0);
+            raycaster.set(trainFront, new THREE.Vector3(0, 0, -1)); // Pointing strictly forward
+            
+            const intersects = raycaster.intersectObjects(tracks, true);
+            for (let i = 0; i < intersects.length; i++) {
+                const hit = intersects[i];
+                if (hit.distance < 1.0) {
+                    // Ignore physics collisions with the 15% wall zones we visually chopped off
+                    let isClipped = false;
+                    let parent = hit.object;
+                    let foundTrack = null;
+                    while(parent) {
+                        if (parent === tracks[0] || parent === tracks[1]) {
+                            foundTrack = parent;
+                            break;
+                        }
+                        parent = parent.parent;
                     }
+                    
+                    if (foundTrack) {
+                        // Updated cutoff buffer distance
+                        const clipOffset = trackLength * 0.15;
+                        const frontZ = foundTrack.position.z - trackLength / 2 + clipOffset;
+                        const backZ = foundTrack.position.z + trackLength / 2 - clipOffset;
+                        
+                        // Buffer of 0.1 to prevent micro-clipping false positives
+                        if (hit.point.z < frontZ - 0.1 || hit.point.z > backZ + 0.1) {
+                            isClipped = true;
+                        }
+                    }
+                    
+                    if (!isClipped) {
+                        // Valid crash into a visible real obstacle!
+                        handleGameOver();
+                        return;
+                    }
+                } else {
+                    // Raycast hits are sorted by distance, exit loop if we hit nothing nearby
+                    break; 
                 }
             }
         }
@@ -544,10 +586,8 @@
         }
 
         function resetGame() {
-            obstacles.forEach(o => scene.remove(o.mesh)); obstacles = [];
             jakes.forEach(j => scene.remove(j.mesh)); jakes = [];
             jakeMixers = [];
-            sceneryChunks.forEach(s => scene.remove(s.mesh)); sceneryChunks = [];
 
             currentLane = 1; targetX = lanes[currentLane];
             playerGroup.position.set(targetX, 0, 5);
@@ -559,8 +599,12 @@
             document.getElementById('scoreVal').innerText = '000000';
             document.getElementById('jakesHitVal').innerText = '0';
             
-            // Seed initial track densely
-            for(let i=0; i<12; i++) spawnEnvironmentChunk(-i * 30);
+            // Snap tracks back to starting positions
+            if (tracks.length === 2) {
+                const startZ = 25;
+                tracks[0].position.z = startZ - usableLength / 2;
+                tracks[1].position.z = tracks[0].position.z - usableLength;
+            }
 
             document.getElementById('gameOverScreen').classList.add('hidden');
             document.getElementById('gameHUD').classList.remove('opacity-0');
@@ -574,12 +618,16 @@
 
         function setupControls() {
             window.addEventListener('keydown', (e) => {
-                if (!isPlaying || isGameOver) return;
+                if (!isPlaying && !isGameOver && e.key !== 'u' && e.key !== 'j') return;
                 initAudio();
                 if (e.key === 'ArrowLeft' || e.key === 'a') moveLane(-1);
                 if (e.key === 'ArrowRight' || e.key === 'd') moveLane(1);
                 if (e.key === 'ArrowUp' || e.key === 'w' || e.key === ' ') triggerJump();
                 if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'Shift') triggerSlide();
+
+                // --- SECRET DEV TOOLS: Realtime Track Height Alignment ---
+                if (e.key === 'u' || e.key === 'U') moveTrack(0.5);
+                if (e.key === 'j' || e.key === 'J') moveTrack(-0.5);
             });
 
             // Mobile Swipes
@@ -603,6 +651,15 @@
             document.getElementById('btnRight').addEventListener('pointerdown', () => moveLane(1));
             document.getElementById('btnJump').addEventListener('pointerdown', triggerJump);
             document.getElementById('btnSlide').addEventListener('pointerdown', triggerSlide);
+            
+            // Manual Track Tuner Buttons
+            document.getElementById('btnTrackUp').addEventListener('pointerdown', () => moveTrack(0.5));
+            document.getElementById('btnTrackDown').addEventListener('pointerdown', () => moveTrack(-0.5));
+        }
+
+        function moveTrack(amount) {
+            tracks.forEach(t => t.position.y += amount);
+            console.log("Manual Track Y Height:", tracks[0].position.y);
         }
 
         function moveLane(dir) {
@@ -652,11 +709,28 @@
                     if (slideTimer <= 0) { isSliding = false; playerGroup.scale.set(1, 1, 1); playerGroup.position.y = 0; }
                 }
 
-                // Move World Objects
-                for (let i = obstacles.length - 1; i >= 0; i--) {
-                    obstacles[i].mesh.position.z += gameSpeed * dt;
-                    if (obstacles[i].mesh.position.z > 20) { scene.remove(obstacles[i].mesh); obstacles.splice(i, 1); }
-                }
+                // --- INFINITE TRACK TREADMILL SCROLLING ---
+                tracks.forEach(track => {
+                    track.position.z += gameSpeed * dt;
+                    
+                    // If the track segment has completely passed behind the camera
+                    if (track.position.z - usableLength / 2 > 20) {
+                        let otherTrack = tracks.find(t => t !== track);
+                        if (otherTrack) {
+                            track.position.z = otherTrack.position.z - usableLength;
+                        }
+                    }
+
+                    // Dynamically update the World Space Clipping Planes as the track moves
+                    const clipOffset = trackLength * 0.15;
+                    const frontZ = track.position.z - trackLength / 2 + clipOffset;
+                    const backZ = track.position.z + trackLength / 2 - clipOffset;
+                    
+                    track.userData.pFront.constant = -frontZ;
+                    track.userData.pBack.constant = backZ;
+                });
+
+                // Move Jakes
                 for (let i = jakes.length - 1; i >= 0; i--) {
                     jakes[i].mesh.position.z += gameSpeed * dt;
                     if (jakes[i].mesh.position.z > 20) { 
@@ -665,10 +739,6 @@
                         if(mixerIdx !== -1) jakeMixers.splice(mixerIdx, 1);
                         jakes.splice(i, 1); 
                     }
-                }
-                for (let i = sceneryChunks.length - 1; i >= 0; i--) {
-                    sceneryChunks[i].mesh.position.z += gameSpeed * dt;
-                    if (sceneryChunks[i].mesh.position.z > 100) { scene.remove(sceneryChunks[i].mesh); sceneryChunks.splice(i, 1); }
                 }
 
                 checkCollisions();
@@ -684,12 +754,9 @@
                 document.getElementById('loadingScreen').classList.add('opacity-0', 'pointer-events-none');
                 document.getElementById('startScreen').classList.remove('opacity-0', 'pointer-events-none');
                 
-                buildPlayer(); // Now builds the Train!
-                buildBaseTracks();
+                buildPlayer(); 
+                buildEndlessTrack();
                 setupControls();
-
-                // Seed initial track densely
-                for(let i=0; i<12; i++) spawnEnvironmentChunk(-i * 30);
             });
 
             document.getElementById('startButton').addEventListener('click', () => {
