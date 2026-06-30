@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>deluluprinter.xyz | Unfairly Cheap Prints fr fr</title>
+    <title>deluluprinter.xyz | Unfairly Cheap Prints</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
     <script>
         tailwind.config = {
             theme: {
@@ -29,12 +31,12 @@
                     boxShadow: {
                         'brutal': '6px 6px 0px 0px rgba(17, 17, 17, 1)',
                         'brutal-sm': '3px 3px 0px 0px rgba(17, 17, 17, 1)',
-                        'brutal-hover': '0px 0px 0px 0px rgba(17, 17, 17, 1)',
                     }
                 }
             }
         }
     </script>
+    
     <style>
         body {
             background-color: #FAFAFA;
@@ -43,6 +45,7 @@
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
         }
+        
         .brutal-btn {
             border: 3px solid #111;
             box-shadow: 4px 4px 0px 0px #111;
@@ -57,2160 +60,866 @@
             box-shadow: 0px 0px 0px 0px #111;
         }
         
-        .app-view {
-            display: none;
-            opacity: 0;
-            transform: translateY(15px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .brutal-card {
+            border: 3px solid #111;
+            box-shadow: 6px 6px 0px 0px #111;
+            transition: all 0.2s ease;
         }
-        .app-view.active {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
+        .brutal-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 8px 8px 0px 0px #111;
         }
 
-        .canvas-bg {
-            background-color: #f1f5f9;
-            background-image: 
-                linear-gradient(45deg, #e2e8f0 25%, transparent 25%), 
-                linear-gradient(-45deg, #e2e8f0 25%, transparent 25%), 
-                linear-gradient(45deg, transparent 75%, #e2e8f0 75%), 
-                linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
-            background-size: 20px 20px;
-            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .toast-enter { animation: slideUp 0.4s ease forwards; }
-
-        /* Carousel transitions */
-        .slide-hidden {
+        /* Modal Transitions */
+        .modal-overlay {
             opacity: 0;
             pointer-events: none;
-            transform: scale(0.95);
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 0.3s ease;
         }
-        .slide-visible {
+        .modal-overlay.active {
             opacity: 1;
             pointer-events: auto;
-            transform: scale(1);
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .modal-content {
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
         }
 
         /* Video feed mirroring */
         #boothVideo { transform: scaleX(-1); }
-        
-        /* Photobooth Countdown Overlay */
-        #boothCountdown {
-            text-shadow: 4px 4px 0px #111, -2px -2px 0px #111, 2px -2px 0px #111, -2px 2px 0px #111;
+
+        .radio-custom:checked + div {
+            background-color: #FFEA00;
+            border-color: #111;
+            box-shadow: 3px 3px 0px 0px #111;
         }
 
-        /* Custom scrollbar for preview */
-        .preview-scroll::-webkit-scrollbar { height: 8px; }
-        .preview-scroll::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-        .preview-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="text-brand-black antialiased selection:bg-brand-magenta selection:text-white pb-24 min-h-screen flex flex-col">
+<body class="text-brand-black antialiased selection:bg-brand-magenta selection:text-white flex flex-col min-h-screen">
 
-    <!-- UNIFIED FIXED HEADER WITH BREATHING ROOM -->
-    <header class="fixed top-0 w-full z-50 flex flex-col shadow-sm">
-        <div class="w-full bg-brand-cyan border-b-4 border-brand-black px-4 py-3 flex items-center justify-center text-center">
-            <p class="font-bold text-xs md:text-sm flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 w-full">
-                <span class="flex items-center gap-1 justify-center"><i class="ph-fill ph-scooter text-lg animate-bounce"></i> Order online 🛵 or send a friend 🤝</span>
-                <span class="hidden sm:inline"> | </span>
-                <span class="mt-1 sm:mt-0">Sikkim's Trendiest Print Studio <strong class="bg-black text-white px-2 py-0.5 rounded uppercase tracking-wider whitespace-nowrap">✨ Gangtok & Beyond</strong></span>
+    <header class="fixed top-0 w-full z-40 flex flex-col shadow-sm">
+        <div class="w-full bg-brand-cyan border-b-4 border-brand-black px-4 py-2 flex items-center justify-center text-center">
+            <p class="font-bold text-xs md:text-sm flex items-center justify-center gap-1 w-full">
+                <i class="ph-fill ph-lightning text-lg animate-pulse text-brand-magenta"></i> Fast Delivery in Gangtok
             </p>
         </div>
-
-        <nav class="w-full bg-white/95 backdrop-blur-md border-b-2 border-brand-black">
-            <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-                <div class="flex items-center gap-2 cursor-pointer" onclick="resetWizard()">
-                    <i class="ph-fill ph-printer text-2xl md:text-3xl text-brand-magenta"></i>
-                    <span class="font-display font-black text-xl md:text-2xl tracking-tight hover:text-brand-magenta transition-colors">deluluprinter.xyz</span>
+        <nav class="w-full bg-white/95 backdrop-blur-md border-b-4 border-brand-black">
+            <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <i class="ph-fill ph-printer text-3xl md:text-4xl text-brand-magenta"></i>
+                    <span class="font-display font-black text-xl md:text-2xl tracking-tight leading-none hover:text-brand-magenta transition-colors">deluluprinter</span>
                 </div>
-                <div class="flex items-center gap-3">
-                    <button id="navBackBtn" onclick="goBack()" class="hidden brutal-btn bg-white px-3 py-2 rounded-lg font-bold text-xs flex items-center gap-1 border-2">
-                        <i class="ph-bold ph-arrow-left"></i> Back
-                    </button>
-                    <button onclick="resetWizard()" class="bg-gray-100 hover:bg-gray-200 border-2 border-brand-black px-3 py-2 rounded-lg font-bold text-xs transition shadow-[2px_2px_0px_#111] hover:shadow-none hover:translate-y-[2px] hover:translate-x-[2px]">
-                        Start Over <i class="ph-bold ph-arrow-counter-clockwise"></i>
-                    </button>
-                </div>
+                <a href="https://wa.me/919907488075?text=Heyy!%20%E2%9C%A8%20I%20have%20a%20question..." target="_blank" class="brutal-btn bg-brand-green text-white px-3 py-2 rounded-xl font-black text-xs md:text-sm flex items-center gap-2">
+                    <i class="ph-bold ph-whatsapp-logo text-lg"></i> <span class="hidden md:inline">Contact</span>
+                </a>
             </div>
         </nav>
     </header>
 
-    <!-- MAIN CONTENT -->
-    <div class="pt-40 md:pt-44 max-w-4xl mx-auto px-4 flex-grow w-full flex flex-col">
+    <main class="pt-32 md:pt-36 flex-grow w-full pb-10">
+        
+        <section class="max-w-6xl mx-auto px-4 mb-10 text-center">
+            <div class="inline-block bg-brand-yellow border-2 border-brand-black px-4 py-1.5 rounded-full font-bold text-xs md:text-sm mb-4 shadow-brutal-sm rotate-[-2deg]">
+                Warning: Dangerously Aesthetic 🚨
+            </div>
+            <h1 class="font-display text-4xl md:text-6xl font-black leading-tight mb-4 tracking-tighter">
+                Pick your vibe. <br/>
+                <span class="text-brand-magenta">Send on WhatsApp.</span>
+            </h1>
+            <p class="text-base md:text-lg font-bold text-gray-600 max-w-xl mx-auto">
+                No cart. No signups. Just ridiculously cheap, high-quality prints straight to your DMs. 👇
+            </p>
+        </section>
 
-        <!-- ==========================================
-             VIEW 1: THE START SCREEN 
-             ========================================== -->
-        <div id="view-start" class="app-view active flex-grow flex flex-col justify-center">
-            
-            <div class="relative w-full h-[400px] md:h-[450px] flex items-center justify-center mb-6">
-                
-                <div class="absolute top-0 right-0 hidden md:block z-20">
-                    <div class="bg-brand-magenta text-white font-black text-xs px-3 py-1 rounded-lg border-2 border-black rotate-[12deg] shadow-brutal-sm">
-                        15% OFF over ₹500! 💸
-                    </div>
-                </div>
+        <section id="shop-gallery" class="max-w-6xl mx-auto px-4 pb-16">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6" id="product-grid">
+                <!-- Products injected via JS -->
+            </div>
+        </section>
 
-                <!-- Slide 0: The Hook -->
-                <div id="slide-0" class="absolute inset-0 slide-visible flex flex-col items-center justify-center text-center">
-                    <div class="inline-block bg-brand-yellow border-2 border-brand-black px-4 py-2 rounded-full font-bold text-xs md:text-sm mb-6 shadow-brutal-sm rotate-[-2deg]">
-                        Warning: Shockingly affordable prices ahead 🚨
-                    </div>
-                    <h1 class="font-display text-4xl md:text-6xl font-black leading-tight mb-4 tracking-tighter">
-                        The aesthetic print <br/> plug for <span class="bg-brand-cyan px-2 pb-1 border-4 border-brand-black shadow-brutal inline-block rotate-2">Sikkim.</span>
-                    </h1>
-                    <p class="text-base md:text-lg font-medium text-gray-600 max-w-xl mx-auto px-2">
-                        No math pricing. Just premium quality prints starting at just ₹10. Save your pocket money for momos. 🥟
-                    </p>
-                </div>
-
-                <!-- Slide 1: The Problem (Math we skip) -->
-                <div id="slide-1" class="absolute inset-0 slide-hidden flex flex-col items-center justify-center text-center px-2">
-                    <h2 class="font-display text-3xl md:text-4xl font-black mb-3 text-brand-magenta leading-tight">Printing shouldn't be a luxury.</h2>
-                    <p class="text-sm md:text-base text-gray-600 font-bold mb-6 max-w-lg mx-auto">Because printer ink isn't actually made of liquid gold. We keep it simple.</p>
-                    <div class="bg-white text-brand-black p-5 rounded-2xl border-4 border-brand-black shadow-brutal-sm transform rotate-2 max-w-[280px] w-full mx-auto">
-                        <h3 class="font-display text-lg font-black mb-3 border-b-2 border-gray-200 pb-2 text-left">The Math We Skip:</h3>
-                        <ul class="space-y-2 font-bold text-xs text-gray-600 text-left">
-                            <li class="flex justify-between"><span>Base B&W page</span> <span>₹??</span></li>
-                            <li class="flex justify-between"><span>Oh, it's color?</span> <span class="text-red-500">+₹??</span></li>
-                            <li class="flex justify-between"><span>Confusion fee</span> <span class="text-red-500">+₹??</span></li>
-                        </ul>
-                        <div class="mt-4 pt-3 border-t-2 border-gray-200 flex justify-between font-black text-lg text-brand-green">
-                            <span>Our Price</span>
-                            <span>Just ₹10 🚀</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 2: Delulu Card Gamification -->
-                <div id="slide-2" class="absolute inset-0 slide-hidden flex flex-col items-center justify-center text-center px-2">
-                    <div class="inline-block bg-black text-white px-3 py-1 rounded-full font-bold text-[10px] mb-3 uppercase tracking-widest border border-white">
-                        Level Up Your Prints 🎮
-                    </div>
-                    <h2 class="font-display text-3xl md:text-4xl font-black mb-3 leading-tight">
-                        Unlock the <span class="text-brand-yellow underline decoration-4 drop-shadow-[2px_2px_0px_#000]">Delulu Card</span> 💳✨
+        <section id="studio-editor" class="border-t-8 border-brand-black bg-brand-purple py-16">
+            <div class="max-w-5xl mx-auto px-4">
+                <div class="text-center mb-10">
+                    <div class="inline-block bg-white text-black border-2 border-black px-4 py-1 rounded-full text-xs font-black tracking-widest uppercase mb-3 shadow-brutal-sm rotate-2">Bored? Try This 🎨</div>
+                    <h2 class="font-display text-4xl md:text-5xl font-black leading-tight mb-4 text-white">
+                        Online Photobooth 📸
                     </h2>
-                    <p class="font-bold text-sm md:text-base text-gray-600 max-w-md mx-auto mb-6">
-                        Collect punches like Pokémon cards. Spend ₹100 = 1 Punch. Get 8 Punches = <span class="text-brand-magenta font-black">₹80 FREE Prints!</span>
-                    </p>
-                    <div class="bg-white p-3 rounded-2xl border-4 border-brand-black transform -rotate-2 shadow-[4px_4px_0px_0px_#00FFFF] inline-block mx-auto">
-                        <div class="grid grid-cols-4 gap-2">
-                            <div class="w-10 h-10 border-2 border-black bg-brand-green text-white flex items-center justify-center rounded font-black text-lg"><i class="ph-bold ph-check"></i></div>
-                            <div class="w-10 h-10 border-2 border-black bg-gray-100 rounded"></div>
-                            <div class="w-10 h-10 border-2 border-black bg-gray-100 rounded"></div>
-                            <div class="w-10 h-10 border-2 border-brand-magenta bg-brand-magenta/20 flex items-center justify-center rounded text-brand-magenta animate-pulse"><i class="ph-fill ph-gift text-xl"></i></div>
-                        </div>
-                    </div>
+                    <p class="text-white font-bold text-base bg-black inline-block px-4 py-2 rounded-lg border-2 border-white">Design aesthetic photo strips. ₹80 for 4 strips!</p>
                 </div>
 
-            </div>
-
-            <div class="flex justify-center gap-2 mb-8">
-                <div id="dot-0" class="w-3 h-3 rounded-full bg-brand-black transition-all duration-300"></div>
-                <div id="dot-1" class="w-3 h-3 rounded-full bg-gray-300 transition-all duration-300"></div>
-                <div id="dot-2" class="w-3 h-3 rounded-full bg-gray-300 transition-all duration-300"></div>
-            </div>
-
-            <div class="w-full max-w-md mx-auto space-y-4">
-                <button onclick="goToView('view-products')" class="brutal-btn bg-brand-green text-white font-black text-2xl md:text-3xl px-12 py-5 rounded-3xl animate-pulse hover:animate-none w-full">
-                    START HERE 🚀
-                </button>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <button onclick="openPhotobooth()" class="brutal-btn bg-brand-purple text-white font-bold text-sm py-4 rounded-2xl flex flex-col items-center justify-center gap-1 group">
-                        <i class="ph-fill ph-camera text-2xl group-hover:scale-110 transition-transform"></i>
-                        <span>Online Photobooth</span>
-                    </button>
-                    <a href="https://wa.me/919907488075?text=Heyy!%20%E2%9C%A8%20I%20have%20a%20question%20about%20printing..." target="_blank" class="brutal-btn bg-black text-white font-bold text-sm py-4 rounded-2xl flex flex-col items-center justify-center gap-1 group">
-                        <i class="ph-bold ph-whatsapp-logo text-brand-green text-2xl group-hover:scale-110 transition-transform"></i>
-                        <span>WhatsApp Us</span>
-                    </a>
-                </div>
-            </div>
-            
-        </div>
-
-        <!-- ==========================================
-             VIEW 1.5: THE ONLINE PHOTOBOOTH (Multi-Strip)
-             ========================================== -->
-        <div id="view-photobooth" class="app-view">
-            <div class="text-center mb-6">
-                <div class="inline-block bg-brand-purple text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase mb-3">Interactive</div>
-                <h2 class="font-display text-3xl md:text-4xl font-black leading-tight mb-2">
-                    Online Photobooth 📸
-                </h2>
-                <p class="text-gray-600 font-bold text-sm">Design 4 or more aesthetic strips! (₹80 for 4 strips)</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <!-- Camera / Upload Section -->
-                <div class="flex flex-col gap-4 relative">
-                    <div class="relative w-full aspect-[4/3] bg-black rounded-3xl overflow-hidden border-4 border-brand-black shadow-brutal flex items-center justify-center">
-                        
-                        <!-- Mobile Strip & Photo Tracker -->
-                        <div id="mobileStripIndicator" class="absolute top-4 right-4 bg-brand-yellow text-black px-3 py-1 rounded-full text-xs font-black shadow-brutal-sm z-20 border-2 border-black transition-all">
-                            Strip 1 • Photo 0/4
-                        </div>
-
-                        <!-- 3-2-1 Countdown Overlay -->
-                        <div id="boothCountdown" class="absolute inset-0 z-30 flex items-center justify-center text-[120px] font-black text-white hidden">
-                            3
-                        </div>
-
-                        <!-- Visual Downward Scroll Hint (Flashes briefly on mobile) -->
-                        <div id="scrollHint" class="absolute bottom-4 left-0 right-0 text-center text-white font-bold text-[10px] z-20 opacity-0 transition-opacity duration-300 drop-shadow-md pointer-events-none">
-                            Scroll down for preview 👇
-                        </div>
-
-                        <video id="boothVideo" autoplay playsinline class="w-full h-full object-cover"></video>
-                        <div id="cameraPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center text-gray-500 bg-gray-100">
-                            <i class="ph-duotone ph-camera-slash text-5xl mb-2"></i>
-                            <span class="font-bold text-sm">Camera Offline</span>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                <button id="btnCapture" onclick="snapBoothPhoto()" class="brutal-btn bg-brand-cyan text-black font-black py-4 rounded-xl flex items-center justify-center gap-2">
-                    <i class="ph-fill ph-camera text-xl"></i> Snap
-                </button>
-                
-                <input type="file" id="boothUploadInput" multiple accept="image/*" class="hidden" onchange="handleBoothUpload(event)">
-                <button onclick="document.getElementById('boothUploadInput').click()" class="brutal-btn bg-white text-black font-black py-4 rounded-xl flex items-center justify-center gap-2">
-                    <i class="ph-bold ph-upload-simple text-xl"></i> Upload
-                </button>
-            </div>
-
-            <div class="bg-white border-4 border-black p-4 rounded-2xl shadow-brutal-sm mt-2">
-                <label class="block font-black text-sm mb-2 text-brand-magenta">Choose Strip Theme:</label>
-                <select id="boothTemplate" class="w-full bg-gray-50 border-2 border-black font-bold text-sm rounded-lg p-3 outline-none cursor-pointer focus:bg-brand-yellow/20 transition-colors" onchange="changeBoothTemplate()">
-                    <option value="classic-4">Classic White (4 Photos)</option>
-                    <option value="black-4">Vintage Black (4 Photos)</option>
-                    <option value="pink-4">Y2K Pink (4 Photos)</option>
-                    <option value="kitty-3">Hello Kitty Frame (3 Photos)</option>
-                    <option value="kitty-4">Hello Kitty Frame (4 Photos)</option>
-                    <option value="minimal-3">Minimalist (3 Photos)</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- The Live Strip Builder Section -->
-                <div class="bg-gray-100 border-4 border-brand-black shadow-brutal rounded-3xl p-6 flex flex-col items-center">
-                    <div class="flex justify-between items-center w-full mb-4 border-b-2 border-gray-300 pb-3">
-                        <h3 class="font-black text-lg">Strip Layout</h3>
-                        <span class="bg-brand-magenta text-white px-3 py-1.5 rounded-lg text-xs font-bold border-2 border-black shadow-brutal-sm">Strips Built: <span id="completedStripsCount">0</span>/4+</span>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     
-                    <!-- TRUE Live Preview Engine -->
-                    <div class="relative w-[140px] md:w-[160px] aspect-[1/3] bg-white border-2 border-black rounded-lg shadow-md mx-auto overflow-hidden flex items-center justify-center">
-                        <canvas id="liveStripCanvas" class="w-full h-full object-contain hidden"></canvas>
-                        <div id="liveStripEmpty" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 text-gray-400">
-                            <i class="ph-duotone ph-image text-4xl mb-2"></i>
-                            <span class="text-[10px] font-bold">Empty Strip</span>
-                        </div>
-                    </div>
+                    <!-- Camera/Upload Panel -->
+                    <div class="flex flex-col gap-4 relative">
+                        <div class="relative w-full aspect-[4/3] bg-black rounded-3xl overflow-hidden border-4 border-brand-black shadow-brutal flex items-center justify-center">
+                            
+                            <div id="mobileStripIndicator" class="absolute top-4 right-4 bg-brand-yellow text-black px-3 py-1 rounded-full text-xs font-black shadow-brutal-sm z-20 border-2 border-black transition-all">
+                                Strip 1 • Photo 0/4
+                            </div>
+                            <div id="boothCountdown" class="absolute inset-0 z-30 flex items-center justify-center text-[120px] font-black text-white hidden" style="text-shadow: 4px 4px 0px #111;">
+                                3
+                            </div>
 
-                    <div class="w-full flex justify-between items-center mt-6 mb-2 px-2">
-                        <span class="font-bold text-xs text-gray-500">Photos: <span id="boothCounter">0</span>/<span id="boothMax">4</span></span>
-                        <button onclick="clearBooth()" class="text-xs font-bold text-red-500 hover:underline"><i class="ph-bold ph-trash"></i> Reset Slots</button>
-                    </div>
-
-                    <!-- Post-Capture Edit / Sticker Palette -->
-                    <div id="boothStickerPalette" class="w-full bg-white border-2 border-dashed border-gray-300 rounded-xl p-3 mb-4 hidden">
-                        <p class="text-[10px] font-black uppercase text-gray-400 mb-2 text-center">Tap to decorate strip ✨</p>
-                        <div class="flex justify-center gap-3 text-2xl">
-                            <button onclick="addStickerToStrip('💖')" class="hover:scale-125 transition-transform drop-shadow-sm">💖</button>
-                            <button onclick="addStickerToStrip('✨')" class="hover:scale-125 transition-transform drop-shadow-sm">✨</button>
-                            <button onclick="addStickerToStrip('🌸')" class="hover:scale-125 transition-transform drop-shadow-sm">🌸</button>
-                            <button onclick="addStickerToStrip('🦋')" class="hover:scale-125 transition-transform drop-shadow-sm">🦋</button>
-                            <button onclick="addStickerToStrip('🎀')" class="hover:scale-125 transition-transform drop-shadow-sm">🎀</button>
-                            <button onclick="addStickerToStrip('🌟')" class="hover:scale-125 transition-transform drop-shadow-sm">🌟</button>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col gap-3 w-full mt-auto">
-                        <button id="btnSaveStrip" onclick="saveCurrentStrip()" disabled class="brutal-btn bg-black text-brand-yellow font-black text-base py-4 rounded-xl w-full flex justify-center items-center gap-2 opacity-50 transition-all">
-                            Fill slots to save... <i class="ph-bold ph-lock"></i>
-                        </button>
-                        
-                        <div id="stripCopiesWrapper" class="hidden flex justify-between items-center bg-brand-cyan/20 border-2 border-brand-cyan p-3 rounded-xl shadow-inner mt-1">
-                            <span id="stripCopiesLabel" class="font-bold text-sm text-black">Duplicate Strip #1:</span>
-                            <div class="flex items-center gap-2">
-                                <button onclick="changeStripCopies(-1)" class="w-8 h-8 brutal-btn bg-white rounded-lg font-black text-lg flex items-center justify-center">-</button>
-                                <input type="number" id="stripCopies" value="1" min="1" max="20" class="w-10 bg-transparent font-black text-lg text-center outline-none" readonly>
-                                <button onclick="changeStripCopies(1)" class="w-8 h-8 brutal-btn bg-white rounded-lg font-black text-lg flex items-center justify-center">+</button>
+                            <video id="boothVideo" autoplay playsinline class="w-full h-full object-cover"></video>
+                            <div id="cameraPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center text-gray-500 bg-gray-100">
+                                <i class="ph-duotone ph-camera-slash text-5xl mb-2"></i>
+                                <span class="font-bold text-sm">Camera Offline</span>
                             </div>
                         </div>
 
-                        <button id="btnCheckoutStrips" onclick="checkoutPhotobooth()" class="hidden brutal-btn bg-brand-green text-white font-black text-base py-4 rounded-xl w-full flex justify-center items-center gap-2 hover:bg-[#1fbc5b] transition-all">
-                            Review & Checkout <i class="ph-bold ph-check-circle"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button id="btnCapture" onclick="snapBoothPhoto()" class="brutal-btn bg-brand-cyan text-black font-black py-4 rounded-xl flex items-center justify-center gap-2">
+                                <i class="ph-fill ph-camera text-xl"></i> Snap
+                            </button>
+                            
+                            <input type="file" id="boothUploadInput" multiple accept="image/*" class="hidden" onchange="handleBoothUpload(event)">
+                            <button onclick="document.getElementById('boothUploadInput').click()" class="brutal-btn bg-white text-black font-black py-4 rounded-xl flex items-center justify-center gap-2">
+                                <i class="ph-bold ph-upload-simple text-xl"></i> Upload
+                            </button>
+                        </div>
 
-        <!-- ==========================================
-             VIEW 2: THE VIBE CHECK (Products)
-             ========================================== -->
-        <div id="view-products" class="app-view">
-            <div class="text-center mb-8">
-                <div class="inline-block bg-black text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase mb-3">Step 1</div>
-                <h2 class="font-display text-3xl md:text-4xl font-black leading-tight mb-2 tracking-tighter">
-                    What are we printing today? ✨
-                </h2>
-                <p class="text-gray-600 font-bold text-sm">Pick your vibe. We handle the rest.</p>
-            </div>
-
-            <!-- Hero Products (The Big 4) -->
-            <div class="grid grid-cols-2 gap-4 mb-8">
-                <button onclick="selectProduct('normal')" class="brutal-btn bg-brand-cyan rounded-2xl p-4 flex flex-col h-full text-left bg-opacity-100 focus:outline-none">
-                    <div class="text-brand-black mb-2"><i class="ph-duotone ph-file-image text-4xl"></i></div>
-                    <h3 class="text-base font-black leading-tight mb-1">Normal Prints</h3>
-                    <p class="text-[10px] font-bold opacity-80 mb-3">Color or B&W A4</p>
-                    <div class="mt-auto text-xl font-black text-brand-black">₹10<span class="text-[10px]">/pg</span></div>
-                </button>
-
-                <button onclick="selectProduct('stickers')" class="brutal-btn bg-brand-magenta text-white rounded-2xl p-4 flex flex-col h-full text-left relative overflow-hidden focus:outline-none">
-                    <div class="absolute top-0 right-0 bg-brand-yellow text-black text-[9px] font-black px-2 py-1 border-b-2 border-l-2 border-black rounded-bl-lg">BEST SELLER</div>
-                    <div class="text-white mb-2"><i class="ph-duotone ph-sticker text-4xl"></i></div>
-                    <h3 class="text-base font-black leading-tight mb-1">A4 Stickers</h3>
-                    <p class="text-[10px] font-bold opacity-90 mb-3">Custom shapes. Slap memes everywhere.</p>
-                    <div class="mt-auto text-xl font-black text-white">₹25<span class="text-[10px]">/pg</span></div>
-                </button>
-
-                <button onclick="selectProduct('passport')" class="brutal-btn bg-white rounded-2xl p-4 flex flex-col h-full text-left focus:outline-none">
-                    <div class="text-brand-black mb-2"><i class="ph-duotone ph-identification-card text-4xl"></i></div>
-                    <h3 class="text-base font-black leading-tight mb-1">Passport Size</h3>
-                    <p class="text-[10px] font-bold opacity-80 mb-3">Set of 9 copies</p>
-                    <div class="mt-auto text-xl font-black text-brand-black">₹50<span class="text-[10px]">/set</span></div>
-                </button>
-
-                <button onclick="selectProduct('polaroid')" class="brutal-btn bg-brand-purple text-white rounded-2xl p-4 flex flex-col h-full text-left relative overflow-hidden focus:outline-none">
-                    <div class="absolute top-0 right-0 bg-brand-yellow text-black text-[9px] font-black px-2 py-1 border-b-2 border-l-2 border-black rounded-bl-lg">AESTHETIC</div>
-                    <div class="text-white mb-2"><i class="ph-duotone ph-camera text-4xl"></i></div>
-                    <h3 class="text-base font-black leading-tight mb-1">Polaroids</h3>
-                    <p class="text-[10px] font-bold opacity-90 mb-3">Vintage aesthetic frames</p>
-                    <div class="mt-auto text-xl font-black text-white">₹10<span class="text-[10px]">/ea</span></div>
-                </button>
-            </div>
-
-            <!-- Expanded Catalog -->
-            <div id="fullCatalog" class="mt-6 space-y-3 pb-8 block">
-                <h3 class="font-display text-xl font-black text-brand-magenta text-center mb-4">More Aesthetic Prints ✨</h3>
-                
-                <button onclick="selectProduct('photobooth')" class="w-full brutal-btn bg-brand-purple text-white rounded-xl p-3 flex items-center justify-between text-left group border-2">
-                    <div class="flex items-center gap-3">
-                        <i class="ph-fill ph-film-strip text-2xl text-brand-yellow"></i>
-                        <div>
-                            <h4 class="font-black text-sm">Photobooth Strips</h4>
-                            <p class="text-[10px] font-bold opacity-90">Design aesthetic photo strips. Min 4 strips.</p>
+                        <div class="bg-white border-4 border-black p-4 rounded-2xl shadow-brutal-sm mt-2">
+                            <label class="block font-black text-sm mb-2 text-brand-magenta">Choose Strip Theme:</label>
+                            <select id="boothTemplate" class="w-full bg-gray-50 border-2 border-black font-bold text-sm rounded-lg p-3 outline-none cursor-pointer focus:bg-brand-yellow/20 transition-colors" onchange="changeBoothTemplate()">
+                                <option value="classic-4">Classic White (4 Photos)</option>
+                                <option value="black-4">Vintage Black (4 Photos)</option>
+                                <option value="pink-4">Y2K Pink (4 Photos)</option>
+                                <option value="minimal-3">Minimalist (3 Photos)</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="text-right whitespace-nowrap pl-2">
-                        <span class="font-black text-lg">₹80</span><span class="text-[10px] font-bold opacity-80">/4 strips</span>
-                    </div>
-                </button>
 
-                <button onclick="selectProduct('glossy')" class="w-full brutal-btn bg-white text-black rounded-xl p-3 flex items-center justify-between text-left group border-2">
-                    <div class="flex items-center gap-3">
-                        <i class="ph-fill ph-image text-2xl text-brand-cyan"></i>
-                        <div>
-                            <h4 class="font-black text-sm">Glossy Photos</h4>
-                            <p class="text-[10px] font-bold opacity-80">Studio quality memories. High-res.</p>
+                    <!-- Live Preview Panel -->
+                    <div class="bg-gray-100 border-4 border-brand-black shadow-brutal rounded-3xl p-6 flex flex-col items-center">
+                        <div class="flex justify-between items-center w-full mb-4 border-b-2 border-gray-300 pb-3">
+                            <h3 class="font-black text-lg">Strip Layout</h3>
+                            <span class="bg-brand-magenta text-white px-3 py-1.5 rounded-lg text-xs font-bold border-2 border-black shadow-brutal-sm">Strips Built: <span id="completedStripsCount">0</span>/4+</span>
                         </div>
-                    </div>
-                    <div class="text-right whitespace-nowrap pl-2">
-                        <span class="font-black text-lg">₹80</span><span class="text-[10px] font-bold opacity-80">/pg</span>
-                    </div>
-                </button>
-
-                <button onclick="selectProduct('sticker_passport')" class="w-full brutal-btn bg-brand-cyan text-black rounded-xl p-3 flex items-center justify-between text-left group border-2">
-                    <div class="flex items-center gap-3">
-                        <i class="ph-fill ph-user-focus text-2xl"></i>
-                        <div>
-                            <h4 class="font-black text-sm">Sticker Passports</h4>
-                            <p class="text-[10px] font-bold opacity-80">Just peel and stick. 9 copies.</p>
+                        
+                        <div class="relative w-[140px] md:w-[160px] aspect-[1/3] bg-white border-2 border-black rounded-lg shadow-md mx-auto overflow-hidden flex items-center justify-center">
+                            <canvas id="liveStripCanvas" class="w-full h-full object-contain hidden"></canvas>
+                            <div id="liveStripEmpty" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 text-gray-400">
+                                <i class="ph-duotone ph-image text-4xl mb-2"></i>
+                                <span class="text-[10px] font-bold">Empty Strip</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="text-right whitespace-nowrap pl-2">
-                        <span class="font-black text-lg">₹60</span><span class="text-[10px] font-bold opacity-80">/set</span>
-                    </div>
-                </button>
 
-                <button onclick="selectProduct('notes')" class="w-full brutal-btn bg-brand-green text-black rounded-xl p-3 flex items-center justify-between text-left group border-dashed border-2">
-                    <div class="flex items-center gap-3">
-                        <i class="ph-fill ph-text-t text-2xl"></i>
-                        <div>
-                            <h4 class="font-black text-sm">Quick Notes (Text)</h4>
-                            <p class="text-[10px] font-bold opacity-80">Paste your ICSE essays. We auto-format.</p>
+                        <div class="w-full flex justify-between items-center mt-6 mb-4 px-2">
+                            <span class="font-bold text-xs text-gray-500">Photos: <span id="boothCounter">0</span>/<span id="boothMax">4</span></span>
+                            <button onclick="clearBooth()" class="text-xs font-bold text-red-500 hover:underline"><i class="ph-bold ph-trash"></i> Reset Slots</button>
                         </div>
-                    </div>
-                    <div class="text-right whitespace-nowrap pl-2">
-                        <span class="font-black text-lg">₹10</span><span class="text-[10px] font-bold">/pg</span>
-                    </div>
-                </button>
 
-                <button onclick="selectProduct('maps')" class="w-full brutal-btn bg-yellow-100 rounded-xl p-3 flex items-center justify-between text-left group border-2">
-                    <div class="flex items-center gap-3">
-                        <i class="ph-fill ph-map-pin-line text-2xl text-brand-magenta"></i>
-                        <div>
-                            <h4 class="font-black text-sm text-brand-magenta">ICSE Map of India</h4>
-                            <p class="text-[10px] font-bold text-gray-600">Blank practice maps. Bulk discount!</p>
-                        </div>
-                    </div>
-                    <div class="text-right whitespace-nowrap pl-2">
-                        <span class="font-black text-lg text-brand-magenta">₹5</span><span class="text-[10px] font-bold text-gray-500">/ea</span>
-                    </div>
-                </button>
-
-                <a href="https://arteviastudio.in/sarup/" target="_blank" class="w-full brutal-btn bg-gray-900 text-white rounded-xl p-3 flex items-center justify-between text-left group border-2">
-                    <div class="flex items-center gap-3">
-                        <i class="ph-fill ph-paint-brush text-2xl text-brand-cyan"></i>
-                        <div>
-                            <h4 class="font-black text-sm">Pro Design Work</h4>
-                            <p class="text-[10px] font-bold text-gray-400">Need professional graphics or branding? Hit up my portfolio.</p>
-                        </div>
-                    </div>
-                    <div class="text-right pl-2">
-                        <i class="ph-bold ph-arrow-up-right text-brand-cyan text-xl"></i>
-                    </div>
-                </a>
-
-                <button onclick="alert('Custom cards are launching next week! Message us to pre-order.')" class="w-full brutal-btn bg-white rounded-xl p-3 flex items-center justify-between text-left group opacity-70 border-dashed border-2">
-                    <div class="flex items-center gap-3">
-                        <i class="ph-fill ph-envelope-open text-2xl text-gray-400"></i>
-                        <div>
-                            <h4 class="font-black text-sm text-gray-500">Custom Cards <span class="bg-brand-magenta text-white text-[9px] px-1.5 py-0.5 rounded ml-1">SOON</span></h4>
-                            <p class="text-[10px] font-bold text-gray-400">Birthdays, anniversaries.</p>
-                        </div>
-                    </div>
-                </button>
-
-                <button onclick="selectProduct('apparel5')" class="w-full brutal-btn bg-white rounded-xl p-3 flex items-center justify-between text-left group border-2">
-                    <div class="flex items-center gap-3">
-                        <i class="ph-fill ph-t-shirt text-2xl"></i>
-                        <div>
-                            <h4 class="font-black text-sm">Apparel Print (A5)</h4>
-                            <p class="text-[10px] font-bold opacity-80">Custom designs on T-shirts.</p>
-                        </div>
-                    </div>
-                    <div class="text-right whitespace-nowrap pl-2">
-                        <span class="font-black text-lg">₹150</span><span class="text-[10px] font-bold">/ea</span>
-                    </div>
-                </button>
-
-                <button onclick="selectProduct('apparel4')" class="w-full brutal-btn bg-white rounded-xl p-3 flex items-center justify-between text-left group border-gray-900 border-2">
-                    <div class="flex items-center gap-3">
-                        <i class="ph-fill ph-t-shirt text-2xl text-brand-cyan"></i>
-                        <div>
-                            <h4 class="font-black text-sm">Apparel Print (A4)</h4>
-                            <p class="text-[10px] font-bold text-gray-400">Massive graphics. Main character.</p>
-                        </div>
-                    </div>
-                    <div class="text-right whitespace-nowrap pl-2">
-                        <span class="font-black text-lg text-brand-cyan">₹250</span><span class="text-[10px] font-bold text-gray-400">/ea</span>
-                    </div>
-                </button>
-
-            </div>
-        </div>
-
-
-        <!-- ==========================================
-             VIEW 3: THE ORDER HUB (Estimator & Checkout)
-             ========================================== -->
-        <div id="view-order" class="app-view">
-            <div class="text-center mb-6">
-                <div class="inline-block bg-black text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase mb-3">Step 2</div>
-                <h2 class="font-display text-3xl font-black mb-1 flex items-center justify-center gap-2 flex-wrap" id="orderHubTitle">
-                    Review & Checkout
-                </h2>
-                <p class="text-gray-600 font-bold text-sm">Estimate the damage and finalize order.</p>
-            </div>
-
-            <!-- Full Screen Preview Injector -->
-            <div id="orderPreviewSection" class="hidden mb-6">
-                <div class="bg-gray-100 border-4 border-brand-black rounded-3xl p-4 shadow-brutal flex justify-center items-center overflow-x-auto preview-scroll">
-                    <img id="orderPreviewImg" class="max-h-[300px] md:max-h-[400px] object-contain shadow-md border border-gray-300 rounded" alt="A4 Compilation Preview">
-                </div>
-            </div>
-
-            <!-- Customer Details -->
-            <div class="mb-6 bg-white border-4 border-brand-black rounded-3xl p-5 shadow-brutal">
-                <label class="block font-black text-base mb-2"><i class="ph-bold ph-user text-brand-magenta"></i> Customer Name</label>
-                <input type="text" id="customerName" class="w-full bg-gray-50 border-2 border-black rounded-xl p-3 font-bold focus:outline-none focus:ring-2 focus:ring-brand-yellow transition-all" placeholder="Enter your full name...">
-            </div>
-
-            <!-- Estimator Box -->
-            <div class="bg-white border-4 border-brand-black rounded-3xl p-5 shadow-brutal mb-6 relative overflow-hidden">
-                <div class="absolute -right-6 -top-6 opacity-5 text-black"><i class="ph-fill ph-calculator text-[150px]"></i></div>
-                
-                <h3 class="font-black text-lg mb-4 relative z-10 flex items-center gap-2 border-b-2 border-dashed border-gray-200 pb-2">
-                    <i class="ph-bold ph-receipt text-brand-cyan text-xl"></i> Estimate the Damage 💸
-                </h3>
-                
-                <div class="space-y-4 mb-6 relative z-10">
-                    <div class="hidden">
-                        <select id="hubVibeSelect" class="w-full" onchange="calculateHubTotal()">
-                            <option value="normal">Normal Prints (₹10/pg)</option>
-                            <option value="glossy">Glossy Photos (₹80/pg)</option>
-                            <option value="passport">Passport Photos (₹50/set of 9)</option>
-                            <option value="sticker_passport">Sticker Passports (₹60/set of 9)</option>
-                            <option value="polaroid">Polaroids (₹70/set of 9)</option>
-                            <option value="stickers">A4 Custom Stickers (₹25/pg)</option>
-                            <option value="premium_stickers">Premium Stickers (₹40/pg)</option>
-                            <option value="glossy_stickers">Glossy Stickers (₹60/pg)</option>
-                            <option value="holographic_stickers">Holo Stickers (₹70/pg)</option>
-                            <option value="notes">Quick Notes (Text) (₹10/pg)</option>
-                            <option value="maps">ICSE Map of India (₹5/ea)</option>
-                            <option value="photobooth">Photobooth Strip (₹80/4 strips)</option>
-                            <option value="apparel5">Apparel Print A5 (₹150)</option>
-                            <option value="apparel4">Apparel Print A4 (₹250)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label id="hubQtyLabel" class="block font-bold text-sm text-gray-600 mb-2">How many pages/copies?</label>
-                        <div class="flex items-center gap-3">
-                            <button onclick="changeQty(-1)" class="w-12 h-12 brutal-btn bg-gray-200 rounded-xl font-black text-xl flex items-center justify-center">-</button>
-                            <input type="number" id="hubQty" min="1" value="1" class="flex-1 bg-gray-50 border-2 border-black font-black text-xl rounded-xl h-12 text-center outline-none focus:bg-brand-yellow/20" oninput="calculateHubTotal()">
-                            <button onclick="changeQty(1)" class="w-12 h-12 brutal-btn bg-gray-200 rounded-xl font-black text-xl flex items-center justify-center">+</button>
+                        <div class="flex flex-col gap-3 w-full mt-auto">
+                            <button id="btnSaveStrip" onclick="saveCurrentStrip()" disabled class="brutal-btn bg-black text-brand-yellow font-black text-base py-4 rounded-xl w-full flex justify-center items-center gap-2 opacity-50 transition-all">
+                                Fill slots to save... <i class="ph-bold ph-lock"></i>
+                            </button>
+                            
+                            <button id="btnCheckoutStrips" onclick="checkoutPhotobooth()" class="hidden brutal-btn bg-brand-green text-white font-black text-base py-4 rounded-xl w-full flex justify-center items-center gap-2 hover:bg-[#1fbc5b] transition-all">
+                                Send Strips on WhatsApp <i class="ph-bold ph-whatsapp-logo"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
-
-                <div class="bg-gray-50 p-4 rounded-xl border-2 border-black flex justify-between items-center relative z-10">
-                    <span class="font-black text-lg text-gray-600">Total:</span>
-                    <div class="text-right" id="hubTotalOutput">
-                        <span class="font-black text-4xl text-brand-green">₹10</span>
-                    </div>
-                </div>
             </div>
+        </section>
+    </main>
 
-            <!-- ADD-ONS -->
-            <div id="addonsSection" class="hidden mb-6 bg-brand-yellow/20 border-4 border-brand-black rounded-3xl p-5 shadow-brutal">
-                <h3 class="font-black text-lg mb-3 flex items-center gap-2"><i class="ph-fill ph-sparkle text-brand-magenta"></i> Level up your prints</h3>
-                
-                <label id="sprayAddon" class="hidden flex items-center gap-3 font-bold text-sm bg-white p-3 rounded-xl border-2 border-black cursor-pointer hover:bg-gray-50 transition-colors">
-                    <input type="checkbox" id="chkSpray" class="w-5 h-5 accent-brand-magenta border-2 border-black rounded" onchange="calculateHubTotal()">
-                    <div class="flex-1 flex justify-between">
-                        <span>Protection Spray Layer</span>
-                        <span class="text-brand-magenta font-black">+₹10/pg</span>
-                    </div>
-                </label>
-                
-                <label id="vinylAddon" class="hidden flex items-center gap-3 font-bold text-sm bg-white p-3 rounded-xl border-2 border-black cursor-pointer hover:bg-gray-50 transition-colors mt-3">
-                    <input type="checkbox" id="chkVinyl" class="w-5 h-5 accent-brand-cyan border-2 border-black rounded" onchange="calculateHubTotal()">
-                    <div class="flex-1 flex justify-between">
-                        <span>Plastic Vinyl Layer</span>
-                        <span class="text-brand-cyan font-black">+₹40/pg</span>
-                    </div>
-                </label>
-            </div>
-
-            <!-- Notes -->
-            <div class="mb-8 bg-white border-4 border-brand-black rounded-3xl p-5 shadow-brutal">
-                <label class="block font-black text-base mb-1 flex items-center gap-2"><i class="ph-bold ph-chat-circle-text text-gray-400 text-xl"></i> Any extra notes?</label>
-                <textarea id="hubNotes" rows="2" class="w-full bg-gray-50 border-2 border-black rounded-xl p-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-yellow transition-all" placeholder="e.g. Please print double-sided..."></textarea>
-            </div>
-
-            <!-- Customer Upload / Backup Actions -->
-            <div class="mb-8 bg-brand-yellow border-4 border-brand-black rounded-3xl p-5 shadow-brutal hidden" id="customerUploadBox">
-                <label class="block font-black text-base mb-2"><i class="ph-bold ph-cloud-arrow-up text-black text-xl"></i> Secure Studio Upload</label>
-                <p class="text-xs font-bold text-gray-800 mb-4">Upload your high-res files directly to our secure print server.</p>
-                
-                <button onclick="executeSecureUpload()" id="btnSecureUpload" class="brutal-btn bg-black text-white w-full py-4 rounded-xl font-black text-base flex items-center justify-center gap-2 mb-4 transition-all">
-                    Upload to Server <i class="ph-bold ph-upload-simple"></i>
-                </button>
-                
-                <div class="relative pt-4 border-t-2 border-black/10">
-                    <button onclick="downloadEncryptedBackup()" id="btnEncDownload" class="w-full bg-white border-2 border-black text-black py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-gray-50 transition-all shadow-brutal-sm">
-                        <i class="ph-bold ph-lock-key"></i> Download Encrypted Backup
-                    </button>
-                </div>
-            </div>
-
-            <!-- Procedural Action -->
-            <div id="orderActionButtons">
-                <button onclick="handleProceed()" class="brutal-btn bg-black text-white w-full py-5 rounded-3xl font-black text-xl flex items-center justify-center gap-2">
-                    Continue to Format <i class="ph-bold ph-arrow-right"></i>
-                </button>
-            </div>
+    <div id="product-modal" class="modal-overlay fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div class="modal-content w-full max-w-lg bg-white md:rounded-3xl rounded-t-3xl border-t-4 border-x-4 md:border-b-4 border-brand-black shadow-[0_-10px_40px_rgba(0,0,0,0.2)] md:shadow-brutal flex flex-col max-h-[90vh]">
             
-        </div>
-
-
-        <!-- ==========================================
-             VIEW 4: THE FORK (Lazy vs Studio)
-             ========================================== -->
-        <div id="view-fork" class="app-view">
-            <div class="text-center mb-8">
-                <div class="inline-block bg-black text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase mb-3">Step 3</div>
-                <h3 class="font-display text-3xl md:text-4xl font-black">How do you want to format this?</h3>
-                <p class="text-sm font-bold text-gray-500 mt-2">Almost done. Choose your fighter.</p>
-            </div>
-            
-            <div class="grid grid-cols-1 gap-5 max-w-lg mx-auto">
-                <button onclick="sendLazyWhatsApp()" class="brutal-btn bg-brand-green text-white rounded-3xl p-6 text-left group relative overflow-hidden focus:outline-none">
-                    <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500 text-black"><i class="ph-fill ph-sleeping text-8xl"></i></div>
-                    <h4 class="font-black text-2xl mb-2 relative z-10">Feeling lazy? 😴</h4>
-                    <p class="font-semibold text-white/90 text-sm relative z-10 mb-4">Dump your files on our WhatsApp. We'll format it for you perfectly.</p>
-                    <div class="inline-flex items-center gap-2 bg-black text-brand-green px-4 py-2 rounded-full text-xs font-bold relative z-10">
-                        <i class="ph-bold ph-whatsapp text-lg"></i> Send to WhatsApp -> Done Yayyyy!
-                    </div>
+            <div class="relative w-full h-40 md:h-48 rounded-t-[28px] border-b-4 border-brand-black flex items-center justify-center overflow-hidden" id="modal-header-bg">
+                <button onclick="closeModal()" class="absolute top-4 right-4 w-10 h-10 bg-white border-2 border-black rounded-full flex items-center justify-center text-xl hover:scale-110 transition-transform shadow-brutal-sm z-10">
+                    <i class="ph-bold ph-x"></i>
                 </button>
+                <div class="text-6xl md:text-8xl transform scale-110 drop-shadow-xl" id="modal-emoji">📸</div>
+            </div>
 
-                <button onclick="goToStudio()" class="brutal-btn bg-brand-cyan rounded-3xl p-6 text-left group relative overflow-hidden focus:outline-none">
-                    <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform duration-500"><i class="ph-fill ph-magic-wand text-8xl"></i></div>
-                    <h4 class="font-black text-2xl mb-2 relative z-10">Got trust issues? ✨</h4>
-                    <p class="font-semibold text-gray-800 text-sm relative z-10 mb-4">Format it yourself exactly how you want it using our Magic Studio canvas.</p>
-                    <div class="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-full text-xs font-bold relative z-10">
-                        Open Studio Editor <i class="ph-bold ph-arrow-right"></i>
+            <div class="p-5 md:p-6 overflow-y-auto flex-grow hide-scrollbar">
+                <h2 id="modal-title" class="font-display text-2xl md:text-3xl font-black mb-1">Product Title</h2>
+                <p id="modal-desc" class="text-sm font-bold text-gray-500 mb-6">Product description goes here.</p>
+
+                <!-- Buy More Save More Quantities -->
+                <div class="mb-6">
+                    <h3 class="font-black text-sm uppercase tracking-wider text-brand-magenta mb-3">Select Quantity / Package</h3>
+                    <div id="modal-options" class="flex flex-col gap-3">
+                        <!-- Options Injected via JS -->
                     </div>
+                </div>
+
+                <!-- Add-ons Section -->
+                <div id="modal-addons-container" class="mb-6 hidden">
+                    <h3 class="font-black text-sm uppercase tracking-wider text-brand-blue mb-3">Pimp it up (Optional)</h3>
+                    <div id="modal-addons" class="flex flex-col gap-2">
+                        <!-- Addons Injected via JS -->
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <h3 class="font-black text-sm uppercase tracking-wider text-brand-black mb-2">Your Name (Optional)</h3>
+                    <input type="text" id="customer-name" placeholder="E.g. Rahul" class="w-full bg-gray-50 border-2 border-brand-black p-3 rounded-xl font-bold outline-none focus:bg-brand-yellow/20 focus:border-brand-magenta transition-colors">
+                </div>
+            </div>
+
+            <!-- Sticky Checkout Footer -->
+            <div class="border-t-4 border-brand-black p-4 md:p-6 bg-white rounded-b-3xl">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="font-bold text-gray-500 uppercase text-sm tracking-wider">Total Amount</span>
+                    <span class="font-black text-3xl text-brand-black" id="modal-total">₹0</span>
+                </div>
+                <button onclick="submitOrder()" class="w-full brutal-btn bg-brand-green text-white py-4 rounded-xl font-black text-lg flex items-center justify-center gap-2 hover:bg-[#1fbc5b]">
+                    <i class="ph-bold ph-whatsapp-logo text-2xl"></i> Send Photos & Buy
                 </button>
-            </div>
-        </div>
-
-
-        <!-- ==========================================
-             VIEW 5: THE MAGIC STUDIO (Canvas Editor)
-             ========================================== -->
-        <div id="view-studio" class="app-view">
-            <div class="text-center mb-6">
-                <div class="inline-block bg-black text-white px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase mb-2">Editor</div>
-                <h2 class="font-display text-3xl font-black mb-1 flex items-center justify-center gap-2">The Magic Studio 🪄</h2>
-                <p class="text-gray-600 font-bold text-xs">Upload, format, preview, checkout.</p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                
-                <!-- LEFT: CONTROLS -->
-                <div class="lg:col-span-4 flex flex-col gap-4 bg-white text-black p-5 rounded-3xl border-4 border-brand-black shadow-[6px_6px_0px_0px_#FFEA00]">
-                    
-                    <div>
-                        <label class="block font-black text-xs uppercase tracking-wider text-gray-500 mb-2">Add Content</label>
-                        
-                        <div id="imageUploadArea">
-                            <input type="file" id="imageInput" multiple accept="image/*" class="hidden">
-                            <div class="flex gap-2 mb-2">
-                                <label for="imageInput" id="addImagesLabel" class="flex-1 brutal-btn bg-brand-cyan hover:bg-cyan-300 text-center py-3 rounded-xl font-black cursor-pointer flex items-center justify-center gap-2 text-sm">
-                                    <i class="ph-bold ph-upload-simple text-lg"></i> Upload Photos
-                                </label>
-                                <button id="clearImagesBtn" class="hidden brutal-btn bg-red-400 text-white w-12 rounded-xl flex items-center justify-center" title="Clear All">
-                                    <i class="ph-bold ph-trash text-lg"></i>
-                                </button>
-                            </div>
-                            <p id="fileCount" class="text-[10px] font-bold text-gray-500 text-center">0 images loaded</p>
-                            <p class="text-[10px] font-black text-brand-blue mt-1 hidden text-center" id="uploadLoading">
-                                <i class="ph-bold ph-spinner animate-spin mr-1"></i> Loading Native Image...
-                            </p>
-                        </div>
-
-                        <div id="textUploadArea" class="hidden">
-                            <textarea id="notesInput" rows="4" class="w-full bg-gray-50 border-2 border-black rounded-xl p-3 font-medium text-sm focus:outline-none focus:bg-brand-yellow/10 transition-colors shadow-inner" placeholder="Paste your text here..."></textarea>
-                        </div>
-                    </div>
-
-                    <div id="settingsArea">
-                        <label class="block font-black text-xs uppercase tracking-wider text-gray-500 mb-2">Tweaks</label>
-                        <div class="space-y-2">
-                            <div id="orientationWrapper" class="flex justify-between items-center bg-gray-50 p-2 rounded-xl border-2 border-gray-200">
-                                <span class="font-bold text-xs">Orientation</span>
-                                <select id="orientation" class="bg-white border-2 border-black font-bold text-xs rounded-lg p-1 outline-none cursor-pointer">
-                                    <option value="portrait">Portrait</option>
-                                    <option value="landscape">Landscape</option>
-                                </select>
-                            </div>
-                            <div id="stickerOptions" class="hidden flex justify-between items-center bg-fuchsia-50 p-2 rounded-xl border-2 border-fuchsia-200">
-                                <span class="font-bold text-xs text-fuchsia-900">Sticker Cut</span>
-                                <select id="stickerShape" class="bg-white border-2 border-black font-bold text-xs rounded-lg p-1 outline-none cursor-pointer">
-                                    <option value="square">Square</option>
-                                    <option value="rounded">Rounded</option>
-                                    <option value="circle">Circle</option>
-                                    <option value="heart">Heart</option>
-                                </select>
-                            </div>
-                            <div id="polaroidOptions" class="hidden flex justify-between items-center bg-orange-50 p-2 rounded-xl border-2 border-orange-200">
-                                <span class="font-bold text-xs text-orange-900">Frame Style</span>
-                                <select id="polaroidStyle" class="bg-white border-2 border-black font-bold text-xs rounded-lg p-1 outline-none cursor-pointer">
-                                    <option value="square">Classic</option>
-                                    <option value="tall">Tall</option>
-                                    <option value="wide">Wide</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button id="generateBtn" class="brutal-btn bg-black text-white w-full py-3 rounded-xl font-black text-sm mt-auto flex items-center justify-center gap-2 group">
-                        <i class="ph-bold ph-magic-wand text-brand-yellow group-hover:rotate-12 transition-transform"></i> Generate Preview
-                    </button>
-                    
-                    <div id="loading" class="hidden flex flex-col items-center justify-center py-2 text-brand-magenta">
-                        <i class="ph-bold ph-spinner animate-spin text-2xl mb-1"></i>
-                        <span class="font-bold text-[10px]">Processing High-Res A4...</span>
-                    </div>
-                </div>
-
-                <!-- RIGHT: PREVIEW & CHECKOUT -->
-                <div class="lg:col-span-8 flex flex-col gap-4">
-                    <div class="flex-grow bg-white rounded-3xl border-4 border-brand-black shadow-brutal p-3 flex flex-col relative overflow-hidden">
-                        <div class="flex justify-between items-center mb-3 border-b-2 border-gray-100 pb-2 px-1">
-                            <h3 class="font-black text-sm text-gray-800 flex items-center gap-1"><i class="ph-fill ph-eye text-brand-cyan"></i> Live A4 Sheet</h3>
-                            <a id="downloadBtn" class="hidden bg-gray-200 hover:bg-gray-300 text-black font-bold py-1 px-2 rounded text-[10px] transition-colors items-center gap-1" download="Delulu_Print.jpg">
-                                Save <i class="ph-bold ph-download-simple"></i>
-                            </a>
-                        </div>
-                        
-                        <div class="flex-grow canvas-bg border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center relative min-h-[300px] md:min-h-[400px] overflow-hidden p-2">
-                            <div id="placeholderText" class="text-center text-gray-400">
-                                <i class="ph-duotone ph-file-dashed text-4xl mb-1"></i>
-                                <p class="font-bold text-xs">Generate to see preview.</p>
-                            </div>
-                            <div id="loadingOverlay" class="hidden flex flex-col items-center justify-center text-brand-black absolute inset-0 bg-white/80 backdrop-blur z-10">
-                                <i class="ph-bold ph-spinner animate-spin text-4xl mb-2 text-brand-magenta"></i>
-                                <span class="font-black text-xs">Generating Output...</span>
-                            </div>
-                            <img id="previewImg" class="hidden max-w-full max-h-full object-contain shadow-[0_0_10px_rgba(0,0,0,0.15)] border border-gray-200 bg-white">
-                        </div>
-                    </div>
-
-                    <button onclick="checkoutStudio()" id="waStudioBtn" class="brutal-btn bg-brand-green text-white w-full py-4 rounded-2xl font-black text-lg flex items-center justify-center gap-2 hover:bg-[#1fbc5b]">
-                        <i class="ph-bold ph-check-circle text-2xl"></i> Review & Checkout
-                    </button>
-                </div>
-
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Footer -->
-    <footer class="bg-brand-black text-white py-12 border-t-4 border-brand-magenta mt-16 w-full">
-        <div class="max-w-4xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
-            <div>
-                <div class="flex items-center justify-center md:justify-start gap-2 mb-1 cursor-pointer" onclick="resetWizard()">
-                    <i class="ph-fill ph-printer text-2xl text-brand-magenta"></i>
-                    <span class="font-display font-black text-xl">deluluprinter.xyz</span>
-                </div>
-                <p class="text-gray-400 text-xs font-semibold">The trendy print aesthetic. Gangtok, Sikkim.</p>
-            </div>
-            <a href="https://arteviastudio.in/" target="_blank" class="bg-gray-900 px-3 py-2 rounded-xl border-2 border-gray-700 hover:bg-gray-800 transition block shadow-brutal-sm">
-                <p class="text-[10px] text-gray-400 font-bold mb-0.5">Powered by</p>
-                <p class="font-black text-brand-cyan text-sm hover:underline">Artevia Studio Engine</p>
-            </a>
-        </div>
-    </footer>
-
-    <!-- Modals & Toasts -->
-    <div id="toast" class="fixed top-20 right-4 bg-brand-black text-white px-5 py-3 rounded-xl brutal-border shadow-brutal font-black z-50 flex items-center hidden">
-        <i class="ph-fill ph-whatsapp-logo text-brand-green text-2xl mr-2"></i>
-        <span id="toastMsg" class="text-sm">Opening WhatsApp in <span id="countdown" class="text-brand-yellow text-lg ml-1">...</span></span>
-    </div>
-
-    <!-- Delulu Card Gamified Popup (>₹100) -->
-    <div id="delulu-popup" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-brand-yellow brutal-border shadow-brutal p-6 md:p-8 rounded-3xl max-w-sm w-full text-center transform scale-95 opacity-0 transition-all duration-300">
-            <i class="ph-fill ph-ticket text-6xl text-brand-magenta mb-2 animate-bounce"></i>
-            <h3 class="font-display font-black text-3xl mb-2">Wait! Free Perks! 🎁</h3>
-            <p class="font-bold text-sm text-gray-800 mb-6">Your order is over ₹100! You qualify for a <span class="text-brand-magenta font-black">FREE Delulu Card</span> punch. (Fill 8 boxes = ₹80 free prints). Want one?</p>
-            <div class="space-y-3">
-                <button id="btn-accept-delulu" class="brutal-btn bg-brand-green text-white w-full py-3 rounded-xl font-black text-lg hover:bg-[#1fbc5b]">Yes, I'm interested! 💳</button>
-                <button id="btn-decline-delulu" class="text-sm font-bold text-gray-600 hover:text-black hover:underline px-4 py-2">No thanks, just checkout</button>
+                <p class="text-[10px] font-bold text-center text-gray-400 mt-3">Clicking this opens WhatsApp. No payment required yet!</p>
             </div>
         </div>
     </div>
 
-    <!-- GLOBAL WHATSAPP FAB -->
-    <a href="https://wa.me/919907488075?text=Heyy!%20%E2%9C%A8%20I%20have%20a%20query%20about%20printing..." target="_blank" class="fixed bottom-6 right-6 z-[100] bg-brand-green text-white p-4 rounded-full shadow-[4px_4px_0px_#111] border-3 border-black flex items-center gap-2 hover:scale-105 hover:-translate-y-1 hover:shadow-[6px_6px_0px_#111] transition-all group">
-        <i class="ph-bold ph-whatsapp-logo text-3xl animate-[pulse_2s_ease-in-out_infinite]"></i>
-        <span class="font-black text-xs uppercase tracking-wider pl-1 pr-2">Got a query?</span>
-    </a>
+    <div id="toast" class="fixed top-20 left-1/2 transform -translate-x-1/2 -translate-y-20 opacity-0 bg-brand-black text-white px-6 py-3 rounded-full font-bold text-sm shadow-brutal border-2 border-white transition-all duration-300 z-[60] pointer-events-none">
+        Message goes here
+    </div>
 
-    <!-- JS LOGIC -->
     <script>
-        // --- GITHUB CONFIGURATION (IMPORTANT) ---
-        const GITHUB_CONFIG = {
-            owner: 'Sarup098',
-            repo: 'deluluprinter',
-            token: '', 
-            branch: 'main'
-        };
-
-        // --- GLOBAL STATE ---
-        let currentMode = null; 
-        let globalImages = []; 
-        let calculatedPages = 0;
-        let originalTotal = 0;
-        let discountApplied = false;
-        let pendingWaMessage = ""; 
-        let heroInterval;
-
-        let boothImages = [];
-        let videoStream = null;
-        let savedStripsData = []; 
-        let allRawBoothImages = []; 
-        let requiredBoothPhotos = 4;
-        let currentOrderRef = "";
-        let stripDecorations = []; // Stores user-added stickers for photobooth
-
-        const prices = {
-            normal: 10, glossy: 80, passport: 50, sticker_passport: 60,
-            polaroid: 70, 
-            stickers: 25, premium_stickers: 40, glossy_stickers: 60, holographic_stickers: 70,
-            notes: 10, maps: 5, photobooth: 80, 
-            apparel5: 150, apparel4: 250
-        };
-
-        const productsData = {
-            normal: { name: 'Normal Prints', hasStudio: true },
-            glossy: { name: 'Glossy Photos', hasStudio: true },
-            passport: { name: 'Passport Size', hasStudio: true },
-            sticker_passport: { name: 'Sticker Passports', hasStudio: true },
-            polaroid: { name: 'Polaroids (Set of 9)', hasStudio: true },
-            stickers: { name: 'A4 Stickers', hasStudio: true },
-            premium_stickers: { name: 'Premium Stickers', hasStudio: true },
-            glossy_stickers: { name: 'Glossy Stickers', hasStudio: true },
-            holographic_stickers: { name: 'Holo Stickers', hasStudio: true },
-            notes: { name: 'Quick Notes', hasStudio: true },
-            maps: { name: 'ICSE Maps', hasStudio: false },
-            photobooth: { name: 'Photobooth Strip', hasStudio: false }, 
-            apparel5: { name: 'Apparel A5', hasStudio: false },
-            apparel4: { name: 'Apparel A4', hasStudio: false }
-        };
-
-        const funFacts = [
-            "Fun fact: 90% of printer jams happen when you're late for class. We fixed that.",
-            "Fun fact: We use premium ink so your prints survive the test of time.",
-            "Fun fact: We bring the trendiest print vibes to Gangtok & Sikkim.",
-            "Fun fact: Adding stickers to your laptop increases its aesthetic value by 100%.",
-            "Fun fact: You're saving so much money right now."
+        // Store Catalog Data
+        const products = [
+            {
+                id: 'mini_polaroids',
+                title: 'Mini Polaroids',
+                desc: 'Cute, aesthetic mini polaroids for your wall, phone case, or wallet. Glossy finish.',
+                emoji: '📸',
+                bgColor: 'bg-brand-purple',
+                options: [
+                    { id: 'mp_9', label: 'Mini Polaroids (9)', price: 69, desc: 'Starter pack' },
+                    { id: 'mp_18', label: 'Mini Polaroids (18)', price: 129, desc: 'Double the fun' },
+                    { id: 'mp_27', label: 'Mini Polaroids (27)', price: 169, desc: 'Getting serious' },
+                    { id: 'mp_34', label: 'Mini Polaroids (34)', price: 199, desc: 'Best Value pack!', isPopular: true },
+                    { id: 'mp_50', label: 'Mini Polaroids (50)', price: 289, desc: 'The whole camera roll' },
+                ],
+                addons: [
+                    { id: 'ext_mp', label: 'Extra Mini Polaroid', price: 8 },
+                    { id: 'env', label: 'Gift Envelope', price: 20 },
+                    { id: 'wrap', label: 'Gift Wrapping', price: 30 },
+                    { id: 'rush', label: 'Priority Printing', price: 50 }
+                ]
+            },
+            {
+                id: 'jumbo_polaroids',
+                title: 'Jumbo Polaroids',
+                desc: 'Big, bold, and beautiful vintage-style prints to make a statement on your wall.',
+                emoji: '🖼️',
+                bgColor: 'bg-brand-cyan',
+                options: [
+                    { id: 'jp_4', label: 'Jumbo Polaroids (4 pcs)', price: 99, desc: 'XL aesthetic prints', isPopular: true },
+                ],
+                addons: [
+                    { id: 'env', label: 'Gift Envelope', price: 20 },
+                    { id: 'wrap', label: 'Gift Wrapping', price: 30 },
+                    { id: 'rush', label: 'Priority Printing', price: 50 }
+                ]
+            },
+            {
+                id: 'photo_strips',
+                title: 'Photo Strips',
+                desc: 'Classic photobooth-style strips. Perfect for bookmarks, phone cases, or gifting.',
+                emoji: '🎞️',
+                bgColor: 'bg-brand-yellow',
+                options: [
+                    { id: 'ps_2', label: 'Photo Strips (2 Strips)', price: 49, desc: 'Sweet & simple' },
+                    { id: 'ps_4', label: 'Photo Strips (4 Strips)', price: 79, desc: 'Good for a group' },
+                    { id: 'ps_8', label: 'Photo Strips (8 Strips)', price: 149, desc: 'Share with friends', isPopular: true },
+                    { id: 'ps_12', label: 'Photo Strips (12 Strips)', price: 199, desc: 'Mega strip pack' },
+                ],
+                addons: [
+                    { id: 'ext_ps', label: 'Extra Photo Strip', price: 20 },
+                    { id: 'env', label: 'Gift Envelope', price: 20 },
+                    { id: 'rush', label: 'Priority Printing', price: 50 }
+                ]
+            },
+            {
+                id: 'stickers',
+                title: 'Sticker Sheets (A4)',
+                desc: 'Custom sticker sheets. You design, we print. Slap them everywhere!',
+                emoji: '🦄',
+                bgColor: 'bg-brand-magenta',
+                options: [
+                    { id: 'stk_mat', label: 'Matte Sticker Sheet (A4)', price: 25, desc: 'Standard matte finish' },
+                    { id: 'stk_glo', label: 'Glossy Sticker Sheet (A4)', price: 45, desc: 'Shiny & vibrant' },
+                    { id: 'stk_trn', label: 'Transparent Sticker Sheet (A4)', price: 60, desc: 'Clear background' },
+                    { id: 'stk_hol', label: 'Holographic Sticker Sheet (A4)', price: 70, desc: 'Shiny rainbow effect', isPopular: true },
+                ],
+                addons: [
+                    { id: 'rush', label: 'Priority Printing', price: 50 }
+                ]
+            },
+            {
+                id: 'greeting_cards',
+                title: 'Greeting Cards',
+                desc: 'Say it with a card. Premium folded cards for birthdays, anniversaries, or just because.',
+                emoji: '💌',
+                bgColor: 'bg-white',
+                options: [
+                    { id: 'gc_a6', label: 'Greeting Card (A6 Folded)', price: 79, desc: 'Cute & compact', isPopular: true },
+                    { id: 'gc_a5', label: 'Greeting Card (A5 Folded)', price: 129, desc: 'Big & expressive' },
+                ],
+                addons: [
+                    { id: 'gc_dsg', label: 'Custom Greeting Card Design', price: 30 },
+                    { id: 'env', label: 'Gift Envelope', price: 20 },
+                    { id: 'rush', label: 'Priority Printing', price: 50 }
+                ]
+            },
+            {
+                id: 'spotify_cards',
+                title: 'Spotify Photo Cards',
+                desc: 'Your favorite photo + a scannable Spotify song code. Play your memories!',
+                emoji: '🎵',
+                bgColor: 'bg-[#86efac]',
+                options: [
+                    { id: 'spt_1', label: 'Spotify Photo Card', price: 149, desc: 'Photo & Code on front' },
+                    { id: 'spt_2', label: 'Double-sided Spotify Photo Card', price: 179, desc: 'Photo front, Code back', isPopular: true },
+                ],
+                addons: [
+                    { id: 'env', label: 'Gift Envelope', price: 20 },
+                    { id: 'wrap', label: 'Gift Wrapping', price: 30 },
+                    { id: 'rush', label: 'Priority Printing', price: 50 }
+                ]
+            },
+            {
+                id: 'posters',
+                title: 'Aesthetic Posters',
+                desc: 'High-quality posters to cover up those boring walls in your room.',
+                emoji: '📜',
+                bgColor: 'bg-brand-blue',
+                options: [
+                    { id: 'pst_a5', label: 'Poster (A5)', price: 49, desc: 'Small space filler' },
+                    { id: 'pst_a4', label: 'Poster (A4)', price: 99, desc: 'Standard size' },
+                    { id: 'pst_a3', label: 'Poster (A3)', price: 179, desc: 'Go big!', isPopular: true },
+                ],
+                addons: [
+                    { id: 'rush', label: 'Priority Printing', price: 50 }
+                ]
+            },
+            {
+                id: 'art_prints',
+                title: 'Premium Art Prints',
+                desc: 'Thick, museum-quality prints tailored for digital artists, illustrators, and fine art.',
+                emoji: '🎨',
+                bgColor: 'bg-brand-yellow',
+                options: [
+                    { id: 'art_a5', label: 'Art Print (A5)', price: 79, desc: 'Mini masterpiece' },
+                    { id: 'art_a4', label: 'Art Print (A4)', price: 149, desc: 'Standard gallery size', isPopular: true },
+                    { id: 'art_a3', label: 'Art Print (A3)', price: 249, desc: 'Large canvas size' },
+                ],
+                addons: [
+                    { id: 'wrap', label: 'Gift Wrapping', price: 30 },
+                    { id: 'rush', label: 'Priority Printing', price: 50 }
+                ]
+            },
+            {
+                id: 'biz_cards',
+                title: 'Biz & Branding',
+                desc: 'Elevate your small business with premium visiting cards, tags, and thank you notes.',
+                emoji: '💼',
+                bgColor: 'bg-brand-cyan',
+                options: [
+                    { id: 'biz_qr', label: 'QR Cards', price: 99, desc: 'Scannable smart cards' },
+                    { id: 'biz_ty', label: 'Thank You Cards (20 pcs)', price: 149, desc: 'For your packages' },
+                    { id: 'biz_tag', label: 'Product Tags (25 pcs)', price: 149, desc: 'Brand your items' },
+                    { id: 'biz_vc', label: 'Visiting Cards (100 pcs)', price: 249, desc: 'Classic networking', isPopular: true },
+                ],
+                addons: [
+                    { id: 'rush', label: 'Priority Printing', price: 50 }
+                ]
+            },
+            {
+                id: 'apparel',
+                title: 'Apparel Printing',
+                desc: 'High-quality prints for tees and hoodies. Bring or send your own apparel!',
+                emoji: '👕',
+                bgColor: 'bg-brand-black',
+                options: [
+                    { id: 'apl_pock', label: 'Apparel Printing (Pocket Print)', price: 99, desc: 'Small chest logo' },
+                    { id: 'apl_a5', label: 'Apparel Printing (A5 Print)', price: 149, desc: 'Medium chest graphic' },
+                    { id: 'apl_a4f', label: 'Apparel Printing (A4 Print)', price: 250, desc: 'Full front graphic', isPopular: true },
+                    { id: 'apl_a4b', label: 'Apparel Printing (Back A4 Print)', price: 250, desc: 'Full back graphic' },
+                    { id: 'apl_a4fb', label: 'Apparel Printing (Front + Back A4)', price: 450, desc: 'Maximized branding' },
+                ],
+                addons: [
+                    { id: 'rush', label: 'Priority Printing', price: 50 }
+                ]
+            }
         ];
 
-        // --- ELEMENTS ---
-        const views = {
-            start: document.getElementById('view-start'),
-            products: document.getElementById('view-products'),
-            photobooth: document.getElementById('view-photobooth'),
-            order: document.getElementById('view-order'),
-            fork: document.getElementById('view-fork'),
-            studio: document.getElementById('view-studio')
-        };
-        const navBackBtn = document.getElementById('navBackBtn');
-        const fullCatalog = document.getElementById('fullCatalog');
-        const catalogToggleBtn = document.getElementById('catalogToggleBtn');
-
-        const orderHubTitle = document.getElementById('orderHubTitle');
-        const hubVibeSelect = document.getElementById('hubVibeSelect');
-        const hubQty = document.getElementById('hubQty');
-        const hubQtyLabel = document.getElementById('hubQtyLabel');
-        const hubTotalOutput = document.getElementById('hubTotalOutput');
-        const hubNotes = document.getElementById('hubNotes');
-        const customerNameInput = document.getElementById('customerName');
-        const orderPreviewSection = document.getElementById('orderPreviewSection');
-        const orderPreviewImg = document.getElementById('orderPreviewImg');
-        const orderActionButtons = document.getElementById('orderActionButtons');
-        const customerUploadBox = document.getElementById('customerUploadBox');
-
-        const imageUploadArea = document.getElementById('imageUploadArea');
-        const textUploadArea = document.getElementById('textUploadArea');
-        const orientationWrapper = document.getElementById('orientationWrapper');
-        const stickerOptions = document.getElementById('stickerOptions');
-        const polaroidOptions = document.getElementById('polaroidOptions');
-        const imageInput = document.getElementById('imageInput');
-        const notesInput = document.getElementById('notesInput');
-        const clearImagesBtn = document.getElementById('clearImagesBtn');
-        const uploadLoading = document.getElementById('uploadLoading');
-        const fileCount = document.getElementById('fileCount');
-        const addImagesLabel = document.getElementById('addImagesLabel');
-        const orientationSelect = document.getElementById('orientation');
-        const stickerShapeSelect = document.getElementById('stickerShape');
-        const polaroidStyleSelect = document.getElementById('polaroidStyle');
-        const generateBtn = document.getElementById('generateBtn');
-        const loading = document.getElementById('loading');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        const previewImg = document.getElementById('previewImg');
-        const placeholderText = document.getElementById('placeholderText');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const toast = document.getElementById('toast');
-        const countdownEl = document.getElementById('countdown');
-        const funFactText = document.getElementById('funFactText');
-
-        // --- HERO CAROUSEL LOGIC ---
-        function startHeroCarousel() {
-            let currentSlide = 0;
-            const totalSlides = 3;
-            if(heroInterval) clearInterval(heroInterval);
-            
-            heroInterval = setInterval(() => {
-                const curSlide = document.getElementById(`slide-${currentSlide}`);
-                const curDot = document.getElementById(`dot-${currentSlide}`);
-                if(curSlide) curSlide.classList.replace('slide-visible', 'slide-hidden');
-                if(curDot) curDot.classList.replace('bg-brand-black', 'bg-gray-300');
-                
-                currentSlide = (currentSlide + 1) % totalSlides;
-                
-                const nextSlide = document.getElementById(`slide-${currentSlide}`);
-                const nextDot = document.getElementById(`dot-${currentSlide}`);
-                if(nextSlide) nextSlide.classList.replace('slide-hidden', 'slide-visible');
-                if(nextDot) nextDot.classList.replace('bg-gray-300', 'bg-brand-black');
-            }, 4000);
-        }
+        let currentProduct = null;
+        let selectedOption = null;
+        let selectedAddons = new Set();
         
-        startHeroCarousel();
+        // --- STREAMING_CHUNK:Rendering the Gallery View ---
+        function renderGallery() {
+            const galleryGrid = document.getElementById('product-grid');
+            const darkBgColors = ['bg-brand-purple', 'bg-brand-magenta', 'bg-brand-blue', 'bg-brand-black', 'bg-brand-green'];
 
-        // --- CORE NAVIGATION ---
-        let viewHistory = ['view-start'];
-
-        function goToView(viewId) {
-            if(viewId !== 'view-photobooth') stopCamera(); 
-
-            Object.values(views).forEach(v => {
-                if (v && v.classList) {
-                    v.classList.remove('active');
-                    setTimeout(() => { if(v && v.style) v.style.display = 'none'; }, 300); 
-                }
+            // Flatten the products so EACH OPTION becomes a distinct tile in the gallery
+            let allTiles = [];
+            products.forEach(product => {
+                product.options.forEach(opt => {
+                    allTiles.push({
+                        productId: product.id,
+                        optionId: opt.id,
+                        title: opt.label,
+                        desc: product.desc,
+                        emoji: product.emoji,
+                        bgColor: product.bgColor,
+                        price: opt.price,
+                        isPopular: opt.isPopular
+                    });
+                });
             });
 
-            const target = views[viewId.replace('view-', '')]; 
-            if (target && target.classList) {
-                setTimeout(() => {
-                    target.style.display = 'block';
-                    void target.offsetWidth; 
-                    target.classList.add('active');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 300);
-            }
-
-            if (viewId === 'view-start') {
-                viewHistory = ['view-start'];
-                if(navBackBtn) navBackBtn.classList.add('hidden');
-                startHeroCarousel();
-            } else {
-                if (viewHistory[viewHistory.length - 1] !== viewId) {
-                    viewHistory.push(viewId);
-                }
-                if(navBackBtn) navBackBtn.classList.remove('hidden');
-                if(heroInterval) clearInterval(heroInterval);
-            }
+            galleryGrid.innerHTML = allTiles.map((tile) => {
+                const isDark = darkBgColors.includes(tile.bgColor);
+                return `
+                <div onclick="openProductModal('${tile.productId}', '${tile.optionId}')" class="brutal-card ${tile.bgColor === 'bg-white' ? 'bg-white text-black' : tile.bgColor + ' text-black'} rounded-3xl p-4 md:p-5 flex flex-col h-full cursor-pointer relative overflow-hidden group">
+                    ${tile.isPopular ? `<div class="absolute top-0 right-0 bg-brand-yellow border-b-4 border-l-4 border-black px-2 py-1 font-black text-[9px] z-10 shadow-sm text-black">POPULAR</div>` : ''}
+                    <div class="flex items-center justify-center w-12 h-12 md:w-16 md:h-16 mb-3 md:mb-4 bg-white/30 rounded-2xl border-2 border-black/20 group-hover:scale-105 transition-transform">
+                        <span class="text-3xl md:text-4xl drop-shadow-md">${tile.emoji}</span>
+                    </div>
+                    <h3 class="font-display text-base md:text-xl font-black leading-tight mb-2 ${isDark ? 'text-white' : 'text-black'}">${tile.title}</h3>
+                    
+                    <div class="mt-auto pt-3 flex flex-col sm:flex-row justify-between items-start sm:items-end w-full gap-2">
+                        <span class="text-xl md:text-2xl font-black ${isDark ? 'text-white' : 'text-black'}">
+                            ₹${tile.price}
+                        </span>
+                        <button class="bg-black text-white px-3 py-1 rounded-full text-[10px] md:text-xs font-bold border-2 border-transparent group-hover:bg-brand-yellow group-hover:text-black group-hover:border-black transition-all w-full sm:w-auto">Buy</button>
+                    </div>
+                </div>
+            `}).join('');
         }
 
-        function goBack() {
-            stopCamera();
-            if (viewHistory.length > 1) {
-                viewHistory.pop(); 
-                const prevView = viewHistory[viewHistory.length - 1];
-                
-                Object.values(views).forEach(v => {
-                    if (v && v.classList) {
-                        v.classList.remove('active');
-                        v.style.display = 'none';
+        // --- STREAMING_CHUNK:Implementing Modal Logic and Dynamic Pricing ---
+        function openProductModal(productId, defaultOptionId) {
+            currentProduct = products.find(p => p.id === productId);
+            
+            // Default to the specific tile clicked, or the popular option if none provided
+            if (defaultOptionId) {
+                selectedOption = currentProduct.options.find(o => o.id === defaultOptionId);
+            } else {
+                selectedOption = currentProduct.options.find(o => o.isPopular) || currentProduct.options[0];
+            }
+            
+            selectedAddons.clear();
+
+            // Style Header
+            const headerBg = document.getElementById('modal-header-bg');
+            headerBg.className = `relative w-full h-40 md:h-48 rounded-t-[28px] border-b-4 border-brand-black flex items-center justify-center overflow-hidden ${currentProduct.bgColor}`;
+            document.getElementById('modal-emoji').textContent = currentProduct.emoji;
+            
+            // Populate Text
+            document.getElementById('modal-title').textContent = currentProduct.title;
+            document.getElementById('modal-desc').textContent = currentProduct.desc;
+            
+            // Build Options List
+            const optionsContainer = document.getElementById('modal-options');
+            optionsContainer.innerHTML = currentProduct.options.map((opt) => `
+                <label class="cursor-pointer relative">
+                    <input type="radio" name="product_option" value="${opt.id}" class="sr-only radio-custom" ${selectedOption.id === opt.id ? 'checked' : ''} onchange="handleOptionChange('${opt.id}')">
+                    <div class="w-full bg-white border-2 border-gray-200 rounded-xl p-4 flex justify-between items-center transition-all hover:border-black">
+                        <div class="flex flex-col">
+                            <span class="font-black text-lg">${opt.label}</span>
+                            <span class="text-xs font-bold text-gray-500">${opt.desc}</span>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="font-black text-xl text-brand-black">₹${opt.price}</span>
+                            ${opt.isPopular ? `<span class="bg-brand-magenta text-white px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider mt-1">Best Value</span>` : ''}
+                        </div>
+                    </div>
+                </label>
+            `).join('');
+
+            // Build Addons List
+            const addonsContainer = document.getElementById('modal-addons-container');
+            const addonsList = document.getElementById('modal-addons');
+            
+            if (currentProduct.addons && currentProduct.addons.length > 0) {
+                addonsContainer.classList.remove('hidden');
+                addonsList.innerHTML = currentProduct.addons.map(addon => `
+                    <label class="cursor-pointer flex items-center gap-3 bg-gray-50 border-2 border-gray-200 p-3 rounded-lg hover:border-brand-blue transition-colors">
+                        <input type="checkbox" value="${addon.id}" class="w-5 h-5 accent-brand-blue border-2 border-black rounded" onchange="handleAddonChange('${addon.id}', this.checked)">
+                        <div class="flex-grow font-bold text-sm text-brand-black">${addon.label}</div>
+                        <div class="font-black text-sm text-brand-blue">+₹${addon.price}</div>
+                    </label>
+                `).join('');
+            } else {
+                addonsContainer.classList.add('hidden');
+            }
+
+            document.getElementById('customer-name').value = '';
+            updateTotal();
+            
+            const modal = document.getElementById('product-modal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function closeModal() {
+            document.getElementById('product-modal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function handleOptionChange(optionId) {
+            selectedOption = currentProduct.options.find(o => o.id === optionId);
+            updateTotal();
+        }
+
+        function handleAddonChange(addonId, isChecked) {
+            if (isChecked) selectedAddons.add(addonId);
+            else selectedAddons.delete(addonId);
+            updateTotal();
+        }
+
+        function updateTotal() {
+            let total = selectedOption ? selectedOption.price : 0;
+            selectedAddons.forEach(addonId => {
+                const addon = currentProduct.addons.find(a => a.id === addonId);
+                if (addon) total += addon.price;
+            });
+            document.getElementById('modal-total').textContent = `₹${total}`;
+        }
+
+        // --- STREAMING_CHUNK:Implementing Checkout to WhatsApp ---
+        function submitOrder() {
+            if (!currentProduct || !selectedOption) return;
+
+            const name = document.getElementById('customer-name').value.trim() || 'Aesthetic Customer';
+            let total = selectedOption.price;
+            
+            let message = `Hey Delulu Printer! ✨ I want to order:\n\n`;
+            message += `${currentProduct.emoji} *${currentProduct.title}*\n`;
+            message += `📦 Package: ${selectedOption.label} (₹${selectedOption.price})\n`;
+            
+            if (selectedAddons.size > 0) {
+                message += `🎁 Add-ons: `;
+                const addOnTexts = [];
+                selectedAddons.forEach(id => {
+                    const addon = currentProduct.addons.find(a => a.id === id);
+                    if(addon) {
+                        addOnTexts.push(`${addon.label} (+₹${addon.price})`);
+                        total += addon.price;
                     }
                 });
-                
-                const target = views[prevView.replace('view-', '')];
-                if (target && target.classList) {
-                    target.style.display = 'block';
-                    void target.offsetWidth;
-                    target.classList.add('active');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-
-                if (viewHistory.length === 1 && navBackBtn) {
-                    navBackBtn.classList.add('hidden');
-                    startHeroCarousel();
-                }
+                message += addOnTexts.join(', ') + `\n`;
             }
-        }
-
-        function resetWizard() {
-            stopCamera();
-            currentMode = null;
-            globalImages = [];
-            window.compiledA4Base64 = null;
-            savedStripsData = [];
-            allRawBoothImages = [];
-            boothImages = [];
-
-            if(notesInput) notesInput.value = '';
-            if(hubQty) { hubQty.value = 1; hubQty.disabled = false; }
-            if(hubNotes) hubNotes.value = '';
-            if(customerNameInput) customerNameInput.value = '';
             
-            if(clearImagesBtn) clearImagesBtn.classList.add('hidden');
-            if(fileCount) fileCount.textContent = '0 images loaded';
-            if(previewImg) previewImg.classList.add('hidden');
-            if(downloadBtn) downloadBtn.classList.add('hidden');
-            if(placeholderText) placeholderText.classList.remove('hidden');
+            message += `👤 Name: ${name}\n`;
+            message += `\n💰 *Estimated Total: ₹${total}*\n\nHere are my photos... 📸`;
 
-            if(orderPreviewSection) orderPreviewSection.classList.add('hidden');
-            if(customerUploadBox) customerUploadBox.classList.add('hidden');
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/919907488075?text=${encodedMessage}`;
             
-            goToView('view-start');
+            window.open(whatsappUrl, '_blank');
+            closeModal();
+            showToast("Opening WhatsApp... Don't forget to attach your photos! 🚀");
         }
 
-        function newFunFact() {
-            if(funFactText) funFactText.textContent = funFacts[Math.floor(Math.random() * funFacts.length)];
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.transform = "translate(-50%, 20px)";
+            toast.style.opacity = "1";
+            setTimeout(() => {
+                toast.style.transform = "translate(-50%, -20px)";
+                toast.style.opacity = "0";
+            }, 3000);
         }
 
-        // ==========================================
-        // PHOTOBOOTH LOGIC
-        // ==========================================
-        async function openPhotobooth() {
-            goToView('view-photobooth');
-            savedStripsData = [];
-            allRawBoothImages = [];
-            boothImages = [];
-            stripDecorations = [];
-            document.getElementById('completedStripsCount').innerText = '0';
-            document.getElementById('btnCheckoutStrips').classList.add('hidden');
-            document.getElementById('boothStickerPalette').classList.add('hidden');
-            
-            changeBoothTemplate(); 
-            await startCamera();
-        }
+        // Initialize Shop on load
+        renderGallery();
+
+        // Close modal when clicking outside content
+        document.getElementById('product-modal').addEventListener('click', function(e) {
+            if(e.target === this) closeModal();
+        });
+
+
+        // --- STREAMING_CHUNK:Implementing Live Photobooth Studio ---
+        let stream = null;
+        let photos = [];
+        let maxPhotos = 4;
+        let savedStrips = 0;
+        let currentTemplate = 'classic-4';
+
+        const boothVideo = document.getElementById('boothVideo');
+        const cameraPlaceholder = document.getElementById('cameraPlaceholder');
+        const liveCanvas = document.getElementById('liveStripCanvas');
+        const liveCtx = liveCanvas.getContext('2d');
+        const liveEmpty = document.getElementById('liveStripEmpty');
+
+        // Layout Configs for Booth
+        const templates = {
+            'classic-4': { bg: '#ffffff', slots: 4, padding: 20, gap: 15, text: "DELULU STUDIO", txtColor: '#000000' },
+            'black-4': { bg: '#111111', slots: 4, padding: 20, gap: 15, text: "VINTAGE EDITION", txtColor: '#ffffff' },
+            'pink-4': { bg: '#ffb6c1', slots: 4, padding: 20, gap: 15, text: "XOXO GOSSIP GIRL", txtColor: '#d500f9' },
+            'minimal-3': { bg: '#f3f4f6', slots: 3, padding: 30, gap: 20, text: "MINIMAL", txtColor: '#374151' }
+        };
+
+        // Start camera automatically when scrolled to bottom section
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !stream) {
+                    startCamera();
+                }
+            });
+        }, { threshold: 0.2 });
+        observer.observe(document.getElementById('studio-editor'));
 
         async function startCamera() {
-            const video = document.getElementById('boothVideo');
-            const placeholder = document.getElementById('cameraPlaceholder');
             try {
-                videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
-                video.srcObject = videoStream;
-                placeholder.classList.add('hidden');
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });
+                boothVideo.srcObject = stream;
+                cameraPlaceholder.style.display = 'none';
             } catch (err) {
-                console.warn("Camera access denied or unavailable.", err);
-                placeholder.classList.remove('hidden');
-            }
-        }
-
-        function stopCamera() {
-            if (videoStream) {
-                videoStream.getTracks().forEach(track => track.stop());
-                videoStream = null;
+                console.error("Camera error:", err);
+                cameraPlaceholder.style.display = 'flex';
+                showToast("Camera access denied. You can still upload photos!");
             }
         }
 
         function changeBoothTemplate() {
-            const tmpl = document.getElementById('boothTemplate').value;
-            requiredBoothPhotos = tmpl.includes('3') ? 3 : 4;
-            document.getElementById('boothMax').innerText = requiredBoothPhotos;
+            currentTemplate = document.getElementById('boothTemplate').value;
+            maxPhotos = templates[currentTemplate].slots;
+            document.getElementById('boothMax').innerText = maxPhotos;
             
-            if (requiredBoothPhotos === 3) {
-                if (boothImages.length > 3) boothImages = boothImages.slice(0, 3);
-            } 
-            
-            updateBoothUI();
-        }
-
-        async function snapBoothPhoto() {
-            const video = document.getElementById('boothVideo');
-            if (!videoStream || boothImages.length >= requiredBoothPhotos) return;
-            
-            // 3-2-1 Countdown
-            const countdownEl = document.getElementById('boothCountdown');
-            countdownEl.classList.remove('hidden');
-            for(let i=3; i>0; i--) {
-                countdownEl.innerText = i;
-                await new Promise(r => setTimeout(r, 1000));
+            if (photos.length > maxPhotos) {
+                photos = photos.slice(0, maxPhotos);
             }
-            countdownEl.innerText = "📸";
-            await new Promise(r => setTimeout(r, 200));
-            countdownEl.classList.add('hidden');
-            
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d');
-            
-            ctx.translate(canvas.width, 0);
-            ctx.scale(-1, 1);
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            boothImages.push(canvas.toDataURL('image/jpeg', 0.8));
-            updateBoothUI();
+            updateLiveStrip();
         }
 
-        function changeStripCopies(delta) {
-            const input = document.getElementById('stripCopies');
-            let val = parseInt(input.value) + delta;
-            if (val < 1) val = 1;
-            if (val > 20) val = 20; // Max 20 copies per click
-            input.value = val;
+        // --- STREAMING_CHUNK:Handling Canvas and Photo Capturing ---
+        async function snapBoothPhoto() {
+            if (photos.length >= maxPhotos) {
+                showToast("Strip is full! Save it first.");
+                return;
+            }
+
+            if (!stream) {
+                showToast("Camera is offline. Please upload photos.");
+                return;
+            }
+
+            const countdown = document.getElementById('boothCountdown');
+            countdown.classList.remove('hidden');
+            
+            for(let i=3; i>0; i--) {
+                countdown.innerText = i;
+                await new Promise(r => setTimeout(r, 800));
+            }
+            countdown.classList.add('hidden');
+
+            // Capture from video feed
+            const snapCanvas = document.createElement('canvas');
+            snapCanvas.width = boothVideo.videoWidth;
+            snapCanvas.height = boothVideo.videoHeight;
+            const ctx = snapCanvas.getContext('2d');
+            
+            // Mirror image horizontally to match preview naturally
+            ctx.translate(snapCanvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(boothVideo, 0, 0);
+            
+            photos.push(snapCanvas.toDataURL('image/jpeg'));
+            updateLiveStrip();
         }
 
         function handleBoothUpload(event) {
-            const files = event.target.files;
-            if(!files || files.length === 0) return;
+            const files = Array.from(event.target.files);
+            if (!files.length) return;
 
-            let spacesLeft = requiredBoothPhotos - boothImages.length;
-            let filesToProcess = Array.from(files).slice(0, spacesLeft);
+            const remainingSlots = maxPhotos - photos.length;
+            const filesToProcess = files.slice(0, remainingSlots);
+
+            if (files.length > remainingSlots) {
+                showToast(`Only ${remainingSlots} slots left. Ignored extra photos.`);
+            }
 
             filesToProcess.forEach(file => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    boothImages.push(e.target.result);
-                    updateBoothUI();
+                    photos.push(e.target.result);
+                    updateLiveStrip();
                 };
                 reader.readAsDataURL(file);
             });
-            event.target.value = ''; 
         }
 
-        function clearBooth() {
-            boothImages = [];
-            stripDecorations = [];
-            document.getElementById('boothStickerPalette').classList.add('hidden');
-            updateBoothUI();
-        }
-
-        function addStickerToStrip(emoji) {
-            if(boothImages.length === 0) { alert('Snap a photo first!'); return; }
-            const cW = 780; const cH = 2340;
-            // Randomly place sticker on the canvas
-            const x = 150 + Math.random() * (cW - 300);
-            const y = 150 + Math.random() * (cH - 300);
-            const size = 120 + Math.random() * 80;
-            const rot = (Math.random() - 0.5) * 0.8; // Random rotation
+        // --- STREAMING_CHUNK:Drawing the Live Preview Canvas ---
+        function updateLiveStrip() {
+            const config = templates[currentTemplate];
             
-            stripDecorations.push({ char: emoji, x, y, size, rot });
-            renderLiveStripPreview();
-        }
-
-        function updateBoothUI() {
-            const currentStripNum = savedStripsData.length + 1;
-            document.getElementById('boothCounter').innerText = boothImages.length;
-            document.getElementById('completedStripsCount').innerText = savedStripsData.length;
+            document.getElementById('boothCounter').innerText = photos.length;
             
-            const mobileIndicator = document.getElementById('mobileStripIndicator');
-            if(mobileIndicator) {
-                mobileIndicator.innerText = `Strip ${currentStripNum} • Photo ${boothImages.length}/${requiredBoothPhotos}`;
+            if (photos.length === 0) {
+                liveCanvas.classList.add('hidden');
+                liveEmpty.classList.remove('hidden');
+                document.getElementById('btnSaveStrip').disabled = true;
+                document.getElementById('btnSaveStrip').innerHTML = `Fill slots to save... <i class="ph-bold ph-lock"></i>`;
+                document.getElementById('btnSaveStrip').classList.add('opacity-50');
+                return;
             }
 
-            const copyWrapperText = document.getElementById('stripCopiesLabel');
-            if (copyWrapperText) {
-                copyWrapperText.innerText = `Duplicate Strip #${currentStripNum}:`;
-            }
+            liveCanvas.classList.remove('hidden');
+            liveEmpty.classList.add('hidden');
 
-            const scrollHint = document.getElementById('scrollHint');
-            if (scrollHint && boothImages.length > 0 && boothImages.length < requiredBoothPhotos) {
-                scrollHint.style.opacity = '1';
-                setTimeout(() => { scrollHint.style.opacity = '0'; }, 2000);
-            }
-            
-            renderLiveStripPreview();
-
+            const isFull = photos.length === maxPhotos;
             const btnSave = document.getElementById('btnSaveStrip');
-            const copyWrapper = document.getElementById('stripCopiesWrapper');
-            if(boothImages.length === requiredBoothPhotos) {
+            
+            if (isFull) {
                 btnSave.disabled = false;
-                btnSave.innerHTML = `Save Strip #${currentStripNum} & Next <i class="ph-bold ph-arrow-right"></i>`;
-                btnSave.classList.remove('opacity-50');
-                btnSave.classList.replace('bg-black', 'bg-brand-cyan');
-                btnSave.classList.replace('text-brand-yellow', 'text-black');
-                document.getElementById('boothStickerPalette').classList.remove('hidden');
-                if(copyWrapper) copyWrapper.classList.remove('hidden');
+                btnSave.innerHTML = `Save this Strip ✨`;
+                btnSave.classList.remove('opacity-50', 'bg-black');
+                btnSave.classList.add('bg-brand-magenta', 'text-white', 'animate-pulse');
             } else {
                 btnSave.disabled = true;
-                btnSave.innerHTML = `Fill slots to save... <i class="ph-bold ph-lock"></i>`;
-                btnSave.classList.add('opacity-50');
-                btnSave.classList.replace('bg-brand-cyan', 'bg-black');
-                btnSave.classList.replace('text-black', 'text-brand-yellow');
-                document.getElementById('boothStickerPalette').classList.add('hidden');
-                if(copyWrapper) copyWrapper.classList.add('hidden');
+                btnSave.innerHTML = `Take ${maxPhotos - photos.length} more... <i class="ph-bold ph-camera"></i>`;
+                btnSave.classList.add('opacity-50', 'bg-black');
+                btnSave.classList.remove('bg-brand-magenta', 'text-white', 'animate-pulse');
             }
 
-            const btnCheckout = document.getElementById('btnCheckoutStrips');
-            if (savedStripsData.length >= 4) {
-                btnCheckout.classList.remove('hidden');
-            } else {
-                btnCheckout.classList.add('hidden');
-            }
-        }
+            // Canvas Drawing Logic
+            const photoAspect = 4/3; // Standardize to landscape for slots
+            const slotWidth = 400;
+            const slotHeight = slotWidth / photoAspect;
+            
+            liveCanvas.width = slotWidth + (config.padding * 2);
+            // Calculate total height needed based on slots and gaps
+            const totalPhotosHeight = (slotHeight * config.slots) + (config.gap * (config.slots - 1));
+            const bottomTextSpace = 80; // Space for logo/text at bottom
+            liveCanvas.height = config.padding + totalPhotosHeight + bottomTextSpace;
 
-        function loadImageObj(src) {
-            return new Promise((resolve, reject) => {
+            // Draw Background
+            liveCtx.fillStyle = config.bg;
+            liveCtx.fillRect(0, 0, liveCanvas.width, liveCanvas.height);
+
+            // Draw Photos
+            let loadedCount = 0;
+            
+            photos.forEach((src, index) => {
                 const img = new Image();
-                img.crossOrigin = "Anonymous"; 
-                img.onload = () => resolve(img);
-                img.onerror = () => reject(new Error(`Failed to load image`));
+                img.onload = () => {
+                    const yPos = config.padding + (index * (slotHeight + config.gap));
+                    
+                    // Simple cover crop implementation for canvas
+                    const hRatio = slotWidth / img.width;
+                    const vRatio = slotHeight / img.height;
+                    const ratio = Math.max(hRatio, vRatio);
+                    const centerShift_x = (slotWidth - img.width*ratio) / 2;
+                    const centerShift_y = (slotHeight - img.height*ratio) / 2;  
+
+                    // Create clipping path for rounded corners on inner images
+                    liveCtx.save();
+                    liveCtx.beginPath();
+                    liveCtx.roundRect(config.padding, yPos, slotWidth, slotHeight, 8);
+                    liveCtx.clip();
+                    
+                    liveCtx.drawImage(img, 0,0, img.width, img.height,
+                                      config.padding + centerShift_x, yPos + centerShift_y, 
+                                      img.width*ratio, img.height*ratio);
+                    liveCtx.restore();
+
+                    loadedCount++;
+                    if (loadedCount === photos.length) drawStripFooter(config);
+                };
                 img.src = src;
             });
+
+            // Fallback for empty slots
+            if (photos.length < config.slots) {
+                liveCtx.fillStyle = config.bg === '#111111' ? '#333' : '#e5e7eb';
+                for (let i = photos.length; i < config.slots; i++) {
+                    const yPos = config.padding + (i * (slotHeight + config.gap));
+                    liveCtx.beginPath();
+                    liveCtx.roundRect(config.padding, yPos, slotWidth, slotHeight, 8);
+                    liveCtx.fill();
+                }
+                drawStripFooter(config); // Ensure footer draws even if no photos yet
+            }
         }
 
-        async function renderLiveStripPreview() {
-            const canvas = document.getElementById('liveStripCanvas');
-            const emptyState = document.getElementById('liveStripEmpty');
+        function drawStripFooter(config) {
+            liveCtx.fillStyle = config.txtColor;
+            liveCtx.font = "bold 24px 'Space Grotesk', sans-serif";
+            liveCtx.textAlign = "center";
+            liveCtx.fillText(config.text, liveCanvas.width / 2, liveCanvas.height - 30);
             
-            emptyState.classList.add('hidden');
-            canvas.classList.remove('hidden');
-            
-            const cW = 780;
-            const cH = 2340;
-            canvas.width = cW;
-            canvas.height = cH;
-            const ctx = canvas.getContext('2d');
-            const tmpl = document.getElementById('boothTemplate').value;
+            liveCtx.font = "bold 12px Inter, sans-serif";
+            liveCtx.fillText("deluluprinter.xyz", liveCanvas.width / 2, liveCanvas.height - 12);
+        }
 
-            if (tmpl === 'kitty-3' || tmpl === 'kitty-4') {
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, cW, cH);
-                const isK4 = tmpl === 'kitty-4';
-                
-                // Adjusted precise positioning for Hello Kitty frames
-                const padX = isK4 ? 45 : 50; 
-                const slotW = isK4 ? 690 : cW - (padX * 2); 
-                const slotH = isK4 ? 460 : 650; // Shorter height for 4-pic to allow bottom graphic room
-                const startY = isK4 ? 80 : 100; 
-                const gapY = isK4 ? 25 : 80;
-                const photoCount = isK4 ? 4 : 3;
-                
-                let currentY = startY;
-                for(let i=0; i<photoCount; i++) {
-                    if (i < boothImages.length) {
-                        const img = await loadImageObj(boothImages[i]);
-                        const scale = Math.max(slotW / img.width, slotH / img.height);
-                        const drawW = img.width * scale;
-                        const drawH = img.height * scale;
-                        const ox = (slotW - drawW) / 2;
-                        const oy = (slotH - drawH) / 2;
-
-                        ctx.save();
-                        ctx.beginPath();
-                        ctx.rect(padX, currentY, slotW, slotH);
-                        ctx.clip();
-                        ctx.drawImage(img, padX + ox, currentY + oy, drawW, drawH);
-                        ctx.restore();
-                    } else {
-                        ctx.fillStyle = '#e2e8f0';
-                        ctx.fillRect(padX, currentY, slotW, slotH);
-                    }
-                    currentY += slotH + gapY;
-                }
-                
-                try {
-                    const frameUrl = isK4 ? 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/hello%20kitty%204%20pic.png' : 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/Hello_Kitty_Frame.png';
-                    const frameImg = await loadImageObj(frameUrl);
-                    ctx.drawImage(frameImg, 0, 0, cW, cH);
-                } catch(e) { }
-            } else {
-                if (tmpl === 'black-4') ctx.fillStyle = '#111111';
-                else if (tmpl === 'pink-4') ctx.fillStyle = '#fbcfe8'; 
-                else ctx.fillStyle = '#ffffff'; 
-                ctx.fillRect(0, 0, cW, cH);
-
-                const padX = 40; 
-                const slotW = 700; 
-                const gapY = tmpl === 'minimal-3' ? 60 : 30;
-                const startY = 40; 
-                const slotH = tmpl === 'minimal-3' ? 710 : 540; 
-                
-                let currentY = startY;
-
-                for(let i=0; i<requiredBoothPhotos; i++) {
-                    if (i < boothImages.length) {
-                        const img = await loadImageObj(boothImages[i]);
-                        const scale = Math.max(slotW / img.width, slotH / img.height);
-                        const drawW = img.width * scale;
-                        const drawH = img.height * scale;
-                        const ox = (slotW - drawW) / 2;
-                        const oy = (slotH - drawH) / 2;
-
-                        ctx.save();
-                        ctx.beginPath();
-                        ctx.rect(padX, currentY, slotW, slotH);
-                        ctx.clip();
-                        ctx.drawImage(img, padX + ox, currentY + oy, drawW, drawH);
-                        ctx.restore();
-                    } else {
-                        ctx.fillStyle = '#e2e8f0';
-                        ctx.fillRect(padX, currentY, slotW, slotH);
-                    }
-
-                    ctx.lineWidth = 6;
-                    ctx.strokeStyle = tmpl === 'black-4' ? '#ffffff' : '#111111';
-                    ctx.strokeRect(padX, currentY, slotW, slotH);
-
-                    currentY += slotH + gapY;
-                }
-            }
-
-            // Draw post-capture decorations
-            stripDecorations.forEach(dec => {
-                ctx.save();
-                ctx.translate(dec.x, dec.y);
-                ctx.rotate(dec.rot);
-                ctx.font = `${dec.size}px Arial`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(dec.char, 0, 0);
-                ctx.restore();
-            });
+        // --- STREAMING_CHUNK:Finalizing Photobooth Save and Checkout ---
+        function clearBooth() {
+            photos = [];
+            updateLiveStrip();
         }
 
         function saveCurrentStrip() {
-            if(boothImages.length < requiredBoothPhotos) return;
-            const btn = document.getElementById('btnSaveStrip');
-            btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin"></i> Saving...`;
+            if (photos.length < maxPhotos) return;
+            
+            // In a real app, we'd save this to an array to batch download.
+            // Here, we simulate adding to a "cart"
+            savedStrips++;
+            document.getElementById('completedStripsCount').innerText = savedStrips;
+            
+            showToast(`Strip #${savedStrips} added! Make 4 for the ₹80 deal.`);
+            
+            // Trigger download of this specific strip for the user
+            const link = document.createElement('a');
+            link.download = `delulu-strip-${savedStrips}.jpg`;
+            link.href = liveCanvas.toDataURL('image/jpeg', 0.9);
+            link.click();
 
-            const canvas = document.getElementById('liveStripCanvas');
-            const finalBase64 = canvas.toDataURL('image/jpeg', 0.9);
-            
-            const copiesInput = document.getElementById('stripCopies');
-            const copies = copiesInput ? parseInt(copiesInput.value) : 1;
-            
-            for(let i=0; i<copies; i++) {
-                savedStripsData.push(finalBase64);
+            // Reveal Checkout button if they meet the minimum criteria
+            if (savedStrips >= 1) {
+                document.getElementById('btnCheckoutStrips').classList.remove('hidden');
             }
+
+            // Reset for next strip
+            clearBooth();
             
-            boothImages.forEach(img => allRawBoothImages.push(img));
-            boothImages = [];
-            stripDecorations = [];
-            if(copiesInput) copiesInput.value = 1; // Reset copies back to 1
-            updateBoothUI();
+            // Update UI indicator
+            document.getElementById('mobileStripIndicator').innerText = `Strip ${savedStrips + 1} • Photo 0/${maxPhotos}`;
         }
 
-        async function checkoutPhotobooth() {
-            if (savedStripsData.length < 4) {
-                alert("Please build at least 4 strips!");
-                return;
-            }
-            stopCamera();
-            
-            const compW = 3508;
-            const compH = 2480;
-            const compCanvas = document.createElement('canvas');
-            compCanvas.width = compW;
-            compCanvas.height = compH;
-            const compCtx = compCanvas.getContext('2d');
-            compCtx.fillStyle = '#ffffff';
-            compCtx.fillRect(0, 0, compW, compH);
-            
-            const numStrips = Math.min(savedStripsData.length, 4); 
-            const stripW = 780;
-            const stripH = 2340;
-            const totalW = numStrips * stripW;
-            const gap = (compW - totalW) / (numStrips + 1);
-            const startY = (compH - stripH) / 2;
-            
-            for(let i=0; i<numStrips; i++) {
-                const sImg = await loadImageObj(savedStripsData[i]);
-                const startX = gap + i * (stripW + gap);
-                compCtx.drawImage(sImg, startX, startY, stripW, stripH);
-            }
-            
-            window.compiledA4Base64 = compCanvas.toDataURL('image/jpeg', 0.95);
-
-            currentMode = 'photobooth';
-            if(hubVibeSelect) hubVibeSelect.value = 'photobooth';
-            if(hubQty) { hubQty.value = savedStripsData.length; hubQty.disabled = true; }
-            
-            orderPreviewImg.src = window.compiledA4Base64; 
-            orderPreviewSection.classList.remove('hidden');
-
-            orderActionButtons.innerHTML = `
-                <button onclick="checkDeluluAndSend(pendingWaMessage || 'Hey, checking out a photobooth order!')" id="waNotifyBtn" class="brutal-btn bg-brand-green text-white w-full py-4 rounded-3xl font-black text-xl flex items-center justify-center gap-2 hover:bg-[#1fbc5b]">
-                    <i class="ph-bold ph-whatsapp text-2xl"></i> Notify on WhatsApp
-                </button>
-            `;
-
-            if(customerUploadBox) customerUploadBox.classList.remove('hidden');
-
-            calculateHubTotal();
-            newFunFact();
-            goToView('view-order');
-        }
-
-        // --- ENCRYPTED BACKUP LOGIC (iOS Compatible + Share API) ---
-        function downloadEncryptedBackup() {
-            const srcToDownload = window.compiledA4Base64 || document.getElementById('previewImg').src;
-            if (!srcToDownload || !srcToDownload.startsWith('data:')) {
-                alert("Nothing to download yet!");
-                return;
-            }
-
-            const btn = document.getElementById('btnEncDownload');
-            const origText = btn.innerHTML;
-            btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin"></i> Encrypting...`;
-            btn.disabled = true;
-
-            const img = new Image();
-            img.crossOrigin = "Anonymous";
-            img.onload = function() {
-                setTimeout(() => {
-                    const canvas = document.createElement('canvas');
-                    const bannerHeight = 250; 
-                    canvas.width = img.width;
-                    canvas.height = img.height + bannerHeight;
-                    const ctx = canvas.getContext('2d');
-                    
-                    ctx.drawImage(img, 0, 0);
-
-                    const imgData = ctx.getImageData(0, 0, img.width, img.height);
-                    const data = imgData.data;
-                    
-                    // Advanced Encryption: Color Inversion + Channel-specific XOR
-                    // PYTHON DECRYPTION GUIDE FOR SARUP:
-                    // img = Image.open("encrypted_backup.jpg").convert('RGB')
-                    // img = img.crop((0, 0, img.width, img.height - 250)) # Crop banner
-                    // arr = np.array(img)
-                    // arr[:,:,0] = 255 - arr[:,:,0] ^ 213
-                    // arr[:,:,1] = 255 - arr[:,:,1] ^ 87
-                    // arr[:,:,2] = 255 - arr[:,:,2] ^ 142
-                    // Image.fromarray(arr).save("decrypted.jpg")
-                    
-                    const KEY_R = 213;
-                    const KEY_G = 87;
-                    const KEY_B = 142;
-
-                    for (let i = 0; i < data.length; i += 4) {
-                        data[i] = 255 - (data[i] ^ KEY_R);         
-                        data[i + 1] = 255 - (data[i + 1] ^ KEY_G); 
-                        data[i + 2] = 255 - (data[i + 2] ^ KEY_B); 
-                    }
-                    
-                    ctx.putImageData(imgData, 0, 0);
-
-                    // Croppable Banner
-                    ctx.fillStyle = "#ffffff";
-                    ctx.fillRect(0, img.height, canvas.width, bannerHeight);
-                    
-                    ctx.setLineDash([15, 15]);
-                    ctx.lineWidth = 4;
-                    ctx.strokeStyle = "#94a3b8";
-                    ctx.beginPath();
-                    ctx.moveTo(0, img.height + 2);
-                    ctx.lineTo(canvas.width, img.height + 2);
-                    ctx.stroke();
-                    
-                    ctx.setLineDash([]);
-                    ctx.fillStyle = "#64748b";
-                    ctx.font = 'bold 24px "Space Grotesk", sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.fillText("✂️ --- CROP HERE BEFORE DECRYPTING --- ✂️", canvas.width / 2, img.height + 45);
-                    
-                    ctx.fillStyle = "#111111";
-                    ctx.font = 'bold 45px "Inter", sans-serif';
-                    ctx.fillText("Relax and send this to us! ✨", canvas.width / 2, img.height + 120);
-                    
-                    ctx.fillStyle = "#475569";
-                    ctx.font = '600 30px "Inter", sans-serif';
-                    ctx.fillText("We will decrypt and print the correct high-res picture.", canvas.width / 2, img.height + 175);
-                    ctx.fillText("This locks your privacy so no one else can view or steal it.", canvas.width / 2, img.height + 220);
-
-                    const encryptedBase64 = canvas.toDataURL('image/jpeg', 0.95);
-
-                    // Web Share API & Download logic (Fix for iPhone)
-                    async function triggerSaveAndWA() {
-                        btn.innerHTML = `<i class="ph-bold ph-check"></i> Backup Ready!`;
-                        btn.classList.replace('bg-white', 'bg-brand-green');
-                        btn.classList.replace('text-black', 'text-white');
-                        btn.disabled = false;
-
-                        const name = document.getElementById('customerName') ? document.getElementById('customerName').value.trim() : "Anonymous";
-                        const typeName = productsData[currentMode] ? productsData[currentMode].name : currentMode;
-                        let msg = `Heyy! ✨\n\nI created a *${typeName}* order online.\n\nEstimated damage is ₹${originalTotal}${discountApplied ? ' (got that 15% OFF! 🎉)' : ''}.\n\n*Name:* ${name}\n`;
-                        msg += `\n📍 I'm ordering from deluluprinter.xyz!\n`;
-                        msg += `\nI am sending you the downloaded Encrypted Backup file along with this text... 🚀`;
-                        
-                        pendingWaMessage = msg;
-
-                        try {
-                            const blob = await (await fetch(encryptedBase64)).blob();
-                            const file = new File([blob], `Artevia_Encrypted_${Math.floor(1000 + Math.random() * 9000)}.jpg`, { type: 'image/jpeg' });
-                            
-                            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                                await navigator.share({
-                                    files: [file],
-                                    title: 'Encrypted Print Backup',
-                                    text: 'My encrypted print file for Delulu Printer'
-                                });
-                                // User successfully shared/saved. Update main CTA
-                                const waBtn = document.getElementById('waNotifyBtn');
-                                if(waBtn) waBtn.classList.add('animate-bounce');
-                            } else {
-                                throw new Error("Share API not supported");
-                            }
-                        } catch (err) {
-                            // Fallback for Desktop/Android
-                            const link = document.createElement('a');
-                            link.download = `Artevia_Encrypted_${Math.floor(1000 + Math.random() * 9000)}.jpg`;
-                            link.href = encryptedBase64;
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                            
-                            alert("Backup downloaded! Please attach this image when you message us on WhatsApp.");
-                        }
-
-                        // Update main button to clearly prompt the WhatsApp step
-                        const actionDiv = document.getElementById('orderActionButtons');
-                        actionDiv.innerHTML = `
-                            <button onclick="checkDeluluAndSend(pendingWaMessage)" class="brutal-btn bg-brand-green text-white w-full py-5 rounded-3xl font-black text-xl flex items-center justify-center gap-2 animate-pulse hover:bg-[#1fbc5b]">
-                                <i class="ph-bold ph-whatsapp text-3xl"></i> Continue to WhatsApp
-                            </button>
-                        `;
-                    }
-                    
-                    triggerSaveAndWA();
-                }, 50);
-            };
-            img.src = srcToDownload;
-        }
-
-
-        // --- SECURE CLOUD UPLOAD (GITHUB) ---
-        async function executeSecureUpload() {
-            if (!GITHUB_CONFIG.token) {
-                alert('Upload failed: Missing server authorization. Please use the "Download Encrypted Backup" option below instead!');
+        function checkoutPhotobooth() {
+            if (savedStrips === 0) {
+                showToast("Build and save at least 1 strip first!");
                 return;
             }
             
-            const name = document.getElementById('customerName').value.trim() || 'Anonymous';
-            currentOrderRef = 'ORD' + Math.floor(1000 + Math.random() * 9000);
+            let message = `Hey! 📸 I just designed some Photobooth Strips on your site.\n\n`;
+            message += `🎞️ *Total Strips Built:* ${savedStrips}\n`;
             
-            const btn = document.getElementById('btnSecureUpload');
-            btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin text-xl"></i> Securing & Uploading...`;
-            btn.disabled = true;
-
-            const cleanName = name.replace(/[^a-zA-Z0-9]/g, '_');
-            const folderName = `${cleanName}_${currentOrderRef}`;
-
-            try {
-                if(window.compiledA4Base64 || (document.getElementById('previewImg') && document.getElementById('previewImg').src.startsWith('data:'))) {
-                    const sheetBase64 = window.compiledA4Base64 || document.getElementById('previewImg').src;
-                    await uploadFileToGitHub(GITHUB_CONFIG.token, folderName, 'A4_Print_Sheet.jpg', sheetBase64);
-                }
-
-                const imagesToUpload = currentMode === 'photobooth' ? allRawBoothImages : globalImages;
-                for(let i=0; i<imagesToUpload.length; i++) {
-                    let base64Data = imagesToUpload[i];
-                    if (base64Data instanceof Image) {
-                        const tempC = document.createElement('canvas');
-                        tempC.width = base64Data.width;
-                        tempC.height = base64Data.height;
-                        tempC.getContext('2d').drawImage(base64Data, 0, 0);
-                        base64Data = tempC.toDataURL('image/jpeg', 0.9);
-                    }
-                    await uploadFileToGitHub(GITHUB_CONFIG.token, folderName, `raw_photo_${i+1}.jpg`, base64Data);
-                }
-                
-                btn.innerHTML = `Upload Successful! <i class="ph-bold ph-check text-xl"></i>`;
-                btn.classList.replace('bg-black', 'bg-brand-green');
-                btn.classList.replace('text-white', 'text-black');
-
-                const typeName = productsData[currentMode] ? productsData[currentMode].name : currentMode;
-                const qty = hubQty ? hubQty.value : 1;
-                const notes = hubNotes ? hubNotes.value.trim() : '';
-                let msg = `Heyy! ✨\n\nI just finished designing a *${typeName}* order online!\n\nEstimated damage is ₹${originalTotal}${discountApplied ? ' (got that 15% OFF! 🎉)' : ''}.\n\n*Name:* ${name}\n*Order ID:* ${currentOrderRef}\n`;
-                if (notes) msg += `\n*Notes:* ${notes}\n`;
-                msg += `\n📍 I'm ordering from deluluprinter.xyz!\n`;
-                msg += `\nI have securely uploaded the files to the cloud. You can pull them using my Order ID! 🚀`;
-                pendingWaMessage = msg;
-
-            } catch (err) {
-                console.error("Upload failed", err);
-                btn.innerHTML = `Upload Timeout - Please Download Backup`;
-                btn.classList.replace('bg-black', 'bg-red-500');
-                btn.disabled = false;
-            }
-        }
-
-        async function uploadFileToGitHub(token, folder, filename, base64Data) {
-            const content = base64Data.split(',')[1];
-            const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/orders/${folder}/${filename}`;
-            const response = await fetch(url, {
-                method: 'PUT',
-                headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: `Secure Upload ${filename}`, content: content, branch: GITHUB_CONFIG.branch })
-            });
-            if(!response.ok) throw new Error(await response.text());
-        }
-
-        // --- STEP 1 -> 2: SELECT PRODUCT TO ORDER HUB ---
-        function selectProduct(mode) {
-            if (mode === 'photobooth') {
-                openPhotobooth();
-                return;
-            }
-
-            currentMode = mode;
-            if(hubVibeSelect) hubVibeSelect.value = mode;
-            if(orderPreviewSection) orderPreviewSection.classList.add('hidden');
-            if(customerUploadBox) customerUploadBox.classList.add('hidden');
-            if(hubQty) hubQty.disabled = false; 
-            
-            orderActionButtons.innerHTML = `
-                <button onclick="handleProceed()" class="brutal-btn bg-black text-white w-full py-5 rounded-3xl font-black text-xl flex items-center justify-center gap-2">
-                    Continue to Format <i class="ph-bold ph-arrow-right"></i>
-                </button>
-            `;
-
-            calculateHubTotal();
-            newFunFact();
-            goToView('view-order');
-        }
-
-        // --- ORDER HUB (Estimator) ---
-        function calculateHubTotal() {
-            if(!hubVibeSelect || !hubQty || !hubQtyLabel || !hubTotalOutput) return;
-            
-            const vibe = hubVibeSelect.value;
-            currentMode = vibe;
-            const qty = parseInt(hubQty.value) || 0;
-
-            // Handle Add-ons Visibility
-            const addonsSection = document.getElementById('addonsSection');
-            const sprayAddon = document.getElementById('sprayAddon');
-            const vinylAddon = document.getElementById('vinylAddon');
-            
-            let isSticker = vibe.includes('sticker');
-            let isPrint = !isSticker && !vibe.includes('apparel') && vibe !== 'photobooth' && vibe !== 'maps' && vibe !== 'notes';
-
-            if (isSticker || isPrint) {
-                addonsSection.classList.remove('hidden');
-                sprayAddon.classList.toggle('hidden', !isSticker);
-                vinylAddon.classList.toggle('hidden', !isPrint);
-                
-                // Clear checkboxes if hidden to avoid hidden charges
-                if(!isSticker) document.getElementById('chkSpray').checked = false;
-                if(!isPrint) document.getElementById('chkVinyl').checked = false;
+            // Simple pricing logic: 4 strips for 80. Additional strips 20 each. 
+            // If less than 4, it's 25 each.
+            let price = 0;
+            if (savedStrips >= 4) {
+                price = 80 + ((savedStrips - 4) * 20);
             } else {
-                addonsSection.classList.add('hidden');
-                document.getElementById('chkSpray').checked = false;
-                document.getElementById('chkVinyl').checked = false;
+                price = savedStrips * 25;
             }
+
+            message += `💰 *Estimated Total: ₹${price}*\n\n`;
+            message += `I have downloaded them to my device and will send them to you right now! ✨`;
+
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/919907488075?text=${encodedMessage}`;
             
-            if (vibe === 'photobooth') {
-                hubQtyLabel.textContent = "Total Strips Created (₹80 for every 4)";
-            } else if (vibe === 'polaroid' || vibe === 'passport' || vibe === 'sticker_passport') {
-                hubQtyLabel.textContent = "How many sets (9 copies per set)?";
-            } else if (vibe === 'maps' || vibe.includes('apparel')) {
-                hubQtyLabel.textContent = "How many items/copies do you need?";
-            } else {
-                hubQtyLabel.textContent = "How many pages do you need?";
-            }
-
-            let baseTotal = 0;
-            if (vibe === 'photobooth') {
-                // Minimum ₹80, allows combinations of 4
-                baseTotal = Math.ceil(qty / 4) * 80;
-                if(qty > 0 && qty < 4) baseTotal = 80; // Enforce minimum
-            } else if (vibe === 'maps') {
-                if (qty >= 100) baseTotal = Math.floor(qty/100)*350 + (qty%100)*5;
-                else if (qty >= 10) baseTotal = Math.floor(qty/10)*40 + (qty%10)*5;
-                else baseTotal = qty * prices.maps;
-            } else {
-                baseTotal = qty * prices[vibe];
-            }
-
-            // Apply Add-ons Cost
-            if (document.getElementById('chkSpray').checked) baseTotal += (10 * qty);
-            if (document.getElementById('chkVinyl').checked) baseTotal += (40 * qty);
-
-            discountApplied = false;
-            let finalTotal = baseTotal;
-            let htmlOutput = "";
-
-            if (baseTotal >= 500) {
-                discountApplied = true;
-                finalTotal = baseTotal - Math.floor(baseTotal * 0.15);
-                originalTotal = finalTotal; 
-                htmlOutput = `
-                    <div class="flex flex-col items-end">
-                        <span class="text-sm line-through text-gray-400">₹${baseTotal}</span>
-                        <span class="text-[10px] font-black text-brand-magenta">15% OFF! 🎉</span>
-                        <span class="font-black text-4xl text-brand-green leading-none">₹${finalTotal}</span>
-                    </div>
-                `;
-            } else {
-                originalTotal = baseTotal;
-                htmlOutput = `<span class="font-black text-4xl text-brand-green leading-none">₹${baseTotal}</span>`;
-            }
-            
-            calculatedPages = qty;
-            hubTotalOutput.innerHTML = htmlOutput;
+            window.open(whatsappUrl, '_blank');
+            showToast("Opening WhatsApp... Don't forget to attach your downloaded strips! 🚀");
         }
-
-        function handleProceed() {
-            if (originalTotal === 0) { alert('Please enter a valid quantity!'); return; }
-            
-            const name = customerNameInput ? customerNameInput.value.trim() : "";
-            if (!name) {
-                alert("Please enter your name for the order before continuing!");
-                customerNameInput.focus();
-                return;
-            }
-
-            const vibe = currentMode;
-            if (!productsData[vibe] || !productsData[vibe].hasStudio) {
-                sendLazyWhatsApp();
-            } else {
-                goToView('view-fork');
-            }
-        }
-
-        // --- WHATSAPP REDIRECT LOGIC ---
-        function checkDeluluAndSend(message) {
-            if (originalTotal >= 100) {
-                pendingWaMessage = message;
-                const popup = document.getElementById('delulu-popup');
-                if(popup) {
-                    popup.classList.remove('hidden');
-                    popup.classList.add('flex');
-                    setTimeout(() => {
-                        const innerBox = popup.querySelector('div');
-                        if(innerBox) {
-                            innerBox.classList.remove('scale-95', 'opacity-0');
-                            innerBox.classList.add('scale-100', 'opacity-100');
-                        }
-                    }, 10);
-                } else {
-                    triggerWhatsApp(message);
-                }
-            } else {
-                triggerWhatsApp(message);
-            }
-        }
-
-        const btnAccept = document.getElementById('btn-accept-delulu');
-        if(btnAccept) {
-            btnAccept.addEventListener('click', () => {
-                document.getElementById('delulu-popup').classList.add('hidden');
-                let msg = pendingWaMessage + `\n\n🎟 *YES! I'm interested in the FREE Delulu Card! Put me in the system!* 💳✨`;
-                triggerWhatsApp(msg);
-            });
-        }
-
-        const btnDecline = document.getElementById('btn-decline-delulu');
-        if(btnDecline) {
-            btnDecline.addEventListener('click', () => {
-                document.getElementById('delulu-popup').classList.add('hidden');
-                triggerWhatsApp(pendingWaMessage);
-            });
-        }
-
-        function triggerWhatsApp(message) {
-            const url = `https://wa.me/919907488075?text=${encodeURIComponent(message)}`;
-            if(toast) {
-                toast.classList.remove('hidden');
-                toast.classList.add('toast-enter');
-                if(countdownEl) countdownEl.textContent = "Redirecting";
-            }
-            setTimeout(() => {
-                window.location.href = url;
-            }, 100);
-        }
-
-        // --- PATH: LAZY WA ---
-        function sendLazyWhatsApp() {
-            if (originalTotal === 0) { alert('Please enter a valid quantity!'); return; }
-            
-            const name = customerNameInput ? customerNameInput.value.trim() : "Anonymous";
-            const typeName = productsData[currentMode] ? productsData[currentMode].name : currentMode;
-            const qty = hubQty ? hubQty.value : 1;
-            const notes = hubNotes ? hubNotes.value.trim() : '';
-            const qtyLabel = (currentMode === 'polaroid' || currentMode === 'maps' || (currentMode && currentMode.includes('apparel'))) ? 'items/copies' : ((currentMode && currentMode.includes('passport')) ? 'sets' : 'pages');
-
-            // Gather Add-ons
-            let addons = [];
-            if(document.getElementById('chkSpray').checked) addons.push("Protection Spray");
-            if(document.getElementById('chkVinyl').checked) addons.push("Plastic Vinyl");
-
-            let msg = `Heyy! ✨\n\nI need ${qty} ${qtyLabel} of *${typeName}*.\n\nEstimated damage is ₹${originalTotal}${discountApplied ? ' (got that 15% OFF! 🎉)' : ''}.\n\n*Name:* ${name}\n`;
-            
-            if(addons.length > 0) msg += `*Add-ons:* ${addons.join(', ')}\n`;
-            if (notes) msg += `\n*Notes:* ${notes}\n`;
-            msg += `\n📍 I'm ordering from deluluprinter.xyz!\n`;
-            msg += `\nHere are my photos/files... 🚀`;
-
-            checkDeluluAndSend(msg);
-        }
-
-        // --- PATH: MAGIC STUDIO ---
-        function goToStudio() {
-            const vibe = currentMode;
-            
-            if (vibe === 'notes') {
-                if(imageUploadArea) imageUploadArea.classList.add('hidden');
-                if(textUploadArea) textUploadArea.classList.remove('hidden');
-                if(orientationSelect) orientationSelect.value = 'portrait';
-                if(orientationWrapper) orientationWrapper.classList.add('hidden');
-                if(stickerOptions) stickerOptions.classList.add('hidden');
-                if(polaroidOptions) polaroidOptions.classList.add('hidden');
-            } else {
-                if(imageUploadArea) imageUploadArea.classList.remove('hidden');
-                if(textUploadArea) textUploadArea.classList.add('hidden');
-                if(orientationWrapper) orientationWrapper.classList.remove('hidden');
-                
-                if (vibe === 'stickers') {
-                    if(stickerOptions) stickerOptions.classList.remove('hidden');
-                } else {
-                    if(stickerOptions) stickerOptions.classList.add('hidden');
-                }
-
-                if (vibe === 'polaroid') {
-                    if(polaroidOptions) polaroidOptions.classList.remove('hidden');
-                    if(orientationSelect) {
-                        orientationSelect.value = 'portrait'; 
-                        orientationSelect.disabled = true; 
-                    }
-                } else {
-                    if(polaroidOptions) polaroidOptions.classList.add('hidden');
-                    if(orientationSelect) orientationSelect.disabled = false;
-                }
-            }
-
-            goToView('view-studio');
-        }
-
-        // --- STUDIO CANVAS ENGINE ---
-        if(imageInput) {
-            imageInput.addEventListener('change', async () => {
-                const files = Array.from(imageInput.files);
-                if (files.length === 0) return;
-
-                if(uploadLoading) uploadLoading.classList.remove('hidden');
-                if(addImagesLabel) addImagesLabel.classList.add('opacity-50', 'pointer-events-none');
-                if(generateBtn) generateBtn.classList.add('opacity-50', 'pointer-events-none');
-
-                try {
-                    for (let i = 0; i < files.length; i++) {
-                        const file = files[i];
-                        if(i % 2 === 0) newFunFact(); 
-
-                        const img = await new Promise((resolve, reject) => {
-                            const reader = new FileReader();
-                            reader.onload = (e) => {
-                                const iObj = new Image();
-                                iObj.onload = () => resolve(iObj);
-                                iObj.onerror = () => reject(new Error("Image decode error"));
-                                iObj.src = e.target.result;
-                            };
-                            reader.onerror = () => reject(new Error("File read error"));
-                            reader.readAsDataURL(file);
-                        });
-                        globalImages.push(img);
-                    }
-                    
-                    if(fileCount) fileCount.textContent = `${globalImages.length} image(s) loaded`;
-                    if(clearImagesBtn) clearImagesBtn.classList.remove('hidden');
-                } catch (error) {
-                    alert("Error loading images. Please try again.");
-                } finally {
-                    imageInput.value = '';
-                    if(uploadLoading) uploadLoading.classList.add('hidden');
-                    if(addImagesLabel) addImagesLabel.classList.remove('opacity-50', 'pointer-events-none');
-                    if(generateBtn) generateBtn.classList.remove('opacity-50', 'pointer-events-none');
-                }
-            });
-        }
-
-        if(clearImagesBtn) {
-            clearImagesBtn.addEventListener('click', () => {
-                globalImages = [];
-                if(fileCount) fileCount.textContent = '0 images loaded';
-                clearImagesBtn.classList.add('hidden');
-                if(previewImg) previewImg.classList.add('hidden');
-                if(downloadBtn) downloadBtn.classList.add('hidden');
-                if(placeholderText) placeholderText.classList.remove('hidden');
-            });
-        }
-
-        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-            let words = text.split(' ');
-            let line = '';
-            for(let n = 0; n < words.length; n++) {
-                let testLine = line + words[n] + ' ';
-                let metrics = ctx.measureText(testLine);
-                if (metrics.width > maxWidth && n > 0) {
-                    ctx.fillText(line, x, y);
-                    line = words[n] + ' ';
-                    y += lineHeight;
-                } else {
-                    line = testLine;
-                }
-            }
-            ctx.fillText(line, x, y);
-            return y + lineHeight;
-        }
-
-        if(generateBtn) {
-            generateBtn.addEventListener('click', async () => {
-                if (currentMode !== 'notes' && globalImages.length === 0) {
-                    alert('Drop some photos first, bestie.'); return;
-                }
-                if (currentMode === 'notes' && (!notesInput || notesInput.value.trim().length === 0)) {
-                    alert('Type some tea first!'); return;
-                }
-
-                generateBtn.disabled = true;
-                if(loading) loading.classList.remove('hidden');
-                if(loadingOverlay) loadingOverlay.classList.remove('hidden');
-                if(previewImg) previewImg.classList.add('hidden');
-                if(placeholderText) placeholderText.classList.add('hidden');
-
-                try {
-                    await new Promise(r => setTimeout(r, 100)); // UI paint tick
-
-                    let isPortrait = orientationSelect ? orientationSelect.value === 'portrait' : true;
-                    if (currentMode === 'notes') isPortrait = true;
-
-                    const canvasW = isPortrait ? 2480 : 3508;
-                    const canvasH = isPortrait ? 3508 : 2480;
-
-                    const isPassport = (currentMode === 'passport' || currentMode === 'sticker_passport');
-                    const footerH = isPassport ? 0 : 350; 
-                    const printH = canvasH - footerH; 
-
-                    const canvas = document.createElement('canvas');
-                    canvas.width = canvasW;
-                    canvas.height = canvasH;
-                    const ctx = canvas.getContext('2d');
-
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(0, 0, canvasW, canvasH);
-                    ctx.imageSmoothingEnabled = true;
-                    ctx.imageSmoothingQuality = 'high';
-
-                    if (currentMode === 'notes') {
-                        ctx.fillStyle = '#000000';
-                        ctx.font = '50px "Inter", sans-serif';
-                        ctx.textBaseline = 'top';
-                        const textLines = notesInput.value.split('\n');
-                        let currentY = 150;
-                        const startX = 150;
-                        const maxW = canvasW - 300;
-                        
-                        textLines.forEach(line => {
-                            if (line.trim() === '') currentY += 50; 
-                            else currentY = wrapText(ctx, line, startX, currentY, maxW, 75);
-                        });
-
-                    } else if (isPassport) {
-                        const img = globalImages[0]; 
-                        const passW = 413; const passH = 531; 
-                        const cols = 3; const rows = 3;
-                        
-                        const targetRatio = passW / passH;
-                        const imgRatio = img.width / img.height;
-                        
-                        let sWidth = img.width, sHeight = img.height, sx = 0, sy = 0;
-                        if (imgRatio > targetRatio) {
-                            sWidth = img.height * targetRatio;
-                            sx = (img.width - sWidth) / 2;
-                        } else {
-                            sHeight = img.width / targetRatio;
-                            sy = (img.height - sHeight) / 2;
-                        }
-
-                        const gridW = (cols * passW) + ((cols - 1) * 60);
-                        const gridH = (rows * passH) + ((rows - 1) * 60);
-                        const startX = (canvasW - gridW) / 2; 
-                        const startY = 150; 
-
-                        for (let i = 0; i < 9; i++) {
-                            const col = i % cols; const row = Math.floor(i / cols);
-                            const dx = startX + col * (passW + 60);
-                            const dy = startY + row * (passH + 60);
-                            
-                            ctx.drawImage(img, sx, sy, sWidth, sHeight, dx, dy, passW, passH);
-                            ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 3;
-                            ctx.strokeRect(dx, dy, passW, passH);
-                        }
-
-                    } else if (currentMode === 'polaroid') {
-                        const cols = 3, rows = 3;
-                        const pStyle = polaroidStyleSelect ? polaroidStyleSelect.value : 'square';
-                        let frameW = 700; let frameH = 875; 
-                        if (pStyle === 'tall') frameH = 950;
-                        if (pStyle === 'wide') frameH = 750;
-
-                        const gapX = (canvasW - (cols * frameW)) / 4;
-                        const gapY = (printH - (rows * frameH)) / 4; 
-
-                        for(let i=0; i<Math.min(9, globalImages.length); i++) {
-                            const img = globalImages[i];
-                            const col = i % cols; const row = Math.floor(i / cols);
-                            const dx = gapX + col * (frameW + gapX);
-                            const dy = gapY + row * (frameH + gapY);
-
-                            ctx.fillStyle = '#ffffff'; ctx.fillRect(dx, dy, frameW, frameH);
-                            ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 2;
-                            ctx.strokeRect(dx-10, dy-10, frameW+20, frameH+20);
-
-                            let imgAreaW = 620;
-                            let imgAreaH = pStyle === 'tall' ? 720 : (pStyle === 'wide' ? 465 : 620);
-                            const margin = (frameW - imgAreaW) / 2;
-                            
-                            const targetRatio = imgAreaW / imgAreaH;
-                            const imgRatio = img.width / img.height;
-                            let sWidth = img.width, sHeight = img.height, sx = 0, sy = 0;
-                            if (imgRatio > targetRatio) {
-                                sWidth = img.height * targetRatio; sx = (img.width - sWidth) / 2;
-                            } else {
-                                sHeight = img.width / targetRatio; sy = (img.height - sHeight) / 2;
-                            }
-                            ctx.drawImage(img, sx, sy, sWidth, sHeight, dx + margin, dy + margin, imgAreaW, imgAreaH);
-                        }
-
-                    } else {
-                        const n = globalImages.length;
-                        let bestScore = 0; let bestC = 1, bestR = n;
-                        const gap = Math.floor(Math.min(canvasW, printH) * 0.03); 
-
-                        for (let c = 1; c <= n; c++) {
-                            let r = Math.ceil(n / c);
-                            let cellW = (canvasW - (gap * (c + 1))) / c;
-                            let cellH = (printH - (gap * (r + 1))) / r; 
-                            let score = 0;
-                            for (let img of globalImages) {
-                                let scale = Math.min(cellW / img.width, cellH / img.height);
-                                score += (img.width * scale) * (img.height * scale);
-                            }
-                            if (score > bestScore) { bestScore = score; bestC = c; bestR = r; }
-                        }
-
-                        const cellW = (canvasW - (gap * (bestC + 1))) / bestC;
-                        const cellH = (printH - (gap * (bestR + 1))) / bestR; 
-
-                        globalImages.forEach((img, i) => {
-                            const col = i % bestC; const row = Math.floor(i / bestC);
-                            const scale = Math.min(cellW / img.width, cellH / img.height);
-                            const drawW = img.width * scale * 0.95; 
-                            const drawH = img.height * scale * 0.95;
-                            const startX = gap + (col * (cellW + gap));
-                            const startY = gap + (row * (cellH + gap));
-                            const xOffset = startX + (cellW - drawW) / 2;
-                            const yOffset = startY + (cellH - drawH) / 2;
-                            ctx.drawImage(img, xOffset, yOffset, drawW, drawH);
-                        });
-                    }
-
-                    if (!isPassport) {
-                        const footerY = printH; 
-                        ctx.fillStyle = '#111111'; ctx.fillRect(0, footerY, canvasW, footerH);
-                        ctx.strokeStyle = '#FF00FF'; ctx.lineWidth = 10;
-                        ctx.beginPath(); ctx.moveTo(0, footerY); ctx.lineTo(canvasW, footerY); ctx.stroke();
-                        ctx.fillStyle = '#00FFFF'; ctx.textAlign = 'center';
-                        ctx.font = '900 60px "Space Grotesk", sans-serif';
-                        ctx.fillText("WALK INTO SHREERAJ HOSTEL FOR DEALS!", canvasW/2, footerY + 100);
-                        ctx.fillStyle = '#FFFFFF'; ctx.font = '700 40px "Inter", sans-serif';
-                        ctx.fillText("Order via deluluprinter.xyz  |  WhatsApp: 9907488075", canvasW/2, footerY + 200);
-                    }
-
-                    window.compiledA4Base64 = canvas.toDataURL('image/jpeg', 0.95);
-                    if(previewImg) {
-                        previewImg.src = window.compiledA4Base64;
-                        previewImg.classList.remove('hidden');
-                    }
-                    if(downloadBtn) {
-                        downloadBtn.href = window.compiledA4Base64;
-                        downloadBtn.classList.remove('hidden');
-                        downloadBtn.style.display = 'inline-flex';
-                    }
-
-                    if (window.innerWidth < 1024 && previewImg) previewImg.scrollIntoView({behavior: 'smooth', block: 'center'});
-
-                } catch (error) {
-                    alert('Error processing: ' + error.message);
-                    if(placeholderText) placeholderText.classList.remove('hidden');
-                } finally {
-                    if(generateBtn) generateBtn.disabled = false;
-                    if(loading) loading.classList.add('hidden');
-                    if(loadingOverlay) loadingOverlay.classList.add('hidden');
-                }
-            });
-        }
-
-        function checkoutStudio() {
-            if (globalImages.length === 0 && (!notesInput || notesInput.value.trim().length === 0)) {
-                alert('Generate a preview first!'); return;
-            }
-
-            const previewSrc = window.compiledA4Base64 || document.getElementById('previewImg').src;
-            orderPreviewImg.src = previewSrc; 
-            orderPreviewSection.classList.remove('hidden');
-
-            orderActionButtons.innerHTML = `
-                <button onclick="triggerWhatsApp(pendingWaMessage || 'Hey, checking out a studio order!')" id="waNotifyBtn" class="brutal-btn bg-brand-green text-white w-full py-4 rounded-3xl font-black text-xl flex items-center justify-center gap-2 hover:bg-[#1fbc5b]">
-                    <i class="ph-bold ph-whatsapp text-2xl"></i> Notify on WhatsApp
-                </button>
-            `;
-
-            if(customerUploadBox) customerUploadBox.classList.remove('hidden');
-
-            calculateHubTotal();
-            newFunFact();
-            goToView('view-order');
-        }
-
-        // --- DRAGGABLE STICKERS LOGIC ---
-        const liveStripCanvasEl = document.getElementById('liveStripCanvas');
-        let isDraggingSticker = false;
-        let draggedStickerIndex = -1;
-        let dragOffsetX = 0;
-        let dragOffsetY = 0;
-
-        function getCanvasPos(e) {
-            const rect = liveStripCanvasEl.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            
-            const scaleX = liveStripCanvasEl.width / rect.width;
-            const scaleY = liveStripCanvasEl.height / rect.height;
-            
-            return {
-                x: (clientX - rect.left) * scaleX,
-                y: (clientY - rect.top) * scaleY
-            };
-        }
-
-        function handleStickerDown(e) {
-            const pos = getCanvasPos(e);
-            for (let i = stripDecorations.length - 1; i >= 0; i--) {
-                const dec = stripDecorations[i];
-                const hw = dec.size / 1.5; 
-                const hh = dec.size / 1.5;
-                if (pos.x >= dec.x - hw && pos.x <= dec.x + hw && pos.y >= dec.y - hh && pos.y <= dec.y + hh) {
-                    isDraggingSticker = true;
-                    draggedStickerIndex = i;
-                    dragOffsetX = pos.x - dec.x;
-                    dragOffsetY = pos.y - dec.y;
-                    if(e.cancelable) e.preventDefault();
-                    return;
-                }
-            }
-        }
-
-        function handleStickerMove(e) {
-            if (!isDraggingSticker || draggedStickerIndex === -1) return;
-            if(e.cancelable) e.preventDefault();
-            const pos = getCanvasPos(e);
-            stripDecorations[draggedStickerIndex].x = pos.x - dragOffsetX;
-            stripDecorations[draggedStickerIndex].y = pos.y - dragOffsetY;
-            renderLiveStripPreview();
-        }
-
-        function handleStickerUp(e) {
-            isDraggingSticker = false;
-            draggedStickerIndex = -1;
-        }
-
-        liveStripCanvasEl.addEventListener('mousedown', handleStickerDown);
-        liveStripCanvasEl.addEventListener('mousemove', handleStickerMove);
-        window.addEventListener('mouseup', handleStickerUp);
-        
-        liveStripCanvasEl.addEventListener('touchstart', handleStickerDown, {passive: false});
-        liveStripCanvasEl.addEventListener('touchmove', handleStickerMove, {passive: false});
-        window.addEventListener('touchend', handleStickerUp);
-
     </script>
 </body>
 </html>
