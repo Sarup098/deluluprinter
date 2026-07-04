@@ -805,12 +805,25 @@
         }
 
         // --- STREAMING_CHUNK:Secret Easter Egg ---
+        let logoClickCount = 0;
+        let logoClickTimer = null;
+
         function handleLogoClick(e) {
-            // Check for triple click natively provided by the browser event
-            if (e.detail === 3) {
+            logoClickCount++;
+
+            if (logoClickCount === 1) {
+                // Immediate single click action (scroll to top)
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Start a timer to reset the count if they don't tap fast enough
+                logoClickTimer = setTimeout(() => {
+                    logoClickCount = 0;
+                }, 500); // 500ms window for 3 taps
+            } else if (logoClickCount === 3) {
+                // Trigger Easter Egg on 3rd tap!
+                clearTimeout(logoClickTimer);
+                logoClickCount = 0;
                 window.open('https://deluluprinter.xyz/create/', '_blank');
-            } else if (e.detail === 1) {
-                window.scrollTo(0, 0);
             }
         }
 
