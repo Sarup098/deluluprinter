@@ -138,7 +138,7 @@
         </div>
         <nav class="w-full bg-white/95 backdrop-blur-md border-b-4 border-brand-black">
             <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-                <div class="flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                <div class="flex items-center gap-2 cursor-pointer select-none" onclick="handleLogoClick(event)">
                     <i class="ph-fill ph-printer text-3xl md:text-4xl text-brand-magenta"></i>
                     <span class="font-display font-black text-xl md:text-2xl tracking-tight leading-none hover:text-brand-magenta transition-colors">deluluprinter</span>
                 </div>
@@ -171,7 +171,7 @@
                 <a href="#shop-gallery" class="brutal-btn bg-brand-black text-white px-6 py-3 rounded-xl font-black text-sm md:text-base flex items-center gap-2">
                     Browse Catalog <i class="ph-bold ph-arrow-down"></i>
                 </a>
-                <a href="#studio-editor" class="brutal-btn bg-brand-purple text-white px-6 py-3 rounded-xl font-black text-sm md:text-base flex items-center gap-2 animate-pulse">
+                <a href="https://deluluprinter.xyz/photobooth" target="_blank" class="brutal-btn bg-brand-purple text-white px-6 py-3 rounded-xl font-black text-sm md:text-base flex items-center gap-2 animate-pulse">
                     <i class="ph-bold ph-camera"></i> Online Photobooth
                 </a>
             </div>
@@ -183,89 +183,16 @@
         </section>
 
         <section id="studio-editor" class="border-t-8 border-brand-black bg-brand-purple py-16 scroll-mt-32 md:scroll-mt-36">
-            <div class="max-w-5xl mx-auto px-4">
-                <div class="text-center mb-10">
-                    <div class="inline-block bg-white text-black border-2 border-black px-4 py-1 rounded-full text-xs font-black tracking-widest uppercase mb-3 shadow-brutal-sm rotate-2">Bored? Try This 🎨</div>
-                    <h2 class="font-display text-4xl md:text-5xl font-black leading-tight mb-4 text-white">
-                        Online Photobooth 📸
-                    </h2>
-                    <p class="text-white font-bold text-base bg-black inline-block px-4 py-2 rounded-lg border-2 border-white mb-4">Design aesthetic photo strips. ₹80 for 4 strips!</p>
-                    <br>
-                    <a href="https://deluluprinter.xyz/create/" target="_blank" class="inline-block text-brand-yellow font-bold text-sm md:text-base underline underline-offset-4 hover:text-white transition-colors">
-                        Or use our Full Studio Editor ✨
-                    </a>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Camera/Upload Panel -->
-                    <div class="flex flex-col gap-4 relative">
-                        <div class="relative w-full aspect-[4/3] bg-black rounded-3xl overflow-hidden border-4 border-brand-black shadow-brutal flex items-center justify-center">
-                            <div id="mobileStripIndicator" class="absolute top-4 right-4 bg-brand-yellow text-black px-3 py-1 rounded-full text-xs font-black shadow-brutal-sm z-20 border-2 border-black transition-all">
-                                Strip 1 • Photo 0/4
-                            </div>
-                            <div id="boothCountdown" class="absolute inset-0 z-30 flex items-center justify-center text-[120px] font-black text-white hidden" style="text-shadow: 4px 4px 0px #111;">
-                                3
-                            </div>
-                            <video id="boothVideo" autoplay playsinline class="w-full h-full object-cover"></video>
-                            <div id="cameraPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center text-gray-500 bg-gray-100">
-                                <i class="ph-duotone ph-camera-slash text-5xl mb-2"></i>
-                                <span class="font-bold text-sm">Camera Offline</span>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <button id="btnCapture" onclick="snapBoothPhoto()" class="brutal-btn bg-brand-cyan text-black font-black py-4 rounded-xl flex items-center justify-center gap-2">
-                                <i class="ph-fill ph-camera text-xl"></i> Snap
-                            </button>
-                            
-                            <input type="file" id="boothUploadInput" multiple accept="image/*" class="hidden" onchange="handleBoothUpload(event)">
-                            <button onclick="document.getElementById('boothUploadInput').click()" class="brutal-btn bg-white text-black font-black py-4 rounded-xl flex items-center justify-center gap-2">
-                                <i class="ph-bold ph-upload-simple text-xl"></i> Upload
-                            </button>
-                        </div>
-
-                        <div class="bg-white border-4 border-black p-4 rounded-2xl shadow-brutal-sm mt-2">
-                            <label class="block font-black text-sm mb-2 text-brand-magenta">Choose Strip Theme:</label>
-                            <select id="boothTemplate" class="w-full bg-gray-50 border-2 border-black font-bold text-sm rounded-lg p-3 outline-none cursor-pointer focus:bg-brand-yellow/20 transition-colors" onchange="changeBoothTemplate()">
-                                <option value="classic-4">Classic White (4 Photos)</option>
-                                <option value="black-4">Vintage Black (4 Photos)</option>
-                                <option value="pink-4">Y2K Pink (4 Photos)</option>
-                                <option value="minimal-3">Minimalist (3 Photos)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Live Preview Panel -->
-                    <div class="bg-gray-100 border-4 border-brand-black shadow-brutal rounded-3xl p-6 flex flex-col items-center">
-                        <div class="flex justify-between items-center w-full mb-4 border-b-2 border-gray-300 pb-3">
-                            <h3 class="font-black text-lg">Strip Layout</h3>
-                            <span class="bg-brand-magenta text-white px-3 py-1.5 rounded-lg text-xs font-bold border-2 border-black shadow-brutal-sm">Strips Built: <span id="completedStripsCount">0</span>/4+</span>
-                        </div>
-                        
-                        <div class="relative w-[140px] md:w-[160px] aspect-[1/3] bg-white border-2 border-black rounded-lg shadow-md mx-auto overflow-hidden flex items-center justify-center">
-                            <canvas id="liveStripCanvas" class="w-full h-full object-contain hidden"></canvas>
-                            <div id="liveStripEmpty" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 text-gray-400">
-                                <i class="ph-duotone ph-image text-4xl mb-2"></i>
-                                <span class="text-[10px] font-bold">Empty Strip</span>
-                            </div>
-                        </div>
-
-                        <div class="w-full flex justify-between items-center mt-6 mb-4 px-2">
-                            <span class="font-bold text-xs text-gray-500">Photos: <span id="boothCounter">0</span>/<span id="boothMax">4</span></span>
-                            <button onclick="clearBooth()" class="text-xs font-bold text-red-500 hover:underline"><i class="ph-bold ph-trash"></i> Reset Slots</button>
-                        </div>
-
-                        <div class="flex flex-col gap-3 w-full mt-auto">
-                            <button id="btnSaveStrip" onclick="saveCurrentStrip()" disabled class="brutal-btn bg-black text-brand-yellow font-black text-base py-4 rounded-xl w-full flex justify-center items-center gap-2 opacity-50 transition-all">
-                                Fill slots to save... <i class="ph-bold ph-lock"></i>
-                            </button>
-                            
-                            <button id="btnCheckoutStrips" onclick="checkoutPhotobooth()" class="hidden brutal-btn bg-brand-green text-white font-black text-base py-4 rounded-xl w-full flex justify-center items-center gap-2 hover:bg-[#1fbc5b] transition-all">
-                                Send Strips on WhatsApp <i class="ph-bold ph-whatsapp-logo"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            <div class="max-w-5xl mx-auto px-4 text-center">
+                <div class="inline-block bg-white text-black border-2 border-black px-4 py-1 rounded-full text-xs font-black tracking-widest uppercase mb-3 shadow-brutal-sm rotate-2">New App ✨</div>
+                <h2 class="font-display text-4xl md:text-5xl font-black leading-tight mb-4 text-white">
+                    Online Photobooth 📸
+                </h2>
+                <p class="text-white font-bold text-base bg-black inline-block px-4 py-2 rounded-lg border-2 border-white mb-8">Design your own aesthetic photo strips on our dedicated app!</p>
+                <br>
+                <a href="https://deluluprinter.xyz/photobooth" target="_blank" class="inline-flex brutal-btn bg-brand-yellow text-black px-8 py-4 rounded-xl font-black text-lg items-center gap-3 animate-bounce">
+                    Launch Photobooth <i class="ph-bold ph-rocket-launch text-2xl"></i>
+                </a>
             </div>
         </section>
     </main>
@@ -288,7 +215,7 @@
             </div>
 
             <!-- Scrollable Content -->
-            <div class="flex-1 overflow-y-auto p-5 md:p-6 hide-scrollbar">
+            <div class="flex-1 overflow-y-auto p-5 md:p-6 pb-32 md:pb-32 hide-scrollbar">
                 <h2 id="modal-title" class="font-display text-2xl md:text-3xl font-black mb-1">Product Title</h2>
                 <p id="modal-desc" class="text-sm font-bold text-gray-500 mb-6">Product description goes here.</p>
 
@@ -475,8 +402,7 @@
                 bgColor: 'bg-brand-blue',
                 options: [
                     { id: 'pst_a5', label: 'Poster (A5)', price: 49, desc: 'Small space filler', qty: 1 },
-                    { id: 'pst_a4', label: 'Poster (A4)', price: 99, desc: 'Standard size', qty: 1 },
-                    { id: 'pst_a3', label: 'Poster (A3)', price: 179, desc: 'Go big!', qty: 1, isPopular: true },
+                    { id: 'pst_a4', label: 'Poster (A4)', price: 99, desc: 'Standard size', qty: 1, isPopular: true },
                 ],
                 addons: []
             },
@@ -878,6 +804,16 @@
             }, 3000);
         }
 
+        // --- STREAMING_CHUNK:Secret Easter Egg ---
+        function handleLogoClick(e) {
+            // Check for triple click natively provided by the browser event
+            if (e.detail === 3) {
+                window.open('https://deluluprinter.xyz/create/', '_blank');
+            } else if (e.detail === 1) {
+                window.scrollTo(0, 0);
+            }
+        }
+
         // Initialize Shop on load
         renderGallery();
 
@@ -885,261 +821,6 @@
         document.getElementById('product-modal').addEventListener('click', function(e) {
             if(e.target === this) closeModal();
         });
-
-
-        // --- STREAMING_CHUNK:Implementing Live Photobooth Studio ---
-        let stream = null;
-        let photos = [];
-        let maxPhotos = 4;
-        let savedStrips = 0;
-        let currentTemplate = 'classic-4';
-
-        const boothVideo = document.getElementById('boothVideo');
-        const cameraPlaceholder = document.getElementById('cameraPlaceholder');
-        const liveCanvas = document.getElementById('liveStripCanvas');
-        const liveCtx = liveCanvas.getContext('2d');
-        const liveEmpty = document.getElementById('liveStripEmpty');
-
-        // Layout Configs for Booth
-        const templates = {
-            'classic-4': { bg: '#ffffff', slots: 4, padding: 20, gap: 15, text: "DELULU STUDIO", txtColor: '#000000' },
-            'black-4': { bg: '#111111', slots: 4, padding: 20, gap: 15, text: "VINTAGE EDITION", txtColor: '#ffffff' },
-            'pink-4': { bg: '#ffb6c1', slots: 4, padding: 20, gap: 15, text: "XOXO GOSSIP GIRL", txtColor: '#d500f9' },
-            'minimal-3': { bg: '#f3f4f6', slots: 3, padding: 30, gap: 20, text: "MINIMAL", txtColor: '#374151' }
-        };
-
-        // Start camera automatically when scrolled to bottom section
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && !stream) {
-                    startCamera();
-                }
-            });
-        }, { threshold: 0.2 });
-        observer.observe(document.getElementById('studio-editor'));
-
-        async function startCamera() {
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });
-                boothVideo.srcObject = stream;
-                cameraPlaceholder.style.display = 'none';
-            } catch (err) {
-                console.error("Camera error:", err);
-                cameraPlaceholder.style.display = 'flex';
-                showToast("Camera access denied. You can still upload photos!");
-            }
-        }
-
-        function changeBoothTemplate() {
-            currentTemplate = document.getElementById('boothTemplate').value;
-            maxPhotos = templates[currentTemplate].slots;
-            document.getElementById('boothMax').innerText = maxPhotos;
-            
-            if (photos.length > maxPhotos) {
-                photos = photos.slice(0, maxPhotos);
-            }
-            updateLiveStrip();
-        }
-
-        async function snapBoothPhoto() {
-            if (photos.length >= maxPhotos) {
-                showToast("Strip is full! Save it first.");
-                return;
-            }
-
-            if (!stream) {
-                showToast("Camera is offline. Please upload photos.");
-                return;
-            }
-
-            const countdown = document.getElementById('boothCountdown');
-            countdown.classList.remove('hidden');
-            
-            for(let i=3; i>0; i--) {
-                countdown.innerText = i;
-                await new Promise(r => setTimeout(r, 800));
-            }
-            countdown.classList.add('hidden');
-
-            const snapCanvas = document.createElement('canvas');
-            snapCanvas.width = boothVideo.videoWidth;
-            snapCanvas.height = boothVideo.videoHeight;
-            const ctx = snapCanvas.getContext('2d');
-            
-            ctx.translate(snapCanvas.width, 0);
-            ctx.scale(-1, 1);
-            ctx.drawImage(boothVideo, 0, 0);
-            
-            photos.push(snapCanvas.toDataURL('image/jpeg'));
-            updateLiveStrip();
-        }
-
-        function handleBoothUpload(event) {
-            const files = Array.from(event.target.files);
-            if (!files.length) return;
-
-            const remainingSlots = maxPhotos - photos.length;
-            const filesToProcess = files.slice(0, remainingSlots);
-
-            if (files.length > remainingSlots) {
-                showToast(`Only ${remainingSlots} slots left. Ignored extra photos.`);
-            }
-
-            filesToProcess.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    photos.push(e.target.result);
-                    updateLiveStrip();
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function updateLiveStrip() {
-            const config = templates[currentTemplate];
-            document.getElementById('boothCounter').innerText = photos.length;
-            
-            if (photos.length === 0) {
-                liveCanvas.classList.add('hidden');
-                liveEmpty.classList.remove('hidden');
-                document.getElementById('btnSaveStrip').disabled = true;
-                document.getElementById('btnSaveStrip').innerHTML = `Fill slots to save... <i class="ph-bold ph-lock"></i>`;
-                document.getElementById('btnSaveStrip').classList.add('opacity-50');
-                return;
-            }
-
-            liveCanvas.classList.remove('hidden');
-            liveEmpty.classList.add('hidden');
-
-            const isFull = photos.length === maxPhotos;
-            const btnSave = document.getElementById('btnSaveStrip');
-            
-            if (isFull) {
-                btnSave.disabled = false;
-                btnSave.innerHTML = `Save this Strip ✨`;
-                btnSave.classList.remove('opacity-50', 'bg-black');
-                btnSave.classList.add('bg-brand-magenta', 'text-white', 'animate-pulse');
-            } else {
-                btnSave.disabled = true;
-                btnSave.innerHTML = `Take ${maxPhotos - photos.length} more... <i class="ph-bold ph-camera"></i>`;
-                btnSave.classList.add('opacity-50', 'bg-black');
-                btnSave.classList.remove('bg-brand-magenta', 'text-white', 'animate-pulse');
-            }
-
-            const photoAspect = 4/3; 
-            const slotWidth = 400;
-            const slotHeight = slotWidth / photoAspect;
-            
-            liveCanvas.width = slotWidth + (config.padding * 2);
-            const totalPhotosHeight = (slotHeight * config.slots) + (config.gap * (config.slots - 1));
-            const bottomTextSpace = 80;
-            liveCanvas.height = config.padding + totalPhotosHeight + bottomTextSpace;
-
-            liveCtx.fillStyle = config.bg;
-            liveCtx.fillRect(0, 0, liveCanvas.width, liveCanvas.height);
-
-            let loadedCount = 0;
-            
-            photos.forEach((src, index) => {
-                const img = new Image();
-                img.onload = () => {
-                    const yPos = config.padding + (index * (slotHeight + config.gap));
-                    
-                    const hRatio = slotWidth / img.width;
-                    const vRatio = slotHeight / img.height;
-                    const ratio = Math.max(hRatio, vRatio);
-                    const centerShift_x = (slotWidth - img.width*ratio) / 2;
-                    const centerShift_y = (slotHeight - img.height*ratio) / 2;  
-
-                    liveCtx.save();
-                    liveCtx.beginPath();
-                    liveCtx.roundRect(config.padding, yPos, slotWidth, slotHeight, 8);
-                    liveCtx.clip();
-                    
-                    liveCtx.drawImage(img, 0,0, img.width, img.height,
-                                      config.padding + centerShift_x, yPos + centerShift_y, 
-                                      img.width*ratio, img.height*ratio);
-                    liveCtx.restore();
-
-                    loadedCount++;
-                    if (loadedCount === photos.length) drawStripFooter(config);
-                };
-                img.src = src;
-            });
-
-            if (photos.length < config.slots) {
-                liveCtx.fillStyle = config.bg === '#111111' ? '#333' : '#e5e7eb';
-                for (let i = photos.length; i < config.slots; i++) {
-                    const yPos = config.padding + (i * (slotHeight + config.gap));
-                    liveCtx.beginPath();
-                    liveCtx.roundRect(config.padding, yPos, slotWidth, slotHeight, 8);
-                    liveCtx.fill();
-                }
-                drawStripFooter(config);
-            }
-        }
-
-        function drawStripFooter(config) {
-            liveCtx.fillStyle = config.txtColor;
-            liveCtx.font = "bold 24px 'Space Grotesk', sans-serif";
-            liveCtx.textAlign = "center";
-            liveCtx.fillText(config.text, liveCanvas.width / 2, liveCanvas.height - 30);
-            
-            liveCtx.font = "bold 12px Inter, sans-serif";
-            liveCtx.fillText("deluluprinter.xyz", liveCanvas.width / 2, liveCanvas.height - 12);
-        }
-
-        function clearBooth() {
-            photos = [];
-            updateLiveStrip();
-        }
-
-        function saveCurrentStrip() {
-            if (photos.length < maxPhotos) return;
-            
-            savedStrips++;
-            document.getElementById('completedStripsCount').innerText = savedStrips;
-            
-            showToast(`Strip #${savedStrips} added! Make 4 for the ₹80 deal.`);
-            
-            const link = document.createElement('a');
-            link.download = `delulu-strip-${savedStrips}.jpg`;
-            link.href = liveCanvas.toDataURL('image/jpeg', 0.9);
-            link.click();
-
-            if (savedStrips >= 1) {
-                document.getElementById('btnCheckoutStrips').classList.remove('hidden');
-            }
-
-            clearBooth();
-            document.getElementById('mobileStripIndicator').innerText = `Strip ${savedStrips + 1} • Photo 0/${maxPhotos}`;
-        }
-
-        function checkoutPhotobooth() {
-            if (savedStrips === 0) {
-                showToast("Build and save at least 1 strip first!");
-                return;
-            }
-            
-            let message = `Hey! 📸 I just designed some Photobooth Strips on your site.\n\n`;
-            message += `🎞️ *Total Strips Built:* ${savedStrips}\n`;
-            
-            let price = 0;
-            if (savedStrips >= 4) {
-                price = 80 + ((savedStrips - 4) * 20);
-            } else {
-                price = savedStrips * 25;
-            }
-
-            message += `💰 *Estimated Total: ₹${price}*\n\n`;
-            message += `I have downloaded them to my device and will send them to you right now! ✨`;
-
-            const encodedMessage = encodeURIComponent(message);
-            const whatsappUrl = `https://wa.me/919907488075?text=${encodedMessage}`;
-            
-            window.open(whatsappUrl, '_blank');
-            showToast("Opening WhatsApp... Don't forget to attach your downloaded strips! 🚀");
-        }
     </script>
 </body>
 </html>
