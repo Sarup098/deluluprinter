@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Delulu Photobooth Studio 📸</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            cyan: '#00FFFF',
+                            magenta: '#FF00FF',
+                            yellow: '#FFEA00',
+                            black: '#111111',
+                            green: '#25D366', 
+                            purple: '#d500f9',
+                            blue: '#2962ff'
+                        }
+                    },
+                    boxShadow: {
+                        'brutal': '6px 6px 0px 0px rgba(17, 17, 17, 1)',
+                        'brutal-sm': '3px 3px 0px 0px rgba(17, 17, 17, 1)',
+                        'brutal-md': '4px 4px 0px 0px rgba(17, 17, 17, 1)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #FAFAFA;
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .brutal-btn {
+            border: 3px solid #111;
+            box-shadow: 4px 4px 0px 0px #111;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .brutal-btn:hover:not(:disabled) {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px 0px #111;
+        }
+        .brutal-btn:active:not(:disabled) {
+            transform: translate(4px, 4px);
+            box-shadow: 0px 0px 0px 0px #111;
+        }
+
+        .brutal-card {
+            border: 3px solid #111;
+            box-shadow: 4px 4px 0px 0px #111;
+            transition: all 0.2s ease;
+        }
+        .brutal-card.selected {
+            border-color: #FF00FF;
+            background-color: #FFEA00;
+            box-shadow: 6px 6px 0px 0px #FF00FF;
+            transform: translate(-2px, -2px);
+        }
+
+        #boothVideo { transform: scaleX(-1); } /* Mirror effect for webcam */
+
+        /* Screen Flash Animation */
+        @keyframes flash {
+            0% { opacity: 0; }
+            30% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        .camera-flash {
+            animation: flash 0.6s ease-out;
+        }
+    </style>
+</head>
+<body class="text-brand-black antialiased flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="w-full bg-brand-cyan border-b-4 border-brand-black fixed top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='https://deluluprinter.xyz'">
+                <i class="ph-bold ph-arrow-left text-2xl"></i>
+                <span class="font-display font-black text-xl tracking-tight">delulu studio 📸</span>
+            </div>
+            <div class="font-bold text-sm bg-white px-3 py-1 border-2 border-black rounded-lg shadow-brutal-sm rotate-2">
+                Beta v1.0
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-24 pb-16 flex-grow w-full max-w-4xl mx-auto px-4">
+        
+        <!-- STEP 1: FRAME SELECTION -->
+        <section id="step-1" class="flex flex-col gap-6 animate-fade-in">
+            <div class="text-center mb-4">
+                <h1 class="font-display text-4xl font-black mb-2">Pick Your Frame ✨</h1>
+                <p class="font-bold text-gray-600">Select an aesthetic overlay for your photobooth strip.</p>
+            </div>
+
+            <div id="frames-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                <!-- Dynamically injected via JS -->
+            </div>
+
+            <div class="mt-8 flex flex-col items-center gap-2 bg-white p-5 rounded-2xl border-4 border-black shadow-brutal w-full max-w-md mx-auto">
+                <label class="font-black text-sm text-brand-magenta uppercase tracking-wider">Strip Customization</label>
+                <input type="text" id="custom-text" placeholder="Enter custom footer text (Optional)" class="w-full bg-gray-50 border-2 border-black p-3 rounded-xl font-bold text-sm outline-none focus:bg-brand-yellow/20 transition-colors text-center">
+            </div>
+
+            <div class="mt-6 flex justify-center">
+                <button id="btn-next-step" onclick="goToStep2()" disabled class="brutal-btn bg-brand-black text-white px-10 py-4 rounded-xl font-black text-lg flex items-center gap-3 opacity-50 cursor-not-allowed transition-all">
+                    Next Step <i class="ph-bold ph-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+
+        <!-- STEP 2: CAMERA CAPTURE -->
+        <section id="step-2" class="hidden flex-col gap-6 animate-fade-in items-center">
+            <div class="text-center mb-2 w-full flex justify-between items-center">
+                <button onclick="goToStep1()" class="font-bold text-gray-500 hover:text-black underline"><i class="ph-bold ph-arrow-left"></i> Back</button>
+                <div class="bg-brand-yellow px-4 py-1 rounded-full border-2 border-black font-black text-sm shadow-brutal-sm" id="capture-status">
+                    Ready to pose!
+                </div>
+                <div class="w-10"></div> <!-- Spacer for flex alignment -->
+            </div>
+
+            <div class="relative w-full max-w-2xl bg-black rounded-3xl overflow-hidden border-4 border-brand-black shadow-brutal aspect-[4/3] flex items-center justify-center">
+                
+                <!-- Live Video Feed -->
+                <video id="boothVideo" autoplay playsinline class="w-full h-full object-cover"></video>
+                
+                <!-- Offline Placeholder -->
+                <div id="cameraPlaceholder" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 text-gray-500">
+                    <i class="ph-duotone ph-camera-slash text-5xl mb-2 animate-pulse"></i>
+                    <span class="font-bold">Requesting Camera Access...</span>
+                </div>
+
+                <!-- Reference Image Overlay (For Zootopia) -->
+                <div id="referenceOverlay" class="absolute top-4 right-4 w-1/4 max-w-[120px] bg-white p-1 rounded-lg border-2 border-brand-magenta shadow-brutal-sm hidden transition-all transform rotate-2">
+                    <div class="text-[9px] font-black uppercase text-brand-magenta text-center mb-1 bg-brand-magenta/10 rounded">Pose Ref 👇</div>
+                    <img id="referenceImg" src="" class="w-full rounded">
+                </div>
+
+                <!-- Giant Countdown Number -->
+                <div id="boothCountdown" class="absolute inset-0 z-30 flex items-center justify-center text-[150px] font-black text-white drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)] hidden">
+                    3
+                </div>
+
+                <!-- Flash Overlay -->
+                <div id="flashEffect" class="absolute inset-0 bg-white z-40 hidden pointer-events-none"></div>
+            </div>
+
+            <div class="flex flex-col items-center gap-4 w-full max-w-2xl">
+                <!-- Progress Dots -->
+                <div class="flex gap-3 my-2" id="photo-progress-dots">
+                    <div class="w-4 h-4 rounded-full border-2 border-black bg-gray-200 transition-colors"></div>
+                    <div class="w-4 h-4 rounded-full border-2 border-black bg-gray-200 transition-colors"></div>
+                    <div class="w-4 h-4 rounded-full border-2 border-black bg-gray-200 transition-colors"></div>
+                    <div class="w-4 h-4 rounded-full border-2 border-black bg-gray-200 transition-colors"></div>
+                </div>
+
+                <button id="btn-take-photo" onclick="takeSinglePhoto()" class="brutal-btn bg-brand-magenta text-white px-10 py-5 rounded-xl font-black text-xl w-full flex justify-center items-center gap-3">
+                    <i class="ph-fill ph-camera text-2xl"></i> Snap Photo 1/4
+                </button>
+            </div>
+        </section>
+
+
+        <!-- STEP 3: PREVIEW & CHECKOUT -->
+        <section id="step-3" class="hidden flex-col gap-6 animate-fade-in items-center">
+            <div class="text-center mb-2">
+                <h2 class="font-display text-4xl font-black mb-2">Your Aesthetic Strip 💖</h2>
+                <p class="font-bold text-gray-600">Looking gorgeous! Ready to print?</p>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="render-loading" class="flex flex-col items-center my-10">
+                <i class="ph-duotone ph-spinner-gap text-5xl text-brand-magenta animate-spin mb-4"></i>
+                <p class="font-bold">Compositing your photos...</p>
+            </div>
+
+            <!-- Final Rendered Output -->
+            <div id="render-result" class="hidden flex-col items-center w-full">
+                <div class="relative w-[60%] max-w-[280px] md:max-w-[320px] bg-white p-2 border-4 border-brand-black shadow-brutal rotate-1 mb-8">
+                    <img id="finalPreviewImage" src="" class="w-full h-auto object-contain pointer-events-none">
+                    <!-- Price Tag Badge -->
+                    <div id="finalPriceBadge" class="absolute -top-4 -right-4 bg-brand-yellow border-2 border-black font-black text-xl px-4 py-2 rounded-full shadow-brutal-sm rotate-12">
+                        ₹80
+                    </div>
+                </div>
+
+                <div class="flex flex-col w-full max-w-md gap-4">
+                    <button onclick="downloadStripAndEnableOrder()" class="brutal-btn bg-brand-cyan text-black px-6 py-4 rounded-xl font-black text-base w-full flex justify-center items-center gap-2">
+                        <i class="ph-bold ph-download-simple text-xl"></i> Save to Device First
+                    </button>
+
+                    <p id="order-reminder" class="text-xs font-bold text-red-500 text-center -mt-2 mb-1 animate-pulse">⚠️ Save the photo to your device to unlock ordering!</p>
+
+                    <button id="btn-order" onclick="checkoutToWhatsApp()" disabled class="brutal-btn bg-gray-300 text-gray-500 border-gray-500 px-6 py-4 rounded-xl font-black text-lg w-full flex justify-center items-center gap-2 cursor-not-allowed transition-all">
+                        <i class="ph-bold ph-whatsapp-logo text-2xl"></i> Order Print on WhatsApp
+                    </button>
+
+                    <button onclick="resetPhotobooth()" class="font-bold text-gray-500 hover:text-black underline mt-4">
+                        Nah, I blinked. Let's retake!
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Global Toast Notification -->
+    <div id="toast" class="fixed top-24 left-1/2 transform -translate-x-1/2 -translate-y-10 opacity-0 bg-brand-black text-white px-6 py-3 rounded-full font-bold text-sm shadow-brutal border-2 border-white transition-all duration-300 z-[60] pointer-events-none">
+        Message goes here
+    </div>
+
+    <!-- Hidden Canvas for Compositing -->
+    <canvas id="compositeCanvas" class="hidden"></canvas>
+
+
+    <script>
+        // --- 1. CONFIGURATION & DATA ---
+        const frames = [
+            { 
+                id: 'hk1', 
+                name: 'Hello Kitty', 
+                type: 'standard', 
+                price: 80, 
+                src: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/Hello_Kitty_Frame.png',
+                slots: 4,
+                thumb: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/Hello_Kitty_Frame.png'
+            },
+            { 
+                id: 'v4', 
+                name: 'V4 Film', 
+                type: 'standard', 
+                price: 80, 
+                src: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/V_4__Frame.png',
+                slots: 4,
+                thumb: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/V_4__Frame.png'
+            },
+            { 
+                id: 'hk4', 
+                name: 'HK 4-Pic', 
+                type: 'standard', 
+                price: 80, 
+                src: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/hello%20kitty%204%20pic.png',
+                slots: 4,
+                thumb: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/hello%20kitty%204%20pic.png'
+            },
+            { 
+                id: 'zootopia', 
+                name: 'Zootopia Special', 
+                type: 'double', 
+                price: 160, 
+                src: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/more%20frame/zootopia/preview.JPG', // Preview used as thumbnail
+                thumb: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/more%20frame/zootopia/preview.JPG',
+                slots: 4,
+                refs: [
+                    'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/more%20frame/zootopia/1.png',
+                    'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/more%20frame/zootopia/2.png',
+                    'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/more%20frame/zootopia/3.png',
+                    'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/more%20frame/zootopia/4.png'
+                ]
+            }
+        ];
+
+        let selectedFrame = null;
+        let stream = null;
+        let capturedPhotos = [];
+        let finalImageBase64 = null;
+        let currentShotIndex = 0;
+
+        // --- 2. INITIALIZATION & UI ROUTING ---
+        function init() {
+            renderFrameGrid();
+        }
+
+        function renderFrameGrid() {
+            const grid = document.getElementById('frames-grid');
+            let html = frames.map(f => {
+                const isDouble = f.type === 'double';
+                const badge = isDouble 
+                    ? `<div class="absolute -top-3 -right-3 bg-brand-magenta text-white text-[10px] font-black uppercase px-2 py-1 rounded shadow-brutal-sm border-2 border-black rotate-6 z-10">2x Width</div>`
+                    : '';
+
+                return `
+                <div id="card-${f.id}" onclick="selectFrame('${f.id}')" class="brutal-card bg-white rounded-2xl flex flex-col cursor-pointer relative overflow-hidden group h-full">
+                    ${badge}
+                    <div class="h-32 md:h-48 w-full bg-gray-100 relative border-b-4 border-brand-black p-4 flex items-center justify-center">
+                        <img src="${f.thumb}" class="max-h-full object-contain group-hover:scale-105 transition-transform drop-shadow-md">
+                    </div>
+                    <div class="p-3 text-center flex-grow flex flex-col justify-between bg-gray-50">
+                        <h3 class="font-black text-sm md:text-base leading-tight mb-1 text-black">${f.name}</h3>
+                        <div class="font-bold text-brand-magenta text-sm">₹${f.price}</div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            // Add Pinterest Suggestion Card
+            html += `
+            <div onclick="suggestFrame()" class="brutal-card bg-gray-50 border-dashed border-4 border-gray-400 rounded-2xl flex flex-col items-center justify-center cursor-pointer relative overflow-hidden group h-full p-4 hover:border-brand-magenta hover:bg-brand-magenta/10 transition-colors">
+                <i class="ph-bold ph-pinterest-logo text-brand-magenta text-4xl mb-2 group-hover:scale-110 transition-transform"></i>
+                <h3 class="font-black text-sm md:text-base text-center mb-1 text-black">More coming soon!</h3>
+                <p class="text-xs text-center text-gray-500 font-bold">Suggest a frame idea</p>
+            </div>
+            `;
+            
+            grid.innerHTML = html;
+        }
+
+        function suggestFrame() {
+            const message = "Hey! ✨ I have a frame idea for the Delulu Photobooth. Here is a Pinterest link/image I'd love to see:";
+            window.open(`https://wa.me/919907488075?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        function selectFrame(id) {
+            selectedFrame = frames.find(f => f.id === id);
+            
+            // UI Selection Styling
+            document.querySelectorAll('.brutal-card').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`card-${id}`).classList.add('selected');
+
+            // Enable Next Button
+            const btn = document.getElementById('btn-next-step');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-brand-black');
+            btn.classList.add('bg-brand-yellow', 'text-black', 'animate-pulse');
+        }
+
+        // --- STREAMING_CHUNK:Camera & Capture Logic... ---
+        async function goToStep2() {
+            document.getElementById('step-1').classList.add('hidden');
+            document.getElementById('step-2').classList.remove('hidden');
+            document.getElementById('step-2').classList.add('flex');
+            
+            // Reset Capture State
+            currentShotIndex = 0;
+            capturedPhotos = [];
+            updateProgressDots(0);
+            
+            const btn = document.getElementById('btn-take-photo');
+            btn.classList.remove('hidden', 'opacity-50', 'cursor-not-allowed');
+            btn.disabled = false;
+            btn.innerHTML = `<i class="ph-fill ph-camera text-2xl"></i> Snap Photo 1/4`;
+            document.getElementById('capture-status').innerHTML = `Ready to pose!`;
+            
+            const refOverlay = document.getElementById('referenceOverlay');
+            const refImg = document.getElementById('referenceImg');
+            if (selectedFrame.type === 'double' && selectedFrame.refs) {
+                refImg.src = selectedFrame.refs[0];
+                refOverlay.classList.remove('hidden');
+            } else {
+                refOverlay.classList.add('hidden');
+            }
+
+            await startCamera();
+        }
+
+        function goToStep1() {
+            stopCamera();
+            document.getElementById('step-2').classList.add('hidden');
+            document.getElementById('step-2').classList.remove('flex');
+            document.getElementById('step-1').classList.remove('hidden');
+        }
+
+        async function startCamera() {
+            const video = document.getElementById('boothVideo');
+            const placeholder = document.getElementById('cameraPlaceholder');
+            
+            try {
+                // Requesting highest typical webcam res for good print quality
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }, 
+                    audio: false 
+                });
+                video.srcObject = stream;
+                
+                video.onloadedmetadata = () => {
+                    placeholder.style.display = 'none';
+                };
+            } catch (err) {
+                console.error("Camera error:", err);
+                placeholder.innerHTML = `<i class="ph-duotone ph-warning text-5xl mb-2 text-red-500"></i><span class="font-bold text-center px-4">Camera access denied or unavailable.<br/>Please allow camera permissions.</span>`;
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+        }
+
+        async function takeSinglePhoto() {
+            if (!stream) {
+                showToast("Camera not ready!");
+                return;
+            }
+
+            const btn = document.getElementById('btn-take-photo');
+            const countdownEl = document.getElementById('boothCountdown');
+            const flashEl = document.getElementById('flashEffect');
+            const statusEl = document.getElementById('capture-status');
+            const refOverlay = document.getElementById('referenceOverlay');
+            const refImg = document.getElementById('referenceImg');
+            
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            // 3 Second Countdown
+            countdownEl.classList.remove('hidden');
+            for(let i=3; i>0; i--) {
+                countdownEl.innerText = i;
+                countdownEl.style.transform = 'scale(1.2)';
+                setTimeout(() => countdownEl.style.transform = 'scale(1)', 150);
+                await new Promise(r => setTimeout(r, 1000));
+            }
+            countdownEl.classList.add('hidden');
+
+            // SNAP!
+            flashEl.classList.remove('hidden');
+            flashEl.classList.add('camera-flash');
+            
+            // Draw current video frame to an offscreen canvas to save it
+            const video = document.getElementById('boothVideo');
+            const snapCanvas = document.createElement('canvas');
+            snapCanvas.width = video.videoWidth;
+            snapCanvas.height = video.videoHeight;
+            const ctx = snapCanvas.getContext('2d');
+            
+            // Mirror the image horizontally so it saves exactly as the user saw it
+            ctx.translate(snapCanvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0);
+            
+            capturedPhotos.push(snapCanvas.toDataURL('image/jpeg', 0.9));
+            currentShotIndex++;
+            updateProgressDots(currentShotIndex);
+
+            // Remove flash class so it can trigger again
+            setTimeout(() => {
+                flashEl.classList.remove('camera-flash');
+                flashEl.classList.add('hidden');
+            }, 600);
+
+            if (currentShotIndex < 4) {
+                // Setup next shot
+                btn.innerHTML = `<i class="ph-fill ph-camera text-2xl"></i> Snap Photo ${currentShotIndex + 1}/4`;
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                statusEl.innerHTML = `Photo ${currentShotIndex + 1} of 4 📸`;
+                
+                if (selectedFrame.type === 'double' && selectedFrame.refs) {
+                    refImg.src = selectedFrame.refs[currentShotIndex];
+                }
+            } else {
+                // All done
+                refOverlay.classList.add('hidden');
+                statusEl.innerHTML = `All done! Processing... ✨`;
+                btn.innerHTML = `<i class="ph-duotone ph-spinner-gap animate-spin text-2xl"></i> Stitching Strip...`;
+                
+                setTimeout(() => {
+                    stopCamera();
+                    goToStep3();
+                }, 800);
+            }
+        }
+
+        function updateProgressDots(count) {
+            const dots = document.getElementById('photo-progress-dots').children;
+            for(let i=0; i<4; i++) {
+                if (i < count) {
+                    dots[i].classList.remove('bg-gray-200');
+                    dots[i].classList.add('bg-brand-magenta');
+                } else {
+                    dots[i].classList.add('bg-gray-200');
+                    dots[i].classList.remove('bg-brand-magenta');
+                }
+            }
+        }
+
+        // --- STREAMING_CHUNK:Image Compositing Engine... ---
+        async function goToStep3() {
+            document.getElementById('step-2').classList.add('hidden');
+            document.getElementById('step-2').classList.remove('flex');
+            
+            const step3 = document.getElementById('step-3');
+            step3.classList.remove('hidden');
+            step3.classList.add('flex');
+
+            document.getElementById('render-loading').classList.remove('hidden');
+            document.getElementById('render-result').classList.add('hidden');
+            document.getElementById('render-result').classList.remove('flex');
+
+            // Reset checkout button state
+            const btnOrder = document.getElementById('btn-order');
+            btnOrder.disabled = true;
+            btnOrder.classList.add('bg-gray-300', 'text-gray-500', 'border-gray-500', 'cursor-not-allowed');
+            btnOrder.classList.remove('bg-brand-green', 'text-white', 'hover:bg-[#1fbc5b]');
+            document.getElementById('order-reminder').classList.remove('hidden');
+
+            await renderFinalStrip();
+
+            document.getElementById('render-loading').classList.add('hidden');
+            document.getElementById('render-result').classList.remove('hidden');
+            document.getElementById('render-result').classList.add('flex');
+            document.getElementById('finalPriceBadge').innerText = `₹${selectedFrame.price}`;
+        }
+
+        async function renderFinalStrip() {
+            const canvas = document.getElementById('compositeCanvas');
+            const ctx = canvas.getContext('2d');
+
+            if (selectedFrame.type === 'double') {
+                // ZOOTOPIA / DOUBLE WIDE LOGIC
+                // We generate the white frame programmatically and place images side-by-side
+                const slotW = 500; 
+                const slotH = Math.round(slotW * 0.75); // 4:3 landscape ratio crop
+                const pad = 40;
+                const gap = 30;
+                
+                canvas.width = (slotW * 2) + (pad * 3);
+                canvas.height = pad + (slotH * 4) + (gap * 3) + 180; // 180 for footer space
+
+                // Fill White Background
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                for (let i = 0; i < 4; i++) {
+                    const y = pad + i * (slotH + gap);
+                    
+                    // 1. Draw User Photo (Left Column)
+                    const userImg = new Image();
+                    userImg.src = capturedPhotos[i];
+                    await new Promise(r => userImg.onload = r);
+                    drawCroppedImage(ctx, userImg, pad, y, slotW, slotH);
+
+                    // 2. Draw Zootopia Reference Photo (Right Column)
+                    const refImg = new Image();
+                    refImg.crossOrigin = "anonymous";
+                    refImg.src = selectedFrame.refs[i];
+                    await new Promise(r => refImg.onload = r);
+                    drawCroppedImage(ctx, refImg, pad * 2 + slotW, y, slotW, slotH);
+                }
+
+                // Draw Custom Footer Text
+                const customText = document.getElementById('custom-text').value.trim() || 'AESTHETIC STRIP';
+                
+                ctx.fillStyle = '#111111';
+                ctx.font = 'bold 50px "Space Grotesk"';
+                ctx.textAlign = 'center';
+                ctx.fillText(customText, canvas.width / 2, canvas.height - 70);
+
+            } else {
+                // STANDARD FRAME LOGIC
+                // We load the transparent PNG, use its exact size, stretch user photos to fill canvas, then overlay the PNG.
+                const overlay = new Image();
+                overlay.crossOrigin = "anonymous";
+                overlay.src = selectedFrame.src;
+                await new Promise(r => overlay.onload = r);
+
+                canvas.width = overlay.width;
+                canvas.height = overlay.height;
+
+                // Fill a safe background color just in case PNG has complete transparency
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Math to evenly stack 4 photos filling the canvas (behind the PNG borders)
+                // Assuming standard vertical layout with some padding
+                const topPad = canvas.height * 0.05; // 5% top margin
+                const botPad = canvas.height * 0.15; // 15% bottom margin (usually where branding is)
+                const padX = canvas.width * 0.08;    // 8% side margin
+                const availableH = canvas.height - topPad - botPad;
+                const slotH = availableH / 4;
+                const slotW = canvas.width - (padX * 2);
+
+                for (let i = 0; i < 4; i++) {
+                    const y = topPad + (i * slotH);
+                    const userImg = new Image();
+                    userImg.src = capturedPhotos[i];
+                    await new Promise(r => userImg.onload = r);
+                    
+                    // Draw user image covering the slot
+                    drawCroppedImage(ctx, userImg, padX, y, slotW, slotH);
+                }
+
+                // Draw the transparent Frame PNG on top!
+                ctx.drawImage(overlay, 0, 0, canvas.width, canvas.height);
+
+                // Check if user added custom text, and overlay it at the bottom for standard frames
+                const customText = document.getElementById('custom-text').value.trim();
+                if (customText) {
+                    ctx.fillStyle = '#111111';
+                    ctx.font = 'bold 40px "Space Grotesk"';
+                    ctx.textAlign = 'center';
+                    
+                    // Add a tiny white glow/stroke so it's readable over any frame graphic
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 6;
+                    ctx.strokeText(customText, canvas.width / 2, canvas.height - 40);
+                    ctx.fillText(customText, canvas.width / 2, canvas.height - 40);
+                }
+            }
+
+            // Export to UI
+            finalImageBase64 = canvas.toDataURL('image/jpeg', 0.95);
+            document.getElementById('finalPreviewImage').src = finalImageBase64;
+        }
+
+        // Helper function to simulate CSS object-fit: cover on canvas
+        function drawCroppedImage(ctx, img, x, y, w, h) {
+            const imgAspect = img.width / img.height;
+            const targetAspect = w / h;
+            
+            let sx = 0, sy = 0, sw = img.width, sh = img.height;
+
+            if (imgAspect > targetAspect) {
+                // Image is wider than needed, crop sides
+                sw = img.height * targetAspect;
+                sx = (img.width - sw) / 2;
+            } else {
+                // Image is taller than needed, crop top/bottom
+                sh = img.width / targetAspect;
+                sy = (img.height - sh) / 2;
+            }
+
+            ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+        }
+
+        // --- STREAMING_CHUNK:Utilities & Checkout ---
+        function downloadStripAndEnableOrder() {
+            if (!finalImageBase64) return;
+            const link = document.createElement('a');
+            link.download = `delulu-photobooth-${Date.now()}.jpg`;
+            link.href = finalImageBase64;
+            link.click();
+            
+            showToast("Strip saved! You can now order it on WhatsApp. 🚀");
+            
+            // Enable the order button
+            const btnOrder = document.getElementById('btn-order');
+            btnOrder.disabled = false;
+            btnOrder.classList.remove('bg-gray-300', 'text-gray-500', 'border-gray-500', 'cursor-not-allowed');
+            btnOrder.classList.add('bg-brand-green', 'text-white', 'hover:bg-[#1fbc5b]');
+            
+            document.getElementById('order-reminder').classList.add('hidden');
+        }
+
+        function checkoutToWhatsApp() {
+            if (!selectedFrame) return;
+            
+            let message = `Hey Delulu Printer! ✨📸\n\n`;
+            message += `I just made a stunning photobooth strip using the *${selectedFrame.name}* frame and I want to print it!\n\n`;
+            message += `💰 *Total: ₹${selectedFrame.price}*\n\n`;
+            message += `I have saved the photo to my device and am attaching it to this message now! 👇`;
+
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/919907488075?text=${encodedMessage}`;
+            
+            window.open(whatsappUrl, '_blank');
+            showToast("Opening WhatsApp... ATTACH YOUR PHOTO! 🚀");
+        }
+
+        function resetPhotobooth() {
+            capturedPhotos = [];
+            finalImageBase64 = null;
+            document.getElementById('btn-start-capture').classList.remove('hidden');
+            document.getElementById('step-3').classList.add('hidden');
+            document.getElementById('step-3').classList.remove('flex');
+            goToStep2();
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.transform = "translate(-50%, 20px)";
+            toast.style.opacity = "1";
+            setTimeout(() => {
+                toast.style.transform = "translate(-50%, -10px)";
+                toast.style.opacity = "0";
+            }, 3000);
+        }
+
+        // Run setup on load
+        window.onload = init;
+    </script>
+</body>
+</html>
