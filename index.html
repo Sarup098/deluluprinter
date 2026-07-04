@@ -113,15 +113,28 @@
         .carousel-item {
             scroll-snap-align: start;
         }
+
+        /* Marquee Animation for Delivery Banner */
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            animation: marquee 20s linear infinite;
+        }
     </style>
 </head>
 <body class="text-brand-black antialiased selection:bg-brand-magenta selection:text-white flex flex-col min-h-screen">
 
     <header class="fixed top-0 w-full z-40 flex flex-col shadow-sm">
-        <div class="w-full bg-brand-cyan border-b-4 border-brand-black px-4 py-2 flex items-center justify-center text-center">
-            <p class="font-bold text-xs md:text-sm flex items-center justify-center gap-1 w-full">
-                <i class="ph-fill ph-lightning text-lg animate-pulse text-brand-magenta"></i> Fast Delivery in Gangtok
-            </p>
+        <!-- New Marquee Banner for Delivery Locations and Offers -->
+        <div class="w-full bg-brand-cyan border-b-4 border-brand-black px-4 py-2 overflow-hidden flex whitespace-nowrap">
+            <div class="animate-marquee font-bold text-xs md:text-sm inline-block">
+                <span class="mx-4 text-brand-black">🚀 <b>FREE DELIVERY</b> on orders above ₹500!</span>
+                <span class="mx-4 text-brand-magenta">📍 Operating in: Gangtok • Singtam • Rangpo • Majitar • Ranipool</span>
+                <span class="mx-4 text-brand-black">🚀 <b>FREE DELIVERY</b> on orders above ₹500!</span>
+                <span class="mx-4 text-brand-magenta">📍 Operating in: Gangtok • Singtam • Rangpo • Majitar • Ranipool</span>
+            </div>
         </div>
         <nav class="w-full bg-white/95 backdrop-blur-md border-b-4 border-brand-black">
             <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
@@ -130,7 +143,6 @@
                     <span class="font-display font-black text-xl md:text-2xl tracking-tight leading-none hover:text-brand-magenta transition-colors">deluluprinter</span>
                 </div>
                 <div class="flex gap-2 md:gap-4 items-center">
-                    <!-- NEW: Create/Edit Link -->
                     <a href="https://deluluprinter.xyz/create/" target="_blank" class="hidden md:flex brutal-btn bg-brand-yellow text-black px-4 py-2 rounded-xl font-black text-sm items-center gap-2">
                         <i class="ph-bold ph-magic-wand text-lg"></i> Studio Editor
                     </a>
@@ -159,18 +171,18 @@
                 <a href="#shop-gallery" class="brutal-btn bg-brand-black text-white px-6 py-3 rounded-xl font-black text-sm md:text-base flex items-center gap-2">
                     Browse Catalog <i class="ph-bold ph-arrow-down"></i>
                 </a>
-                <a href="https://deluluprinter.xyz/create/" target="_blank" class="brutal-btn bg-brand-purple text-white px-6 py-3 rounded-xl font-black text-sm md:text-base flex items-center gap-2 animate-pulse">
-                    <i class="ph-bold ph-paint-brush"></i> Create & Edit Custom
+                <a href="#studio-editor" class="brutal-btn bg-brand-purple text-white px-6 py-3 rounded-xl font-black text-sm md:text-base flex items-center gap-2 animate-pulse">
+                    <i class="ph-bold ph-camera"></i> Online Photobooth
                 </a>
             </div>
         </section>
 
-        <section id="shop-gallery" class="max-w-6xl mx-auto px-0 md:px-4 pb-16">
-            <!-- Categories will be injected here via JS -->
-            <div id="categories-container" class="flex flex-col gap-10 md:gap-12"></div>
+        <section id="shop-gallery" class="max-w-6xl mx-auto px-4 pb-16 scroll-mt-36 md:scroll-mt-40">
+            <!-- Flattened grid without category grouping -->
+            <div id="all-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8"></div>
         </section>
 
-        <section id="studio-editor" class="border-t-8 border-brand-black bg-brand-purple py-16">
+        <section id="studio-editor" class="border-t-8 border-brand-black bg-brand-purple py-16 scroll-mt-32 md:scroll-mt-36">
             <div class="max-w-5xl mx-auto px-4">
                 <div class="text-center mb-10">
                     <div class="inline-block bg-white text-black border-2 border-black px-4 py-1 rounded-full text-xs font-black tracking-widest uppercase mb-3 shadow-brutal-sm rotate-2">Bored? Try This 🎨</div>
@@ -259,14 +271,14 @@
     </main>
 
     <div id="product-modal" class="modal-overlay fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm p-0 md:p-4">
-        <div class="modal-content w-full h-[90vh] md:h-auto max-w-2xl bg-white md:rounded-3xl rounded-t-3xl border-t-4 border-x-4 md:border-b-4 border-brand-black shadow-[0_-10px_40px_rgba(0,0,0,0.2)] md:shadow-brutal flex flex-col relative overflow-hidden">
+        <div class="modal-content w-full h-[95svh] md:h-[90svh] max-w-2xl bg-white md:rounded-3xl rounded-t-3xl border-t-4 border-x-4 md:border-b-4 border-brand-black shadow-[0_-10px_40px_rgba(0,0,0,0.2)] md:shadow-brutal flex flex-col relative overflow-hidden">
             
             <button onclick="closeModal()" class="absolute top-4 right-4 w-10 h-10 bg-white border-2 border-black rounded-full flex items-center justify-center text-xl hover:scale-110 transition-transform shadow-brutal-sm z-50">
                 <i class="ph-bold ph-x"></i>
             </button>
 
-            <!-- Image Banner Header -->
-            <div class="relative w-full h-48 md:h-64 border-b-4 border-brand-black bg-gray-100 shrink-0" id="modal-header-bg">
+            <!-- Image Banner Header (shrink-0 prevents squishing) -->
+            <div class="relative w-full h-40 md:h-56 border-b-4 border-brand-black bg-gray-100 shrink-0" id="modal-header-bg">
                 <img id="modal-image" src="" alt="Product Image" class="w-full h-full object-cover">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                 <div class="absolute bottom-4 left-5 right-5 flex justify-between items-end">
@@ -276,13 +288,13 @@
             </div>
 
             <!-- Scrollable Content -->
-            <div class="p-5 md:p-6 overflow-y-auto flex-grow hide-scrollbar pb-32 md:pb-6">
+            <div class="flex-1 overflow-y-auto p-5 md:p-6 hide-scrollbar">
                 <h2 id="modal-title" class="font-display text-2xl md:text-3xl font-black mb-1">Product Title</h2>
                 <p id="modal-desc" class="text-sm font-bold text-gray-500 mb-6">Product description goes here.</p>
 
                 <!-- Buy More Save More Quantities -->
                 <div class="mb-6">
-                    <h3 class="font-black text-sm uppercase tracking-wider text-brand-magenta mb-3">Select Quantity / Package</h3>
+                    <h3 class="font-black text-sm uppercase tracking-wider text-brand-magenta mb-3">Select Quantity (Buy More, Save More)</h3>
                     <div id="modal-options" class="flex flex-col gap-3">
                         <!-- Options Injected via JS -->
                     </div>
@@ -295,21 +307,71 @@
                         <!-- Addons Injected via JS -->
                     </div>
                 </div>
-
-                <div class="mb-2">
-                    <h3 class="font-black text-sm uppercase tracking-wider text-brand-black mb-2">Your Name (Optional)</h3>
-                    <input type="text" id="customer-name" placeholder="E.g. Rahul" class="w-full bg-gray-50 border-2 border-brand-black p-3 rounded-xl font-bold outline-none focus:bg-brand-yellow/20 focus:border-brand-magenta transition-colors">
-                </div>
             </div>
 
             <!-- Sticky Checkout Footer (Absolute to stick to bottom of modal) -->
             <div class="absolute bottom-0 left-0 w-full border-t-4 border-brand-black p-4 md:p-5 bg-white shrink-0 z-40 md:relative">
                 <div class="flex justify-between items-center mb-3 md:mb-4">
-                    <span class="font-bold text-gray-500 uppercase text-xs md:text-sm tracking-wider">Total Amount</span>
+                    <span class="font-bold text-gray-500 uppercase text-xs md:text-sm tracking-wider">Item Total</span>
                     <span class="font-black text-2xl md:text-3xl text-brand-black" id="modal-total">₹0</span>
                 </div>
-                <button onclick="submitOrder()" class="w-full brutal-btn bg-brand-green text-white py-3 md:py-4 rounded-xl font-black text-base md:text-lg flex items-center justify-center gap-2 hover:bg-[#1fbc5b]">
-                    <i class="ph-bold ph-whatsapp-logo text-2xl"></i> Send Photos & Buy
+                <div class="flex gap-2 w-full">
+                    <button onclick="addToCart(false)" class="flex-1 brutal-btn bg-brand-yellow text-black py-3 rounded-xl font-black text-sm md:text-base flex items-center justify-center gap-2">
+                        <i class="ph-bold ph-shopping-cart text-xl"></i> Add to Cart
+                    </button>
+                    <button onclick="addToCart(true)" class="flex-1 brutal-btn bg-brand-green text-white py-3 rounded-xl font-black text-sm md:text-base flex items-center justify-center gap-2 hover:bg-[#1fbc5b]">
+                        Buy Now <i class="ph-bold ph-caret-right text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Cart Button -->
+    <button id="floating-cart" onclick="toggleCart()" class="fixed bottom-6 right-6 bg-brand-cyan text-brand-black w-14 h-14 rounded-full border-4 border-black shadow-brutal flex items-center justify-center z-40 hidden hover:-translate-y-1 transition-transform">
+        <i class="ph-bold ph-shopping-cart text-2xl"></i>
+        <span id="cart-count" class="absolute -top-2 -right-2 bg-brand-magenta text-white text-xs font-black w-6 h-6 rounded-full border-2 border-black flex items-center justify-center">0</span>
+    </button>
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="modal-overlay fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/60 backdrop-blur-sm p-0 md:p-4">
+        <div class="modal-content w-full h-[85svh] md:h-auto md:max-h-[85svh] max-w-lg bg-white md:rounded-3xl rounded-t-3xl border-t-4 border-x-4 md:border-b-4 border-brand-black shadow-[0_-10px_40px_rgba(0,0,0,0.2)] md:shadow-brutal flex flex-col relative overflow-hidden">
+            
+            <!-- Cart Header -->
+            <div class="flex justify-between items-center p-4 border-b-4 border-brand-black bg-brand-yellow shrink-0">
+                <h2 class="font-display font-black text-2xl tracking-tight">Your Cart 🛒</h2>
+                <button onclick="toggleCart()" class="w-10 h-10 bg-white border-2 border-black rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-brutal-sm">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+            
+            <!-- Cart Items -->
+            <div id="cart-items" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 bg-gray-50 hide-scrollbar pb-32 md:pb-4">
+                <!-- Items injected via JS -->
+            </div>
+
+            <!-- Cart Footer (Checkout logic) -->
+            <div class="absolute bottom-0 left-0 w-full shrink-0 p-4 border-t-4 border-brand-black bg-white z-40 md:relative">
+                <div id="delivery-progress" class="mb-3 text-xs md:text-sm font-bold text-center bg-gray-100 py-1.5 rounded-lg border-2 border-dashed border-gray-300"></div>
+                
+                <div class="flex justify-between items-center mb-1 text-sm font-bold text-gray-500">
+                    <span>Subtotal</span>
+                    <span id="cart-subtotal">₹0</span>
+                </div>
+                <div class="flex justify-between items-center mb-3 text-sm font-bold text-gray-500">
+                    <span>Delivery</span>
+                    <span id="cart-delivery">₹80</span>
+                </div>
+                
+                <div class="flex justify-between items-center mb-4 border-t-2 border-gray-200 pt-2">
+                    <span class="font-black uppercase text-sm tracking-wider">Total</span>
+                    <span class="font-black text-2xl md:text-3xl text-brand-black" id="cart-total">₹0</span>
+                </div>
+                
+                <input type="text" id="cart-customer-name" placeholder="Your Name (Optional)" class="w-full bg-gray-50 border-2 border-brand-black p-3 rounded-xl font-bold outline-none focus:bg-brand-yellow/20 focus:border-brand-magenta transition-colors mb-3">
+                
+                <button onclick="checkoutCart()" class="w-full brutal-btn bg-brand-green text-white py-3 md:py-4 rounded-xl font-black text-base flex items-center justify-center gap-2 hover:bg-[#1fbc5b]">
+                    <i class="ph-bold ph-whatsapp-logo text-2xl"></i> Send Order on WhatsApp
                 </button>
             </div>
         </div>
@@ -339,11 +401,11 @@
                 image: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/polaroids.webp',
                 bgColor: 'bg-brand-purple',
                 options: [
-                    { id: 'mp_9', label: 'Mini Polaroids (9)', price: 69, desc: 'Starter pack' },
-                    { id: 'mp_18', label: 'Mini Polaroids (18)', price: 129, desc: 'Double the fun' },
-                    { id: 'mp_27', label: 'Mini Polaroids (27)', price: 169, desc: 'Getting serious' },
-                    { id: 'mp_34', label: 'Mini Polaroids (34)', price: 199, desc: 'Best Value pack!', isPopular: true },
-                    { id: 'mp_50', label: 'Mini Polaroids (50)', price: 289, desc: 'The whole camera roll' },
+                    { id: 'mp_9', label: '9 Polaroids', price: 69, desc: 'Starter pack', qty: 9 },
+                    { id: 'mp_18', label: '18 Polaroids', price: 129, desc: 'Double the fun', qty: 18 },
+                    { id: 'mp_27', label: '27 Polaroids', price: 169, desc: 'Getting serious', qty: 27 },
+                    { id: 'mp_34', label: '34 Polaroids', price: 199, desc: 'Most popular!', qty: 34, isPopular: true },
+                    { id: 'mp_50', label: '50 Polaroids', price: 289, desc: 'The whole camera roll', qty: 50 },
                 ],
                 addons: [
                     { id: 'ext_mp', label: 'Extra Mini Polaroid', price: 8 },
@@ -360,10 +422,10 @@
                 image: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/photostrips.jpg',
                 bgColor: 'bg-brand-yellow',
                 options: [
-                    { id: 'ps_2', label: 'Photo Strips (2 Strips)', price: 49, desc: 'Sweet & simple' },
-                    { id: 'ps_4', label: 'Photo Strips (4 Strips)', price: 79, desc: 'Good for a group' },
-                    { id: 'ps_8', label: 'Photo Strips (8 Strips)', price: 149, desc: 'Share with friends', isPopular: true },
-                    { id: 'ps_12', label: 'Photo Strips (12 Strips)', price: 199, desc: 'Mega strip pack' },
+                    { id: 'ps_2', label: '2 Strips', price: 49, desc: 'Sweet & simple', qty: 2 },
+                    { id: 'ps_4', label: '4 Strips', price: 79, desc: 'Good for a group', qty: 4 },
+                    { id: 'ps_8', label: '8 Strips', price: 149, desc: 'Share with friends', qty: 8, isPopular: true },
+                    { id: 'ps_12', label: '12 Strips', price: 199, desc: 'Mega strip pack', qty: 12 },
                 ],
                 addons: [
                     { id: 'ext_ps', label: 'Extra Photo Strip', price: 20 },
@@ -379,8 +441,8 @@
                 image: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/spotify.jpg',
                 bgColor: 'bg-[#86efac]',
                 options: [
-                    { id: 'spt_1', label: 'Spotify Photo Card', price: 149, desc: 'Photo & Code on front' },
-                    { id: 'spt_2', label: 'Double-sided Spotify Photo Card', price: 179, desc: 'Photo front, Code back', isPopular: true },
+                    { id: 'spt_1', label: 'Spotify Photo Card', price: 149, desc: 'Photo & Code on front', qty: 1 },
+                    { id: 'spt_2', label: 'Double-sided Card', price: 179, desc: 'Photo front, Code back', qty: 1, isPopular: true },
                 ],
                 addons: [
                     { id: 'env', label: 'Gift Envelope', price: 20 },
@@ -393,10 +455,10 @@
                 title: 'Jumbo Polaroids',
                 desc: 'Big, bold, and beautiful vintage-style prints to make a statement on your wall.',
                 emoji: '🖼️',
-                image: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/polaroids.webp', // Resued as it's aesthetic
+                image: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/polaroids.webp', 
                 bgColor: 'bg-brand-cyan',
                 options: [
-                    { id: 'jp_4', label: 'Jumbo Polaroids (4 pcs)', price: 99, desc: 'XL aesthetic prints', isPopular: true },
+                    { id: 'jp_4', label: '4 Jumbo Polaroids', price: 99, desc: 'XL aesthetic prints', qty: 4, isPopular: true },
                 ],
                 addons: [
                     { id: 'env', label: 'Gift Envelope', price: 20 },
@@ -412,9 +474,9 @@
                 image: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/poster.avif',
                 bgColor: 'bg-brand-blue',
                 options: [
-                    { id: 'pst_a5', label: 'Poster (A5)', price: 49, desc: 'Small space filler' },
-                    { id: 'pst_a4', label: 'Poster (A4)', price: 99, desc: 'Standard size' },
-                    { id: 'pst_a3', label: 'Poster (A3)', price: 179, desc: 'Go big!', isPopular: true },
+                    { id: 'pst_a5', label: 'Poster (A5)', price: 49, desc: 'Small space filler', qty: 1 },
+                    { id: 'pst_a4', label: 'Poster (A4)', price: 99, desc: 'Standard size', qty: 1 },
+                    { id: 'pst_a3', label: 'Poster (A3)', price: 179, desc: 'Go big!', qty: 1, isPopular: true },
                 ],
                 addons: []
             },
@@ -427,8 +489,8 @@
                 image: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/greeting%20card.webp',
                 bgColor: 'bg-white',
                 options: [
-                    { id: 'gc_a6', label: 'Greeting Card (A6 Folded)', price: 79, desc: 'Cute & compact', isPopular: true },
-                    { id: 'gc_a5', label: 'Greeting Card (A5 Folded)', price: 129, desc: 'Big & expressive' },
+                    { id: 'gc_a6', label: 'Greeting Card (A6 Folded)', price: 79, desc: 'Cute & compact', qty: 1, isPopular: true },
+                    { id: 'gc_a5', label: 'Greeting Card (A5 Folded)', price: 129, desc: 'Big & expressive', qty: 1 },
                 ],
                 addons: [
                     { id: 'gc_dsg', label: 'Custom Greeting Card Design', price: 30 },
@@ -444,8 +506,8 @@
                 image: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/matte%20stickers.jpg',
                 bgColor: 'bg-brand-magenta',
                 options: [
-                    { id: 'stk_mat', label: 'Matte Sticker Sheet (A4)', price: 25, desc: 'Standard matte finish', isPopular: true },
-                    { id: 'stk_glo', label: 'Glossy Sticker Sheet (A4)', price: 45, desc: 'Shiny & vibrant' },
+                    { id: 'stk_mat', label: 'Matte Sticker Sheet (A4)', price: 25, desc: 'Standard matte finish', qty: 1, isPopular: true },
+                    { id: 'stk_glo', label: 'Glossy Sticker Sheet (A4)', price: 45, desc: 'Shiny & vibrant', qty: 1 },
                 ],
                 addons: []
             },
@@ -458,8 +520,8 @@
                 image: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/holographic%20stickers.jpeg',
                 bgColor: 'bg-brand-yellow',
                 options: [
-                    { id: 'stk_trn', label: 'Transparent Sticker Sheet (A4)', price: 60, desc: 'Clear background' },
-                    { id: 'stk_hol', label: 'Holographic Sticker Sheet (A4)', price: 70, desc: 'Shiny rainbow effect', isPopular: true },
+                    { id: 'stk_trn', label: 'Transparent Sticker Sheet (A4)', price: 60, desc: 'Clear background', qty: 1 },
+                    { id: 'stk_hol', label: 'Holographic Sticker Sheet (A4)', price: 70, desc: 'Shiny rainbow effect', qty: 1, isPopular: true },
                 ],
                 addons: []
             },
@@ -472,10 +534,10 @@
                 image: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/visiting%20card.jpeg',
                 bgColor: 'bg-brand-cyan',
                 options: [
-                    { id: 'biz_qr', label: 'QR Cards (50 pcs)', price: 99, desc: 'Scannable smart cards' },
-                    { id: 'biz_ty', label: 'Thank You Cards (20 pcs)', price: 149, desc: 'For your packages' },
-                    { id: 'biz_tag', label: 'Product Tags (25 pcs)', price: 149, desc: 'Brand your items' },
-                    { id: 'biz_vc', label: 'Visiting Cards (100 pcs)', price: 249, desc: 'Classic networking', isPopular: true },
+                    { id: 'biz_qr', label: 'QR Cards (50 pcs)', price: 99, desc: 'Scannable smart cards', qty: 50 },
+                    { id: 'biz_ty', label: 'Thank You Cards (20 pcs)', price: 149, desc: 'For your packages', qty: 20 },
+                    { id: 'biz_tag', label: 'Product Tags (25 pcs)', price: 149, desc: 'Brand your items', qty: 25 },
+                    { id: 'biz_vc', label: 'Visiting Cards (100 pcs)', price: 249, desc: 'Classic networking', qty: 100, isPopular: true },
                 ],
                 addons: []
             },
@@ -488,10 +550,10 @@
                 image: 'https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/apparal%20printing.webp',
                 bgColor: 'bg-brand-black',
                 options: [
-                    { id: 'apl_pock', label: 'Apparel Printing (Pocket Print)', price: 99, desc: 'Small chest logo' },
-                    { id: 'apl_a5', label: 'Apparel Printing (A5 Print)', price: 149, desc: 'Medium chest graphic' },
-                    { id: 'apl_a4f', label: 'Apparel Printing (A4 Print)', price: 250, desc: 'Full front graphic', isPopular: true },
-                    { id: 'apl_a4fb', label: 'Apparel Printing (Front + Back A4)', price: 450, desc: 'Maximized branding' },
+                    { id: 'apl_pock', label: 'Apparel Printing (Pocket Print)', price: 99, desc: 'Small chest logo', qty: 1 },
+                    { id: 'apl_a5', label: 'Apparel Printing (A5 Print)', price: 149, desc: 'Medium chest graphic', qty: 1 },
+                    { id: 'apl_a4f', label: 'Apparel Printing (A4 Print)', price: 250, desc: 'Full front graphic', qty: 1, isPopular: true },
+                    { id: 'apl_a4fb', label: 'Apparel Printing (Front + Back A4)', price: 450, desc: 'Maximized branding', qty: 1 },
                 ],
                 addons: []
             }
@@ -500,59 +562,42 @@
         let currentProduct = null;
         let selectedOption = null;
         let selectedAddons = new Set();
+        let cart = []; // Array to store shopping cart items
         
         // --- STREAMING_CHUNK:Rendering the Category Mobile Grid ---
         function renderGallery() {
-            const container = document.getElementById('categories-container');
+            const container = document.getElementById('all-products-grid');
+            if (!container) return;
+
             let html = '';
 
-            categories.forEach(category => {
-                // Filter products that belong to this category
-                const catProducts = products.filter(p => p.categoryId === category.id);
-                if (catProducts.length === 0) return;
-
+            // Render all products perfectly flat without categories separating them
+            products.forEach(product => {
+                const popularOption = product.options.find(o => o.isPopular) || product.options[0];
+                const minPrice = Math.min(...product.options.map(o => o.price));
+                
                 html += `
-                <div class="category-section pl-4 md:pl-0">
-                    <div class="flex items-center gap-2 mb-4 md:mb-6">
-                        <span class="text-2xl md:text-3xl">${category.emoji}</span>
-                        <h2 class="font-display text-2xl md:text-3xl font-black tracking-tight ${category.color}">${category.title}</h2>
-                    </div>
-                    
-                    <!-- Horizontal scroll on mobile, grid on desktop -->
-                    <div class="flex overflow-x-auto hide-scrollbar carousel-snap gap-4 pb-4 md:grid md:grid-cols-2 lg:grid-cols-4 md:overflow-visible pr-4 md:pr-0">
-                `;
-
-                // For a more condensed store view, group by primary Product instead of individual Option tiles
-                catProducts.forEach(product => {
-                    const popularOption = product.options.find(o => o.isPopular) || product.options[0];
-                    const minPrice = Math.min(...product.options.map(o => o.price));
-                    
-                    html += `
-                        <div onclick="openProductModal('${product.id}', null)" class="carousel-item brutal-card bg-white rounded-[24px] flex flex-col cursor-pointer relative overflow-hidden group shrink-0 w-[75vw] sm:w-[300px] md:w-auto md:shrink">
-                            <div class="h-40 md:h-48 w-full bg-gray-200 relative border-b-4 border-brand-black overflow-hidden">
-                                <img src="${product.image}" alt="${product.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                <div class="absolute top-3 right-3 bg-white/90 backdrop-blur text-black px-2 py-1 rounded-md text-[10px] font-black border-2 border-black shadow-brutal-sm">
-                                    FROM ₹${minPrice}
-                                </div>
-                            </div>
-                            <div class="p-4 flex flex-col flex-grow">
-                                <h3 class="font-display text-lg md:text-xl font-black leading-tight mb-1 text-black flex items-center gap-2">
-                                    ${product.title}
-                                </h3>
-                                <p class="text-xs font-bold text-gray-500 line-clamp-2 mb-4">${product.desc}</p>
-                                
-                                <div class="mt-auto pt-2 flex justify-between items-end w-full">
-                                    <div class="text-sm font-bold text-brand-blue">${product.options.length} Options <i class="ph-bold ph-caret-down"></i></div>
-                                    <button class="bg-black text-white px-4 py-2 rounded-xl text-xs md:text-sm font-black border-2 border-transparent group-hover:bg-brand-yellow group-hover:text-black group-hover:border-black transition-all">Select</button>
-                                </div>
+                    <div onclick="openProductModal('${product.id}', null)" class="brutal-card bg-white rounded-[24px] flex flex-col cursor-pointer relative overflow-hidden group w-full">
+                        <div class="h-48 md:h-56 w-full bg-gray-200 relative border-b-4 border-brand-black overflow-hidden">
+                            <img src="${product.image}" loading="lazy" alt="${product.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <!-- Big FROM Price Tag -->
+                            <div class="absolute top-3 right-3 bg-brand-yellow text-black px-4 py-2 rounded-xl text-sm md:text-base font-black border-4 border-black shadow-brutal-sm transform rotate-2 group-hover:scale-110 transition-transform">
+                                FROM ₹${minPrice}
                             </div>
                         </div>
-                    `;
-                });
-
-                html += `
+                        <div class="p-5 flex flex-col flex-grow">
+                            <h3 class="font-display text-xl md:text-2xl font-black leading-tight mb-2 text-black flex items-center gap-2">
+                                ${product.emoji} ${product.title}
+                            </h3>
+                            <p class="text-sm font-bold text-gray-500 line-clamp-2 mb-6">${product.desc}</p>
+                            
+                            <div class="mt-auto flex justify-between items-end w-full">
+                                <div class="text-sm font-bold text-brand-blue">${product.options.length} Size/Qty Options</div>
+                                <button class="bg-black text-white px-5 py-2.5 rounded-xl text-sm font-black border-2 border-transparent group-hover:bg-brand-cyan group-hover:text-black group-hover:border-black transition-all">Select</button>
+                            </div>
+                        </div>
                     </div>
-                </div>`;
+                `;
             });
 
             container.innerHTML = html;
@@ -581,23 +626,32 @@
             document.getElementById('modal-title').textContent = currentProduct.title;
             document.getElementById('modal-desc').textContent = currentProduct.desc;
             
-            // Build Options List
+            // Build Options List with Per Piece Math
             const optionsContainer = document.getElementById('modal-options');
-            optionsContainer.innerHTML = currentProduct.options.map((opt) => `
-                <label class="cursor-pointer relative">
+            optionsContainer.innerHTML = currentProduct.options.map((opt) => {
+                let perPieceBadge = '';
+                if (opt.qty && opt.qty > 1) {
+                    const perPiece = (opt.price / opt.qty).toFixed(1).replace(/\.0$/, '');
+                    perPieceBadge = `<div class="inline-block bg-brand-cyan/30 text-brand-black px-2 py-0.5 rounded text-[10px] md:text-xs font-black uppercase mt-1 border-2 border-black shadow-[2px_2px_0_0_#000]">₹${perPiece} / pc</div>`;
+                }
+
+                return `
+                <label class="cursor-pointer relative block">
                     <input type="radio" name="product_option" value="${opt.id}" class="sr-only radio-custom" ${selectedOption.id === opt.id ? 'checked' : ''} onchange="handleOptionChange('${opt.id}')">
-                    <div class="w-full bg-white border-2 border-gray-200 rounded-xl p-4 flex justify-between items-center transition-all hover:border-black">
+                    <div class="w-full bg-white border-2 border-gray-200 rounded-xl p-3 md:p-4 flex justify-between items-center transition-all hover:border-black">
                         <div class="flex flex-col pr-2">
                             <span class="font-black text-base md:text-lg leading-tight">${opt.label}</span>
-                            <span class="text-[10px] md:text-xs font-bold text-gray-500">${opt.desc}</span>
+                            <span class="text-xs font-bold text-gray-500">${opt.desc}</span>
+                            <div>${perPieceBadge}</div>
                         </div>
                         <div class="flex flex-col items-end shrink-0">
                             <span class="font-black text-xl text-brand-black">₹${opt.price}</span>
-                            ${opt.isPopular ? `<span class="bg-brand-magenta text-white px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider mt-1">Best Value</span>` : ''}
+                            ${opt.isPopular ? `<span class="bg-brand-magenta text-white px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider mt-1 border border-black shadow-[2px_2px_0_0_#000]">Best Value</span>` : ''}
                         </div>
                     </div>
                 </label>
-            `).join('');
+                `;
+            }).join('');
 
             // Build Addons List
             const addonsContainer = document.getElementById('modal-addons-container');
@@ -616,7 +670,6 @@
                 addonsContainer.classList.add('hidden');
             }
 
-            document.getElementById('customer-name').value = '';
             updateTotal();
             
             const modal = document.getElementById('product-modal');
@@ -649,38 +702,168 @@
             document.getElementById('modal-total').textContent = `₹${total}`;
         }
 
-        // --- STREAMING_CHUNK:Handling WhatsApp Generation ---
-        function submitOrder() {
+        // --- STREAMING_CHUNK:Handling Cart & WhatsApp Checkout ---
+        function addToCart(proceedToCheckout = false) {
             if (!currentProduct || !selectedOption) return;
 
-            const name = document.getElementById('customer-name').value.trim() || 'Aesthetic Customer';
-            let total = selectedOption.price;
-            
-            let message = `Hey Delulu Printer! ✨ I want to order:\n\n`;
-            message += `${currentProduct.emoji} *${currentProduct.title}*\n`;
-            message += `📦 Package: ${selectedOption.label} (₹${selectedOption.price})\n`;
-            
-            if (selectedAddons.size > 0) {
-                message += `🎁 Add-ons: `;
-                const addOnTexts = [];
-                selectedAddons.forEach(id => {
-                    const addon = currentProduct.addons.find(a => a.id === id);
-                    if(addon) {
-                        addOnTexts.push(`${addon.label} (+₹${addon.price})`);
-                        total += addon.price;
-                    }
-                });
-                message += addOnTexts.join(', ') + `\n`;
+            // Calculate exact item price including addons
+            let itemPrice = selectedOption.price;
+            const includedAddons = [];
+            selectedAddons.forEach(id => {
+                const addon = currentProduct.addons.find(a => a.id === id);
+                if (addon) {
+                    itemPrice += addon.price;
+                    includedAddons.push(addon);
+                }
+            });
+
+            const cartItem = {
+                product: currentProduct,
+                option: selectedOption,
+                addons: includedAddons,
+                price: itemPrice
+            };
+
+            cart.push(cartItem);
+            closeModal();
+            updateCartUI();
+
+            if (proceedToCheckout) {
+                toggleCart();
+            } else {
+                showToast(`Added ${currentProduct.title} to cart! 🛒`);
             }
+        }
+
+        function updateCartUI() {
+            const floatingBtn = document.getElementById('floating-cart');
+            const cartCount = document.getElementById('cart-count');
             
+            if (cart.length > 0) {
+                floatingBtn.classList.remove('hidden');
+                cartCount.textContent = cart.length;
+            } else {
+                floatingBtn.classList.add('hidden');
+            }
+            renderCartModal();
+        }
+
+        function toggleCart() {
+            const modal = document.getElementById('cart-modal');
+            if (modal.classList.contains('active')) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            } else {
+                renderCartModal();
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function renderCartModal() {
+            const container = document.getElementById('cart-items');
+            let subtotal = 0;
+
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-500 font-bold py-10">Your cart is empty 🥺<br/><span class="text-xs mt-2 block">Go add some aesthetic prints!</span></div>`;
+            } else {
+                container.innerHTML = cart.map((item, index) => {
+                    subtotal += item.price;
+                    const addonHTML = item.addons.length > 0 
+                        ? `<div class="text-[10px] text-brand-blue font-bold mt-1 uppercase">+ ${item.addons.map(a => a.label).join(', ')}</div>` 
+                        : '';
+                        
+                    return `
+                    <div class="bg-white border-2 border-brand-black rounded-xl p-3 flex gap-3 relative shadow-[2px_2px_0px_0px_#111]">
+                        <div class="w-16 h-16 bg-gray-200 border-2 border-black rounded-lg shrink-0 overflow-hidden">
+                            <img src="${item.product.image}" class="w-full h-full object-cover" />
+                        </div>
+                        <div class="flex-grow flex flex-col justify-center pr-6">
+                            <div class="font-black text-sm leading-tight">${item.product.emoji} ${item.product.title}</div>
+                            <div class="text-[11px] font-bold text-gray-500">${item.option.label}</div>
+                            ${addonHTML}
+                            <div class="font-black text-brand-magenta text-sm mt-1">₹${item.price}</div>
+                        </div>
+                        <button onclick="removeFromCart(${index})" class="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors p-1">
+                            <i class="ph-bold ph-trash text-lg"></i>
+                        </button>
+                    </div>
+                    `;
+                }).join('');
+            }
+
+            const deliveryFee = subtotal >= 500 || subtotal === 0 ? 0 : 80;
+            const total = subtotal + deliveryFee;
+
+            document.getElementById('cart-subtotal').textContent = `₹${subtotal}`;
+            
+            const deliveryEl = document.getElementById('cart-delivery');
+            const progressEl = document.getElementById('delivery-progress');
+            
+            if (subtotal >= 500) {
+                deliveryEl.textContent = "FREE";
+                deliveryEl.className = "text-brand-green font-black";
+                progressEl.innerHTML = `🎉 <span class="text-brand-green">You unlocked FREE Delivery!</span>`;
+                progressEl.className = "mb-3 text-xs md:text-sm font-bold text-center bg-brand-green/10 text-brand-green py-2 rounded-lg border-2 border-dashed border-brand-green";
+            } else if (subtotal > 0) {
+                deliveryEl.textContent = `₹${deliveryFee}`;
+                deliveryEl.className = "text-gray-500";
+                const needed = 500 - subtotal;
+                progressEl.innerHTML = `Add <span class="text-brand-magenta font-black">₹${needed}</span> more for FREE Delivery! 🚀`;
+                progressEl.className = "mb-3 text-xs md:text-sm font-bold text-center bg-gray-100 py-2 rounded-lg border-2 border-dashed border-gray-300";
+            } else {
+                deliveryEl.textContent = `₹0`;
+                progressEl.innerHTML = `Build a cart of ₹500 for Free Delivery!`;
+                progressEl.className = "mb-3 text-xs md:text-sm font-bold text-center bg-gray-100 py-2 rounded-lg border-2 border-dashed border-gray-300";
+            }
+
+            document.getElementById('cart-total').textContent = `₹${total}`;
+        }
+
+        function checkoutCart() {
+            if (cart.length === 0) {
+                showToast("Your cart is empty!");
+                return;
+            }
+
+            const name = document.getElementById('cart-customer-name').value.trim() || 'Aesthetic Customer';
+            let subtotal = 0;
+            
+            let message = `Hey Delulu Printer! ✨ I'd like to order:\n\n`;
+            
+            cart.forEach((item, index) => {
+                message += `${index + 1}. ${item.product.emoji} *${item.product.title}*\n`;
+                message += `   📦 ${item.option.label} (₹${item.option.price})\n`;
+                if (item.addons.length > 0) {
+                    message += `   🎁 Add-ons: ${item.addons.map(a => `${a.label} (+₹${a.price})`).join(', ')}\n`;
+                }
+                subtotal += item.price;
+                message += `\n`;
+            });
+            
+            const deliveryFee = subtotal >= 500 ? 0 : 80;
+            const total = subtotal + deliveryFee;
+
             message += `👤 Name: ${name}\n`;
-            message += `\n💰 *Estimated Total: ₹${total}*\n\nHere are my photos... 📸`;
+            message += `\n-------------------\n`;
+            message += `💵 Subtotal: ₹${subtotal}\n`;
+            message += `🛵 Delivery: ${deliveryFee === 0 ? 'FREE 🎉' : `₹${deliveryFee}`}\n`;
+            message += `💰 *Grand Total: ₹${total}*\n`;
+            message += `-------------------\n`;
+            message += `\nHere are my photos... 📸`;
 
             const encodedMessage = encodeURIComponent(message);
             const whatsappUrl = `https://wa.me/919907488075?text=${encodedMessage}`;
             
             window.open(whatsappUrl, '_blank');
-            closeModal();
+            
+            // Note: Not emptying cart automatically so they don't lose progress if they come back.
+            toggleCart();
             showToast("Opening WhatsApp... Don't forget to attach your photos! 🚀");
         }
 
