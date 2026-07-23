@@ -80,7 +80,7 @@
                 <div class="mb-2"><i class="fas fa-id-badge text-2xl"></i></div>
                 <h3 class="text-lg font-black mb-1 leading-tight">Passport Size</h3>
                 <div class="text-2xl font-black mb-2 mt-auto">8 <span class="text-xs font-bold">/Sheet</span></div>
-                <p class="text-[10px] font-bold">Paper saver (4x2 top)</p>
+                <p class="text-[10px] font-bold">Paper saver (4x2 grid)</p>
             </div>
 
             <!-- Normal Prints Card -->
@@ -88,7 +88,7 @@
                 <div class="mb-2"><i class="fas fa-images text-2xl"></i></div>
                 <h3 class="text-lg font-black mb-1 leading-tight">Normal Prints</h3>
                 <div class="text-2xl font-black mb-2 mt-auto">Best <span class="text-xs font-bold">Fit</span></div>
-                <p class="text-[10px] font-bold">Tuition notes & photos</p>
+                <p class="text-[10px] font-bold">Auto-rotates for space</p>
             </div>
 
             <!-- Polaroid Card -->
@@ -186,7 +186,7 @@
         </div>
         
         <div class="mt-8 text-center font-bold text-gray-500 text-sm">
-            Powered by <span class="text-black">deluluprinter.xyz</span> | Artevia Studio Local Engine 🚀
+            Powered by <span class="text-black">deluluprinter.xyz</span> | Shree Raj Hostel Printing 🚀
         </div>
     </div>
 
@@ -267,19 +267,6 @@
             });
         };
 
-        const loadExternalImage = (src) => {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.crossOrigin = "anonymous"; 
-                img.onload = () => resolve(img);
-                img.onerror = () => {
-                    console.warn(`Failed to load QR from ${src}, using fallback.`);
-                    resolve(null);
-                };
-                img.src = src;
-            });
-        };
-
         // --- SHAPE GENERATORS ---
         function drawHeart(ctx, x, y, width, height) {
             ctx.save();
@@ -347,20 +334,12 @@
                 const canvasW = isPortrait ? 2480 : 3508;
                 const canvasH = isPortrait ? 3508 : 2480;
 
-                // Footer Advertisement Configuration (Conditional)
-                const isPassport = currentMode === 'passport';
-                const footerH = isPassport ? 0 : 450; 
-                const printH = canvasH - footerH; 
+                // No bottom footer dead space; we use the whole page and put text in the center
+                const footerH = 0; 
+                const printH = canvasH; 
 
                 const files = Array.from(imageInput.files);
                 let images = await Promise.all(files.map(loadImage));
-                
-                const priceQrSrc = "https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/price.png";
-                const orderQrSrc = "https://raw.githubusercontent.com/Sarup098/deluluprinter/main/files/main.png";
-                const [priceQrImg, orderQrImg] = await Promise.all([
-                    loadExternalImage(priceQrSrc),
-                    loadExternalImage(orderQrSrc)
-                ]);
 
                 const canvas = document.createElement('canvas');
                 canvas.width = canvasW;
@@ -372,108 +351,63 @@
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = 'high';
 
+                // Increase the gap significantly for ink savings
+                const inkSavingGapRatio = 0.05; // 5% of space reserved for gaps
+
                 // ==========================================
-                // PRINT LAYOUT ENGINE
+                // PRINT LAYOUT ENGINE WITH AUTO-ROTATE
                 // ==========================================
 
-                if (isPassport) {
+                if (currentMode === 'passport') {
                     const img = images[0]; 
                     const passW = 413; 
                     const passH = 531; 
-                    const gap = 60;    
                     
-                    const targetRatio = passW / passH;
-                    const imgRatio = img.width / img.height;
+                    // Increase gap for more whitespace between passports
+                    const gap = 80; 
                     
-                    let sWidth = img.width, sHeight = img.height, sx = 0, sy = 0;
-                    if (imgRatio > targetRatio) {
-                        sWidth = img.height * targetRatio;
-                        sx = (img.width - sWidth) / 2;
-                    } else {
-                        sHeight = img.width / targetRatio;
-                        sy = (img.height - sHeight) / 2;
-                    }
-
-                    // Push the grid to the left side (StartX = 100)
-                    const startX = 100; 
-                    const startY = 150; 
+                    const cols = 4;
+                    const rows = 2; // Fixed grid for 8 photos
+                    
+                    // Center the passport grid horizontally and vertically in the print area
+                    const totalW = (cols * passW) + ((cols - 1) * gap);
+                    const totalH = (rows * passH) + ((rows - 1) * gap);
+                    const startX = (canvasW - totalW) / 2; 
+                    const startY = (printH - totalH) / 2; 
 
                     for (let i = 0; i < 8; i++) {
-                        const col = i % 4;
-                        const row = Math.floor(i / 4);
+                        const col = i % cols;
+                        const row = Math.floor(i / cols);
                         const dx = startX + col * (passW + gap);
                         const dy = startY + row * (passH + gap);
                         
-                        ctx.drawImage(img, sx, sy, sWidth, sHeight, dx, dy, passW, passH);
+                        ctx.save();
+                        // Clip bounding box
+                        ctx.beginPath();
+                        ctx.rect(dx, dy, passW, passH);
+                        ctx.clip();
                         
+                        // Auto-Rotate to maximize space (convert landscape to portrait)
+                        let rotate = img.width > img.height; 
+                        let visualW = rotate ? img.height : img.width;
+                        let visualH = rotate ? img.width : img.height;
+                        
+                        // Scale to completely fill the target area (Center crop)
+                        let scale = Math.max(passW / visualW, passH / visualH);
+                        let drawRealW = img.width * scale;
+                        let drawRealH = img.height * scale;
+                        
+                        ctx.translate(dx + passW/2, dy + passH/2);
+                        if(rotate) ctx.rotate(Math.PI/2);
+                        
+                        ctx.drawImage(img, -drawRealW/2, -drawRealH/2, drawRealW, drawRealH);
+                        ctx.restore();
+                        
+                        // Stroke outer boundary
                         ctx.strokeStyle = '#cbd5e1'; 
                         ctx.lineWidth = 3;
                         ctx.strokeRect(dx, dy, passW, passH);
                     }
-
-                    // ==========================================
-                    // SIDE ADVERTISEMENT (Passport Mode Only)
-                    // ==========================================
-                    // Starts after the 4 columns of photos
-                    const sideAdX = startX + (4 * passW) + (3 * gap) + 80; 
-                    const sideAdY = startY;
-                    const sideAdW = 380; 
-                    const sideAdH = (2 * passH) + gap; 
-
-                    // Base 
-                    ctx.fillStyle = '#22d3ee';
-                    ctx.fillRect(sideAdX, sideAdY, sideAdW, sideAdH);
-                    ctx.strokeStyle = '#000000';
-                    ctx.lineWidth = 8;
-                    ctx.strokeRect(sideAdX, sideAdY, sideAdW, sideAdH);
-
-                    // Title
-                    ctx.fillStyle = '#000000';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'top';
-                    ctx.font = '900 40px "Inter", sans-serif';
-                    ctx.fillText("PRINT", sideAdX + sideAdW/2, sideAdY + 40);
-                    ctx.fillText("STICKERS,", sideAdX + sideAdW/2, sideAdY + 85);
-                    ctx.fillText("POLAROIDS", sideAdX + sideAdW/2, sideAdY + 130);
-                    ctx.fillText("& MORE!", sideAdX + sideAdW/2, sideAdY + 175);
-
-                    // Price
-                    ctx.fillStyle = '#facc15';
-                    ctx.fillRect(sideAdX + 20, sideAdY + 240, sideAdW - 40, 110);
-                    ctx.strokeRect(sideAdX + 20, sideAdY + 240, sideAdW - 40, 110);
-                    ctx.fillStyle = '#000000';
-                    ctx.font = '900 28px "Inter", sans-serif';
-                    ctx.fillText("STARTS AT ₹10", sideAdX + sideAdW/2, sideAdY + 260);
-                    ctx.fillText("COLOUR PRINTS", sideAdX + sideAdW/2, sideAdY + 300);
-
-                    // QRs
-                    const drawSideQr = (img, yOffset, label) => {
-                        const qrSize = 180;
-                        const qrX = sideAdX + (sideAdW - qrSize)/2;
-                        const qrY = sideAdY + yOffset;
-                        
-                        ctx.fillStyle = '#000';
-                        ctx.fillRect(qrX + 8, qrY + 8, qrSize, qrSize);
-                        ctx.fillStyle = '#fff';
-                        ctx.fillRect(qrX, qrY, qrSize, qrSize);
-                        ctx.strokeRect(qrX, qrY, qrSize, qrSize);
-                        
-                        if(img) ctx.drawImage(img, qrX + 10, qrY + 10, qrSize - 20, qrSize - 20);
-                        
-                        ctx.fillStyle = '#000';
-                        ctx.font = '900 18px "Inter", sans-serif';
-                        ctx.fillText(label, sideAdX + sideAdW/2, qrY + qrSize + 15);
-                    };
-
-                    drawSideQr(priceQrImg, 380, "SCAN FOR PRICE");
-                    drawSideQr(orderQrImg, 620, "SCAN TO ORDER");
-
-                    // Footer Link
-                    ctx.font = '800 22px "Inter", sans-serif';
-                    ctx.fillText("deluluprinter.xyz", sideAdX + sideAdW/2, sideAdY + 860);
-                    ctx.fillText("WA: 9907488075", sideAdX + sideAdW/2, sideAdY + 890);
-                    
-                    ctx.textAlign = 'left'; // Reset
 
                 } else if (currentMode === 'polaroid') {
                     let polaroidImgs = [];
@@ -482,7 +416,7 @@
                     }
 
                     const cols = 3, rows = 3;
-                    const frameW = 700, frameH = 875; 
+                    const frameW = 680, frameH = 850; // slightly smaller frames
                     const gapX = (canvasW - (cols * frameW)) / 4;
                     const gapY = (printH - (rows * frameH)) / 4; 
 
@@ -501,24 +435,45 @@
                         ctx.strokeRect(dx, dy, frameW, frameH);
                         ctx.setLineDash([]); 
 
-                        const imgAreaSize = 620;
-                        const margin = (frameW - imgAreaSize) / 2;
-                        const imgX = dx + margin;
-                        const imgY = dy + margin; 
+                        // Make image area inside polaroid slightly smaller
+                        const imgAreaSize = 580;
+                        const marginX = (frameW - imgAreaSize) / 2;
+                        const marginY = 50; // Fixed top margin for polaroid look
+                        const imgX = dx + marginX;
+                        const imgY = dy + marginY; 
+                        
+                        ctx.save();
+                        // Clip bounding box for polaroid photo area
+                        ctx.beginPath();
+                        ctx.rect(imgX, imgY, imgAreaSize, imgAreaSize);
+                        ctx.clip();
+                        
+                        // Auto-Rotate just to handle landscape correctly in square space
+                        let rotate = img.width > img.height; 
+                        let visualW = rotate ? img.height : img.width;
+                        let visualH = rotate ? img.width : img.height;
+                        
+                        // Center crop scale
+                        let scale = Math.max(imgAreaSize / visualW, imgAreaSize / visualH);
+                        let drawRealW = img.width * scale;
+                        let drawRealH = img.height * scale;
 
-                        const side = Math.min(img.width, img.height);
-                        const sx = (img.width - side) / 2;
-                        const sy = (img.height - side) / 2;
-
-                        ctx.drawImage(img, sx, sy, side, side, imgX, imgY, imgAreaSize, imgAreaSize);
+                        ctx.translate(imgX + imgAreaSize/2, imgY + imgAreaSize/2);
+                        if(rotate) ctx.rotate(Math.PI/2);
+                        
+                        ctx.drawImage(img, -drawRealW/2, -drawRealH/2, drawRealW, drawRealH);
+                        ctx.restore();
                     });
 
                 } else {
                     const n = images.length;
                     let bestScore = 0;
                     let bestC = 1, bestR = n;
-                    const gap = Math.floor(Math.min(canvasW, printH) * 0.03); 
+                    
+                    // Much larger gap calculation to ensure more whitespace and smaller images
+                    const gap = Math.floor(Math.min(canvasW, printH) * inkSavingGapRatio); 
 
+                    // Grid Optimization Engine
                     for (let c = 1; c <= n; c++) {
                         let r = Math.ceil(n / c);
                         let cellW = (canvasW - (gap * (c + 1))) / c;
@@ -526,8 +481,16 @@
                         
                         let score = 0;
                         for (let img of images) {
-                            let scale = Math.min(cellW / img.width, cellH / img.height);
-                            score += (img.width * scale) * (img.height * scale);
+                            // Check scale normally
+                            let scale1 = Math.min(cellW / img.width, cellH / img.height);
+                            // Check scale if rotated by 90 degrees
+                            let scale2 = Math.min(cellW / img.height, cellH / img.width);
+                            
+                            let area1 = (img.width * scale1) * (img.height * scale1);
+                            let area2 = (img.height * scale2) * (img.width * scale2);
+                            
+                            // Prefer the orientation that gives the largest printed area
+                            score += Math.max(area1, area2);
                         }
 
                         if (score > bestScore) {
@@ -544,17 +507,33 @@
                         const col = i % bestC;
                         const row = Math.floor(i / bestC);
 
-                        const scale = Math.min(cellW / img.width, cellH / img.height);
-                        const drawW = img.width * scale;
-                        const drawH = img.height * scale;
+                        // Re-evaluate rotation for this specific image in the final grid
+                        let scale1 = Math.min(cellW / img.width, cellH / img.height);
+                        let scale2 = Math.min(cellW / img.height, cellH / img.width);
+                        
+                        let area1 = (img.width * scale1) * (img.height * scale1);
+                        let area2 = (img.height * scale2) * (img.width * scale2);
+                        let rotate = area2 > area1;
+
+                        // Reduce the scale slightly to create padding inside the grid cell itself
+                        const inkSavingScaleFactor = 0.90; 
+
+                        let baseScale = rotate ? scale2 : scale1;
+                        let scale = baseScale * inkSavingScaleFactor;
+                        
+                        let drawW = rotate ? img.height * scale : img.width * scale;
+                        let drawH = rotate ? img.width * scale : img.height * scale;
 
                         const startX = gap + (col * (cellW + gap));
                         const startY = gap + (row * (cellH + gap));
+                        
+                        // Center within the grid cell
                         const xOffset = startX + (cellW - drawW) / 2;
                         const yOffset = startY + (cellH - drawH) / 2;
 
                         ctx.save();
 
+                        // Apply Sticker Shapes to bounding box (before rotation)
                         if (currentMode === 'stickers') {
                             const shape = stickerShapeSelect.value;
                             
@@ -580,84 +559,51 @@
                             }
                         }
 
-                        ctx.drawImage(img, xOffset, yOffset, drawW, drawH);
+                        // Apply drawing transformations
+                        if (rotate) {
+                            ctx.translate(xOffset + drawW/2, yOffset + drawH/2);
+                            ctx.rotate(Math.PI / 2);
+                            ctx.drawImage(img, -drawH/2, -drawW/2, drawH, drawW); // Swap w/h here since context is rotated
+                        } else {
+                            ctx.drawImage(img, xOffset, yOffset, drawW, drawH);
+                        }
+                        
                         ctx.restore(); 
                     });
                 }
-
+                
                 // ==========================================
-                // BOTTOM ADVERTISEMENT (For Normal/Polaroid/Stickers)
+                // CENTER WATERMARK (Placed exactly in the middle gap)
                 // ==========================================
-                if (!isPassport) {
-                    const footerY = printH; 
+                
+                // Exact center coordinates of the entire canvas
+                const textXPos = canvasW / 2;
+                const textYPos = canvasH / 2;
+                
+                ctx.font = '600 32px "Inter", sans-serif'; 
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const watermarkText = "Printed from Shree Raj Hostel | WhatsApp No: 9907488075 | Best Price & Optimal Quality";
+                
+                // Add a small white background block behind text to ensure crisp dead-space separation
+                const textMetrics = ctx.measureText(watermarkText);
+                const paddingX = 40;
+                const paddingY = 20;
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(
+                    textXPos - (textMetrics.width / 2) - paddingX, 
+                    textYPos - paddingY - 16, 
+                    textMetrics.width + (paddingX * 2), 
+                    (paddingY * 2) + 32
+                );
 
-                    ctx.fillStyle = '#22d3ee'; 
-                    ctx.fillRect(0, footerY, canvasW, footerH);
-                    
-                    ctx.strokeStyle = '#000000';
-                    ctx.lineWidth = 14;
-                    ctx.beginPath();
-                    ctx.moveTo(0, footerY);
-                    ctx.lineTo(canvasW, footerY);
-                    ctx.stroke();
+                ctx.fillStyle = '#64748b'; // Slate gray for a subtle watermark look
+                ctx.fillText(watermarkText, textXPos, textYPos);
 
-                    ctx.fillStyle = '#000000';
-                    ctx.textAlign = 'left';
-                    ctx.textBaseline = 'top';
-
-                    // Reduced font sizes and string length to prevent overlapping
-                    ctx.font = '900 65px "Inter", sans-serif';
-                    ctx.fillText("PRINT STICKERS, POLAROIDS & MORE!", 80, footerY + 80);
-
-                    ctx.font = '800 45px "Inter", sans-serif';
-                    ctx.fillText("Order via deluluprinter.xyz  |  WhatsApp: 9907488075", 80, footerY + 180);
-
-                    ctx.fillStyle = '#facc15'; 
-                    ctx.fillRect(70, footerY + 280, 950, 90);
-                    ctx.strokeStyle = '#000000';
-                    ctx.lineWidth = 6;
-                    ctx.strokeRect(70, footerY + 280, 950, 90);
-                    
-                    ctx.fillStyle = '#000000';
-                    ctx.font = '900 40px "Inter", sans-serif';
-                    ctx.fillText("💥 STARTS AT JUST ₹10 FOR COLOUR PRINTS!", 100, footerY + 305);
-
-                    // Shift QRs to the right and scale slightly to ensure padding
-                    const drawQrBlock = (img, x, label) => {
-                        const qrSize = 220;
-                        const qrY = footerY + 70;
-                        
-                        ctx.fillStyle = '#000000';
-                        ctx.fillRect(x + 10, qrY + 10, qrSize, qrSize);
-                        
-                        ctx.fillStyle = '#ffffff';
-                        ctx.fillRect(x, qrY, qrSize, qrSize);
-                        ctx.lineWidth = 6;
-                        ctx.strokeStyle = '#000000';
-                        ctx.strokeRect(x, qrY, qrSize, qrSize);
-
-                        if(img) {
-                            ctx.drawImage(img, x + 15, qrY + 15, qrSize - 30, qrSize - 30);
-                        } else {
-                            ctx.fillStyle = '#000000';
-                            ctx.font = '700 30px "Inter", sans-serif';
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.fillText("QR", x + qrSize/2, qrY + qrSize/2);
-                            ctx.textAlign = 'left';
-                            ctx.textBaseline = 'top';
-                        }
-
-                        ctx.fillStyle = '#000000';
-                        ctx.font = '900 24px "Inter", sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.fillText(label, x + qrSize/2, qrY + qrSize + 25);
-                        ctx.textAlign = 'left'; 
-                    };
-
-                    drawQrBlock(priceQrImg, canvasW - 650, "SCAN FOR PRICE");
-                    drawQrBlock(orderQrImg, canvasW - 330, "SCAN TO ORDER");
-                }
+                // Reset alignment
+                ctx.textAlign = 'left'; 
+                ctx.textBaseline = 'top';
 
                 // ==========================================
 
