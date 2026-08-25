@@ -177,6 +177,43 @@
             </div>
         </section>
 
+        <!-- NEW FLIPBOOTH SECTION -->
+        <section id="flipbooth-promo" class="max-w-5xl mx-auto px-4 mb-16">
+            <div class="bg-brand-cyan border-4 border-brand-black rounded-3xl p-6 md:p-10 shadow-brutal-lg relative overflow-hidden flex flex-col md:flex-row items-center gap-8 group">
+                <!-- Decorative Elements -->
+                <div class="absolute top-4 right-4 bg-white border-2 border-black rounded-full px-3 py-1 font-black text-xs uppercase tracking-widest shadow-brutal-sm rotate-12 z-10">NEW!</div>
+                <div class="absolute -bottom-6 -left-6 text-9xl opacity-20 pointer-events-none group-hover:scale-110 transition-transform duration-500">📖</div>
+
+                <!-- Text Content -->
+                <div class="flex-1 z-10 text-center md:text-left">
+                    <h2 class="font-display text-4xl md:text-5xl font-black leading-tight mb-4">
+                        Make a <span class="text-white drop-shadow-[2px_2px_0_rgba(17,17,17,1)]">Flipbook</span> <br/>
+                        of yourself.
+                    </h2>
+                    <p class="font-bold text-base md:text-lg text-gray-800 mb-6">
+                        Record a short video or upload one from your phone. We'll stitch it into a 24-page virtual flipbook you can actually drag and riffle through. Export as a GIF or print it out!
+                    </p>
+                    <a href="https://deluluprinter.xyz/flipbook/" target="_blank" class="inline-flex brutal-btn bg-brand-yellow text-black px-8 py-4 rounded-xl font-black text-lg items-center gap-3 hover:-translate-y-1 transition-transform">
+                        Try Flipbooth Now <i class="ph-bold ph-arrow-right text-xl"></i>
+                    </a>
+                </div>
+
+                <!-- Visual Preview / Icon area -->
+                <div class="flex-1 flex justify-center z-10 relative">
+                    <div class="w-48 h-64 md:w-64 md:h-80 bg-white border-4 border-black rounded-xl shadow-brutal flex items-center justify-center relative rotate-3 group-hover:rotate-6 transition-transform duration-300">
+                        <!-- Simulated pages -->
+                        <div class="absolute inset-0 bg-gray-100 border-4 border-black rounded-xl -right-2 top-2 -z-10"></div>
+                        <div class="absolute inset-0 bg-gray-200 border-4 border-black rounded-xl -right-4 top-4 -z-20"></div>
+                        
+                        <div class="text-center">
+                            <i class="ph-fill ph-book-open text-6xl text-brand-magenta mb-2 block animate-bounce"></i>
+                            <span class="font-display font-black text-xl uppercase tracking-widest">Flip It!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="shop-gallery" class="max-w-6xl mx-auto px-4 pb-16 scroll-mt-36 md:scroll-mt-40">
             <!-- Flattened grid without category grouping -->
             <div id="all-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8"></div>
@@ -488,16 +525,14 @@
         let currentProduct = null;
         let selectedOption = null;
         let selectedAddons = new Set();
-        let cart = []; // Array to store shopping cart items
+        let cart = []; 
         
-        // --- STREAMING_CHUNK:Rendering the Category Mobile Grid ---
         function renderGallery() {
             const container = document.getElementById('all-products-grid');
             if (!container) return;
 
             let html = '';
 
-            // Render all products perfectly flat without categories separating them
             products.forEach(product => {
                 const popularOption = product.options.find(o => o.isPopular) || product.options[0];
                 const minPrice = Math.min(...product.options.map(o => o.price));
@@ -529,7 +564,6 @@
             container.innerHTML = html;
         }
 
-        // --- STREAMING_CHUNK:Implementing Checkout Modal ---
         function openProductModal(productId, defaultOptionId) {
             currentProduct = products.find(p => p.id === productId);
             const categoryMeta = categories.find(c => c.id === currentProduct.categoryId);
@@ -628,11 +662,9 @@
             document.getElementById('modal-total').textContent = `₹${total}`;
         }
 
-        // --- STREAMING_CHUNK:Handling Cart & WhatsApp Checkout ---
         function addToCart(proceedToCheckout = false) {
             if (!currentProduct || !selectedOption) return;
 
-            // Calculate exact item price including addons
             let itemPrice = selectedOption.price;
             const includedAddons = [];
             selectedAddons.forEach(id => {
@@ -788,7 +820,6 @@
             
             window.open(whatsappUrl, '_blank');
             
-            // Note: Not emptying cart automatically so they don't lose progress if they come back.
             toggleCart();
             showToast("Opening WhatsApp... Don't forget to attach your photos! 🚀");
         }
@@ -804,7 +835,6 @@
             }, 3000);
         }
 
-        // --- STREAMING_CHUNK:Secret Easter Egg ---
         let logoClickCount = 0;
         let logoClickTimer = null;
 
@@ -812,25 +842,20 @@
             logoClickCount++;
 
             if (logoClickCount === 1) {
-                // Immediate single click action (scroll to top)
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 
-                // Start a timer to reset the count if they don't tap fast enough
                 logoClickTimer = setTimeout(() => {
                     logoClickCount = 0;
-                }, 500); // 500ms window for 3 taps
+                }, 500); 
             } else if (logoClickCount === 3) {
-                // Trigger Easter Egg on 3rd tap!
                 clearTimeout(logoClickTimer);
                 logoClickCount = 0;
                 window.open('https://deluluprinter.xyz/create/', '_blank');
             }
         }
 
-        // Initialize Shop on load
         renderGallery();
 
-        // Close modal when clicking outside content
         document.getElementById('product-modal').addEventListener('click', function(e) {
             if(e.target === this) closeModal();
         });
