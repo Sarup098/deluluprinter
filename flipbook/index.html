@@ -20,19 +20,16 @@
                     },
                     colors: {
                         brand: {
-                            cyan: '#00FFFF',
-                            magenta: '#FF00FF',
-                            yellow: '#FFEA00',
-                            black: '#111111',
-                            green: '#25D366', 
-                            purple: '#d500f9',
-                            blue: '#2962ff'
+                            cyan: '#00FFFF', magenta: '#FF00FF', yellow: '#FFEA00',
+                            black: '#111111', green: '#25D366', purple: '#d500f9', blue: '#2962ff'
                         }
                     },
                     boxShadow: {
                         'brutal': '6px 6px 0px 0px rgba(17, 17, 17, 1)',
                         'brutal-sm': '3px 3px 0px 0px rgba(17, 17, 17, 1)',
                         'brutal-md': '4px 4px 0px 0px rgba(17, 17, 17, 1)',
+                        'brutal-lg': '10px 10px 0px 0px rgba(17, 17, 17, 1)',
+                        'brutal-white': '4px 4px 0px 0px rgba(255, 255, 255, 1)',
                     }
                 }
             }
@@ -41,9 +38,9 @@
     
     <style>
         body {
-            background-color: #FAFAFA;
-            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
-            background-size: 24px 24px;
+            background-color: #E2E8F0; /* Soft gray backing */
+            background-image: radial-gradient(#94a3b8 1.5px, transparent 1.5px);
+            background-size: 20px 20px;
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
         }
@@ -51,100 +48,104 @@
         .brutal-btn {
             border: 3px solid #111;
             box-shadow: 4px 4px 0px 0px #111;
-            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.1s ease;
         }
-        .brutal-btn:hover:not(:disabled) {
-            transform: translate(-2px, -2px);
-            box-shadow: 6px 6px 0px 0px #111;
-        }
-        .brutal-btn:active:not(:disabled) {
-            transform: translate(4px, 4px);
-            box-shadow: 0px 0px 0px 0px #111;
-        }
+        .brutal-btn:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px 0px #111; }
+        .brutal-btn:active:not(:disabled) { transform: translate(4px, 4px); box-shadow: 0px 0px 0px 0px #111; }
 
-        /* Modal / UI Overlay Elements */
         .errbar {
-            position: fixed; inset: 0 0 auto 0; z-index: 999;
+            position: fixed; inset: 0 0 auto 0; z-index: 9999;
             background: #FF00FF; color: #fff; border-bottom: 4px solid #111;
             font-family: 'Space Grotesk', sans-serif; font-weight: 700;
-            padding: 10px 14px; white-space: pre-wrap;
-            box-shadow: 6px 6px 0px 0px #111;
+            padding: 10px 14px; white-space: pre-wrap; box-shadow: 6px 6px 0px 0px #111;
         }
         [hidden] { display: none !important; }
         
-        /* Scene Logic */
+        /* Scene Management */
         .bookwrap, .camwrap, .stitching, .trouble { display: none; }
-        body[data-scene="intro"] .bookwrap, body[data-scene="book"]  .bookwrap { display: flex; }
+        body[data-scene="intro"] .bookwrap, body[data-scene="book"] .bookwrap { display: flex; }
         body[data-scene="live"] .camwrap, body[data-scene="countdown"] .camwrap, body[data-scene="recording"] .camwrap { display: flex; }
         body[data-scene="stitch"] .stitching { display: flex; }
         body[data-scene="trouble"] .trouble { display: flex; }
 
         /* Camera Window */
         .camwindow {
-            position: relative; width: min(600px, 88vw, calc(50vh * 4 / 3)); aspect-ratio: 4 / 3;
+            position: relative; width: 100%; max-width: 600px; aspect-ratio: 4 / 3;
             background: #111; border: 4px solid #111; box-shadow: 8px 8px 0px 0px #111;
-            overflow: hidden; border-radius: 8px;
+            overflow: hidden; border-radius: 12px; margin: 0 auto;
         }
-        #video, .fakecam { width: 100%; height: 100%; object-fit: cover; display: block; transform: scaleX(-1); }
+        #video, .fakecam { width: 100%; height: 100%; object-fit: cover; display: block; transform: scaleX(-1); filter: saturate(1.1) contrast(1.1); }
         .fakecam[hidden] { display: none; }
 
         .countdown {
             position: absolute; inset: 0; display: grid; place-items: center;
             font-size: clamp(90px, 20vw, 190px); font-family: 'Space Grotesk', sans-serif; font-weight: 900;
-            color: #FFEA00; text-shadow: 4px 4px 0px #111; z-index: 7;
+            color: #FFEA00; text-shadow: 4px 4px 0px #111; z-index: 7; pointer-events: none;
         }
+        .countdown span { display: block; animation: pop 0.9s ease-out; }
+        @keyframes pop {
+            0% { transform: scale(0.4) rotate(-14deg); opacity: 0; }
+            22% { transform: scale(1.14) rotate(4deg); opacity: 1; }
+            55% { transform: scale(1) rotate(-1deg); opacity: 1; }
+            100% { transform: scale(0.9) rotate(0deg); opacity: 0.15; }
+        }
+
         .recbadge {
-            position: absolute; top: 14px; left: 16px; z-index: 7; display: flex; align-items: center; gap: 8px;
-            font-family: 'Space Grotesk', sans-serif; font-weight: 900; font-size: 19px; color: #fff; text-shadow: 2px 2px 0px #111;
+            position: absolute; top: 16px; left: 16px; z-index: 7; display: flex; align-items: center; gap: 8px;
+            font-family: 'Space Grotesk', sans-serif; font-weight: 900; font-size: 20px; color: #fff; text-shadow: 2px 2px 0px #111;
         }
         .recbadge .dot { width: 16px; height: 16px; border-radius: 50%; background: #FF00FF; border: 2px solid #111; animation: blink 1s steps(1) infinite; }
         @keyframes blink { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0; } }
 
         .framecount {
-            position: absolute; right: 14px; bottom: 12px; z-index: 7;
-            font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 900; color: #00FFFF; text-shadow: 2px 2px 0px #111;
+            position: absolute; right: 16px; bottom: 14px; z-index: 7;
+            font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 900; color: #00FFFF; text-shadow: 2px 2px 0px #111;
         }
         .flash { position: absolute; inset: 0; z-index: 8; background: #fff; opacity: 0; pointer-events: none; }
         .flash.pop { animation: flashpop 0.22s ease-out; }
-        @keyframes flashpop { 0% { opacity: 1; } 100% { opacity: 0; } }
+        @keyframes flashpop { 0% { opacity: 0.85; } 100% { opacity: 0; } }
 
         /* Thumbnails Strip */
         .shots {
-            --strip: min(600px, 88vw, calc(50vh * 4 / 3));
-            --thumb: calc((var(--strip) - 46px) / 12);
-            display: flex; gap: 4px; width: var(--strip); height: calc(var(--thumb) * 1.5 + 8px);
-            align-items: center; align-content: center; justify-content: center; flex-wrap: wrap; margin-top: 10px;
+            display: flex; gap: 6px; width: 100%; max-width: 600px;
+            align-items: center; justify-content: center; flex-wrap: wrap; margin: 16px auto 0;
         }
         .shots canvas {
-            width: var(--thumb); height: calc(var(--thumb) * 0.75);
-            border: 2px solid #111; background: #fff; box-shadow: 2px 2px 0px 0px #111;
-            transform: rotate(var(--r, 0deg)); animation: shotin 0.34s ease-out backwards;
+            width: calc(16.666% - 6px); aspect-ratio: 4/3; border: 2px solid #111; background: #fff; box-shadow: 2px 2px 0px 0px #111;
+            transform: rotate(var(--r, 0deg)); animation: shotin 0.34s ease-out backwards; object-fit: cover;
         }
-        @keyframes shotin { 0% { transform: translateY(-52px) scale(1.5); opacity: 0; } 100% { transform: translateY(0) scale(1) rotate(var(--r, 0deg)); opacity: 1; } }
+        @keyframes shotin { 0% { transform: translateY(-30px) scale(1.5); opacity: 0; } 100% { transform: translateY(0) scale(1) rotate(var(--r, 0deg)); opacity: 1; } }
 
         /* Controls Layout */
-        .controls > .row, .controls > .scrubwrap { display: none; }
+        .controls-panel > .row, .controls-panel > .scrubwrap { display: none; }
         body[data-scene="intro"] .row-intro { display: flex; }
         body[data-scene="live"] .row-live { display: flex; }
         body[data-scene="countdown"] .row-recording { display: flex; }
         body[data-scene="recording"] .row-recording { display: flex; }
         body[data-scene="book"] .row-book { display: flex; }
-        body[data-scene="book"] .scrubwrap { display: flex; flex-direction: column; gap: 2px; }
+        body[data-scene="book"] .scrubwrap { display: flex; flex-direction: column; }
 
         /* Scrubber */
-        .scrub { position: relative; width: min(520px, 100%); height: 34px; cursor: pointer; touch-action: none; border: 3px solid #111; background: #fff; border-radius: 8px; box-shadow: 4px 4px 0px 0px #111; margin-top: 16px;}
-        .scrubmark { position: absolute; top: 50%; left: 0; width: 24px; height: 34px; margin: -17px 0 0 -12px; pointer-events: none; background: #FF00FF; border: 3px solid #111; border-radius: 4px; transition: none; }
+        .scrub { position: relative; width: 100%; height: 40px; cursor: pointer; touch-action: none; border: 3px solid #111; background: #fff; border-radius: 8px; box-shadow: 4px 4px 0px 0px #111; margin-top: 8px;}
+        .scrubmark { position: absolute; top: 50%; left: 0; width: 28px; height: 40px; margin: -20px 0 0 -14px; pointer-events: none; background: #00FFFF; border: 3px solid #111; border-radius: 4px; transition: none; }
+        .scrubticks { position: absolute; inset: 0; pointer-events: none; display: flex; justify-content: space-between; padding: 0 4px; align-items: center; }
+        .scrubticks div { width: 2px; height: 12px; background: rgba(17,17,17,0.2); }
+        .scrubticks div:nth-child(5n+1) { height: 20px; background: rgba(17,17,17,0.5); }
         
         /* Book Canvas Container */
-        .bookwrap { position: relative; z-index: 3; flex-direction: column; align-items: center; gap: 6px; width: min(980px, 96vw); margin: 0 auto; }
-        .book { width: 100%; height: min(54vh, 470px); min-height: 260px; display: block; touch-action: none; cursor: grab; outline: none; }
+        .bookwrap { position: relative; z-index: 3; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
+        .book { width: 100%; max-width: 900px; height: min(54vh, 470px); min-height: 260px; display: block; touch-action: none; cursor: grab; outline: none; border-radius: 4px; margin: 0 auto;}
         .book.grabbing { cursor: grabbing; }
 
-        /* Selectable Options */
-        .pace[aria-checked="true"] { background: #FFEA00; box-shadow: 4px 4px 0px 0px #111; transform: translate(-2px, -2px); border: 3px solid #111;}
-        .pace { padding: 8px 16px; border: 3px solid transparent; border-radius: 8px; font-weight: 900; color: #111; transition: all 0.2s; cursor: pointer; font-family: 'Space Grotesk', sans-serif;}
-        
-        /* Marquee Animation for Delivery Banner */
+        /* Selectable Options (Pills) */
+        .pace-pill[aria-checked="true"] { background: #FFEA00; box-shadow: 3px 3px 0px 0px #111; transform: translate(-2px, -2px); border-color: #111; }
+        .pace-pill { padding: 6px 14px; border: 2px solid #ddd; background: #fff; border-radius: 12px; font-weight: 700; color: #111; transition: all 0.2s; cursor: pointer; font-family: 'Space Grotesk', sans-serif; font-size: 14px;}
+        .speed-pill[aria-checked="true"] { background: #FF00FF; color: #fff; box-shadow: 3px 3px 0px 0px #111; transform: translate(-2px, -2px); border-color: #111; }
+        .speed-pill { padding: 6px 14px; border: 2px solid #ddd; background: #fff; border-radius: 12px; font-weight: 700; color: #111; transition: all 0.2s; cursor: pointer; font-family: 'Space Grotesk', sans-serif; font-size: 14px;}
+
+        /* Floating Stickers */
+        .sticker { position: absolute; pointer-events: none; z-index: 0; font-family: 'Space Grotesk', sans-serif; font-weight: 900; border: 3px solid #111; padding: 4px 12px; box-shadow: 4px 4px 0px #111; text-transform: uppercase; letter-spacing: 1px; }
+
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         .animate-marquee { animation: marquee 20s linear infinite; }
     </style>
@@ -154,14 +155,13 @@
     <div id="errbar" class="errbar" hidden></div>
     <input type="file" id="video-upload" class="hidden" accept="video/mp4,video/webm,video/ogg,video/quicktime">
 
-    <!-- HEADER -->
     <header class="fixed top-0 w-full z-40 flex flex-col shadow-sm">
         <div class="w-full bg-brand-cyan border-b-4 border-brand-black px-4 py-2 overflow-hidden flex whitespace-nowrap">
             <div class="animate-marquee font-bold text-xs md:text-sm inline-block font-display">
-                <span class="mx-4 text-brand-black">🚀 <b>FREE DELIVERY</b> on orders above ₹500!</span>
-                <span class="mx-4 text-brand-magenta">📍 Operating in: Gangtok • Singtam • Rangpo • Majitar • Ranipool</span>
-                <span class="mx-4 text-brand-black">🚀 <b>FREE DELIVERY</b> on orders above ₹500!</span>
-                <span class="mx-4 text-brand-magenta">📍 Operating in: Gangtok • Singtam • Rangpo • Majitar • Ranipool</span>
+                <span class="mx-4 text-brand-black">🚀 <b>FLIPBOOTH</b> IS NOW LIVE!</span>
+                <span class="mx-4 text-brand-magenta">✨ TURN YOUR VIDEOS INTO VIRTUAL PAPER</span>
+                <span class="mx-4 text-brand-black">🚀 <b>FLIPBOOTH</b> IS NOW LIVE!</span>
+                <span class="mx-4 text-brand-magenta">✨ TURN YOUR VIDEOS INTO VIRTUAL PAPER</span>
             </div>
         </div>
         <nav class="w-full bg-white/95 backdrop-blur-md border-b-4 border-brand-black">
@@ -174,109 +174,138 @@
         </nav>
     </header>
 
-    <!-- STAGE -->
-    <main class="pt-32 md:pt-36 flex-grow w-full pb-10 flex flex-col items-center justify-center relative z-10" id="stage">
+    <main class="pt-32 md:pt-36 flex-grow w-full pb-8 flex flex-col relative z-10" id="stage">
         
-        <!-- Book View -->
-        <div class="bookwrap w-full flex-grow flex items-center justify-center relative" id="bookwrap">
-            <canvas id="book" class="book" tabindex="0" role="application" aria-label="Flipbook"></canvas>
-            <p class="font-display font-black text-brand-black bg-brand-yellow px-4 py-2 border-2 border-black rounded-lg shadow-brutal-sm -rotate-2 mt-4" id="bookhint">Drag a page to flip • or press SPACE</p>
-        </div>
+        <!-- Decorative Stickers (Hidden on very small screens) -->
+        <div class="hidden md:block sticker bg-brand-yellow text-black rotate-[-6deg] top-40 left-10 text-2xl">WOW!</div>
+        <div class="hidden lg:block sticker bg-brand-cyan text-black rotate-[12deg] bottom-20 left-16 text-xl">100% MAGIC</div>
+        <div class="hidden md:block sticker bg-brand-magenta text-white rotate-[-4deg] top-52 right-12 text-xl">SO BRUTAL</div>
+        <div class="hidden lg:block sticker bg-white text-black rotate-[8deg] bottom-32 right-20 text-2xl">FLIP IT!</div>
 
-        <!-- Camera View -->
-        <div class="camwrap" id="camwrap">
-            <div class="camwindow" id="camwindow">
-                <video id="video" playsinline muted autoplay></video>
-                <canvas id="fakecam" class="fakecam" hidden></canvas>
-                <div class="countdown" id="countdown" aria-live="assertive"></div>
-                <div class="recbadge" id="recbadge" hidden><span class="dot"></span>REC</div>
-                <div class="framecount" id="framecount" hidden>00/24</div>
-                <div class="flash" id="flash"></div>
-            </div>
-            <div class="shots" id="shots" aria-hidden="true"></div>
-        </div>
-
-        <!-- Stitching View -->
-        <div class="stitching w-full max-w-md mx-auto text-center" id="stitching">
-            <i class="ph-duotone ph-aperture text-6xl text-brand-magenta mb-4 animate-spin"></i>
-            <h2 id="stitchtext" class="font-display text-3xl font-black mb-4">Stitching Flipbook...</h2>
-            <div class="w-full h-8 border-4 border-black bg-white rounded-full overflow-hidden p-1 shadow-brutal-sm">
-                <div class="h-full bg-brand-cyan rounded-full transition-all duration-300" style="width: 0%" id="stitchfill"></div>
-            </div>
-        </div>
-
-        <!-- Trouble View -->
-        <div class="trouble w-full max-w-lg mx-auto" id="trouble">
-            <div class="bg-white border-4 border-brand-black p-8 rounded-2xl shadow-brutal text-center">
-                <h2 id="troubletitle" class="font-display text-3xl font-black text-brand-magenta mb-4">Hmm.</h2>
-                <p id="troublebody" class="font-bold text-gray-700 mb-6"></p>
-                <div class="flex flex-wrap gap-4 justify-center">
-                    <button class="brutal-btn bg-brand-yellow px-6 py-3 rounded-xl font-black" data-act="retry-camera">Try Again</button>
-                    <button class="brutal-btn bg-white px-6 py-3 rounded-xl font-black" data-act="use-demo">Use Demo</button>
+        <div class="w-full max-w-5xl mx-auto px-4 flex-grow flex flex-col justify-center items-center relative z-10">
+            
+            <!-- Book View -->
+            <div class="bookwrap" id="bookwrap">
+                <canvas id="book" class="book" tabindex="0" role="application" aria-label="Flipbook"></canvas>
+                <div class="mt-6 inline-block bg-brand-black text-white px-6 py-2 border-2 border-white rounded-lg shadow-brutal-white font-bold font-display rotate-[-1deg]" id="bookhint">
+                    Drag a page to flip • or press SPACE
                 </div>
             </div>
-        </div>
 
+            <!-- Camera View -->
+            <div class="camwrap w-full" id="camwrap">
+                <div class="camwindow" id="camwindow">
+                    <video id="video" playsinline muted autoplay></video>
+                    <canvas id="fakecam" class="fakecam" hidden></canvas>
+                    <div class="countdown" id="countdown" aria-live="assertive"></div>
+                    <div class="recbadge" id="recbadge" hidden><span class="dot"></span>REC</div>
+                    <div class="framecount" id="framecount" hidden>00/24</div>
+                    <div class="flash" id="flash"></div>
+                </div>
+                <div class="shots" id="shots" aria-hidden="true"></div>
+            </div>
+
+            <!-- Stitching View -->
+            <div class="stitching w-full max-w-md mx-auto text-center bg-white border-4 border-black p-8 rounded-2xl shadow-brutal" id="stitching">
+                <i class="ph-duotone ph-aperture text-6xl text-brand-magenta mb-4 animate-spin block mx-auto w-fit"></i>
+                <h2 id="stitchtext" class="font-display text-3xl font-black mb-4 uppercase">Stitching...</h2>
+                <div class="w-full h-8 border-4 border-black bg-gray-100 rounded-full overflow-hidden p-1 shadow-inner">
+                    <div class="h-full bg-gradient-to-r from-brand-cyan to-brand-blue rounded-full transition-all duration-300" style="width: 0%" id="stitchfill"></div>
+                </div>
+            </div>
+
+            <!-- Trouble View -->
+            <div class="trouble w-full max-w-lg mx-auto" id="trouble">
+                <div class="bg-white border-4 border-brand-black p-8 rounded-2xl shadow-brutal text-center">
+                    <h2 id="troubletitle" class="font-display text-3xl font-black text-brand-magenta mb-4 uppercase">Hmm.</h2>
+                    <p id="troublebody" class="font-bold text-gray-700 mb-6"></p>
+                    <div class="flex flex-wrap gap-4 justify-center">
+                        <button class="brutal-btn bg-brand-yellow px-6 py-3 rounded-xl font-black uppercase tracking-wide" data-act="retry-camera">Try Again</button>
+                        <button class="brutal-btn bg-white px-6 py-3 rounded-xl font-black uppercase tracking-wide" data-act="use-demo">Use Demo</button>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
     </main>
 
-    <!-- CONTROLS -->
-    <footer class="controls w-full flex flex-col items-center gap-6 pb-12 relative z-20">
-        
-        <!-- Intro Screen Controls -->
-        <div class="row row-intro flex flex-wrap justify-center gap-4">
-            <button class="brutal-btn bg-brand-cyan text-brand-black px-6 py-3 md:px-8 md:py-4 rounded-xl font-display font-black text-lg md:text-xl flex items-center gap-2" onclick="document.getElementById('video-upload').click()">
-                <i class="ph-bold ph-upload-simple"></i> Upload a Video
-            </button>
-            <button class="brutal-btn bg-brand-yellow text-brand-black px-6 py-3 md:px-8 md:py-4 rounded-xl font-display font-black text-lg md:text-xl flex items-center gap-2" data-act="start">
-                <i class="ph-bold ph-camera"></i> Record Webcam
-            </button>
-            <button class="brutal-btn bg-white text-brand-black px-6 py-3 md:px-8 md:py-4 rounded-xl font-display font-black text-lg flex items-center gap-2" data-act="use-demo">
-                <i class="ph-bold ph-play"></i> Try Demo
-            </button>
-        </div>
-
-        <!-- Live Camera Controls -->
-        <div class="row row-live paces flex-wrap justify-center gap-2 mb-2" id="paces" role="radiogroup"></div>
-        <p class="pacenote font-bold text-sm text-gray-600 mb-2" id="pacenote"></p>
-        
-        <div class="row row-live flex flex-wrap justify-center gap-4">
-            <button class="brutal-btn bg-brand-magenta text-white px-8 py-4 rounded-xl font-display font-black text-xl flex items-center gap-2" data-act="record">
-                <i class="ph-bold ph-record"></i> Start Recording
-            </button>
-            <button class="brutal-btn bg-white text-brand-black px-6 py-4 rounded-xl font-bold text-lg" data-act="back-intro">Cancel</button>
-        </div>
-
-        <div class="row row-recording">
-            <button class="brutal-btn bg-brand-black text-white px-6 py-3 rounded-xl font-bold text-lg" data-act="cancel-record">Stop</button>
-        </div>
-
-        <!-- Book Controls -->
-        <div class="row row-book flex flex-wrap justify-center items-center gap-4 w-full max-w-xl mx-auto px-4">
-            <button class="brutal-btn bg-white p-3 rounded-xl font-black text-2xl" data-act="prev"><i class="ph-bold ph-caret-left"></i></button>
-            <button class="brutal-btn bg-brand-magenta text-white px-8 py-3 rounded-xl font-display font-black text-xl uppercase tracking-widest" data-act="play" id="play-btn">Flip It!</button>
-            <button class="brutal-btn bg-white p-3 rounded-xl font-black text-2xl" data-act="next"><i class="ph-bold ph-caret-right"></i></button>
-        </div>
-
-        <div class="row row-book paces w-full max-w-md mx-auto flex-wrap justify-center gap-2" id="speeds" role="radiogroup"></div>
-        
-        <div class="scrubwrap row-book w-full max-w-xl mx-auto px-4 text-center mt-2" id="scrubwrap">
-            <div class="scrub" id="scrub" role="slider" tabindex="0" aria-valuemin="1" aria-valuenow="1" aria-valuemax="24">
-                <div class="scrubmark" id="scrubmark"></div>
+    <footer class="w-full max-w-4xl mx-auto px-4 pb-12 relative z-20">
+        <div class="controls-panel bg-white border-4 border-brand-black p-6 md:p-8 rounded-2xl shadow-brutal-lg flex flex-col items-center gap-6">
+            
+            <!-- Intro Screen Controls -->
+            <div class="row row-intro flex-wrap justify-center gap-4 w-full">
+                <button class="brutal-btn flex-1 min-w-[200px] bg-brand-cyan text-brand-black px-6 py-4 rounded-xl font-display font-black text-lg flex justify-center items-center gap-2" onclick="document.getElementById('video-upload').click()">
+                    <i class="ph-bold ph-upload-simple text-2xl"></i> Upload Video
+                </button>
+                <button class="brutal-btn flex-1 min-w-[200px] bg-brand-yellow text-brand-black px-6 py-4 rounded-xl font-display font-black text-lg flex justify-center items-center gap-2" data-act="start">
+                    <i class="ph-bold ph-camera text-2xl"></i> Record Webcam
+                </button>
+                <button class="brutal-btn w-full md:w-auto bg-gray-100 text-brand-black px-6 py-4 rounded-xl font-display font-black text-lg flex justify-center items-center gap-2" data-act="use-demo">
+                    <i class="ph-bold ph-play text-2xl"></i> Try Demo
+                </button>
             </div>
-            <p class="pagelabel font-bold text-sm text-gray-600 mt-2 font-display" id="pagelabel">Page 1 of 24</p>
-        </div>
 
-        <div class="row row-book row-again flex flex-wrap justify-center gap-4 mt-4">
-            <button class="brutal-btn bg-brand-cyan text-brand-black px-6 py-3 rounded-xl font-bold flex items-center gap-2" data-act="gif"><i class="ph-bold ph-file-gif"></i> Save GIF</button>
-            <button class="brutal-btn bg-white text-brand-black px-6 py-3 rounded-xl font-bold flex items-center gap-2" data-act="print"><i class="ph-bold ph-printer"></i> Print PDF</button>
-            <button class="brutal-btn bg-brand-yellow text-brand-black px-6 py-3 rounded-xl font-bold flex items-center gap-2" data-act="again"><i class="ph-bold ph-arrow-counter-clockwise"></i> Start Over</button>
+            <!-- Live Camera Controls -->
+            <div class="row row-live flex-col items-center w-full">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="font-bold text-gray-500 text-sm uppercase tracking-widest">Capture Speed:</span>
+                    <div class="flex flex-wrap justify-center gap-2" id="paces" role="radiogroup"></div>
+                </div>
+                <div class="flex flex-wrap justify-center gap-4 w-full">
+                    <button class="brutal-btn flex-1 max-w-[300px] bg-brand-magenta text-white px-8 py-4 rounded-xl font-display font-black text-xl flex justify-center items-center gap-2 uppercase tracking-wide" data-act="record">
+                        <i class="ph-fill ph-record text-2xl"></i> Start Recording
+                    </button>
+                    <button class="brutal-btn bg-gray-100 text-brand-black px-6 py-4 rounded-xl font-bold text-lg uppercase" data-act="back-intro">Cancel</button>
+                </div>
+            </div>
+
+            <div class="row row-recording w-full justify-center">
+                <button class="brutal-btn bg-brand-black text-white px-10 py-4 rounded-xl font-black text-xl uppercase tracking-widest animate-pulse" data-act="cancel-record">Stop Recording</button>
+            </div>
+
+            <!-- Book Controls -->
+            <div class="row row-book flex-col w-full">
+                <!-- Play/Scrub Header -->
+                <div class="flex flex-wrap justify-between items-center w-full gap-4 mb-2">
+                    <div class="flex gap-2">
+                        <button class="brutal-btn bg-white px-4 py-2 rounded-lg font-black text-xl" data-act="prev"><i class="ph-bold ph-caret-left"></i></button>
+                        <button class="brutal-btn bg-brand-magenta text-white px-6 py-2 rounded-lg font-display font-black text-lg uppercase tracking-widest min-w-[120px]" data-act="play" id="play-btn">Flip It!</button>
+                        <button class="brutal-btn bg-white px-4 py-2 rounded-lg font-black text-xl" data-act="next"><i class="ph-bold ph-caret-right"></i></button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-gray-500 text-sm uppercase tracking-widest">Flip Speed:</span>
+                        <div class="flex gap-2" id="speeds" role="radiogroup"></div>
+                    </div>
+                </div>
+
+                <!-- Scrubber -->
+                <div class="scrubwrap w-full mb-6 text-center" id="scrubwrap">
+                    <div class="scrub" id="scrub" role="slider" tabindex="0" aria-valuemin="1" aria-valuenow="1" aria-valuemax="24">
+                        <div class="scrubticks" id="scrubticks"></div>
+                        <div class="scrubmark" id="scrubmark"></div>
+                    </div>
+                    <p class="pagelabel font-bold text-sm text-gray-500 mt-2 font-display uppercase tracking-widest" id="pagelabel">Page 1 of 24</p>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-wrap justify-center gap-4 w-full pt-4 border-t-2 border-dashed border-gray-300">
+                    <button class="brutal-btn flex-1 min-w-[160px] bg-brand-cyan text-brand-black px-4 py-3 rounded-xl font-black uppercase text-sm flex justify-center items-center gap-2" data-act="gif" id="btn-gif">
+                        <i class="ph-bold ph-file-gif text-xl"></i> Save GIF
+                    </button>
+                    <button class="brutal-btn flex-1 min-w-[160px] bg-brand-green text-white px-4 py-3 rounded-xl font-black uppercase text-sm flex justify-center items-center gap-2" data-act="print" id="btn-print">
+                        <i class="ph-bold ph-printer text-xl"></i> Print PDF
+                    </button>
+                    <button class="brutal-btn flex-1 min-w-[160px] bg-brand-yellow text-brand-black px-4 py-3 rounded-xl font-black uppercase text-sm flex justify-center items-center gap-2" data-act="again">
+                        <i class="ph-bold ph-arrow-counter-clockwise text-xl"></i> Start Over
+                    </button>
+                </div>
+            </div>
         </div>
     </footer>
 
 <script>
 (function() {
 
-// Error handling
 const errbar = document.getElementById('errbar');
 function showError(what, e) {
     const msg = `${what}: ${(e && (e.stack || e.message)) || e}`;
@@ -287,19 +316,12 @@ function showError(what, e) {
 window.addEventListener('error', (e) => showError('error', e.error || e.message));
 window.addEventListener('unhandledrejection', (e) => showError('unhandled rejection', e.reason));
 
-const params = new URLSearchParams(location.search);
 const FRAME_COUNT = 24;
-
 const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
 const easeOut = (x) => 1 - Math.pow(1 - x, 3);
 const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 
-// PDF Output Helpers
-const MM = 72 / 25.4;
-const KAPPA = 0.5522847498;
-const enc = new TextEncoder();
-const num = (v) => (Math.round(v * 1000) / 1000).toString();
-
+/* --- AUDIO --- */
 let ctxAudio = null;
 let muted = false;
 let noiseBuffer = null;
@@ -311,149 +333,100 @@ function audio() {
     ctxAudio = new AC();
     return ctxAudio;
 }
-
 function getNoise(ac) {
     if (noiseBuffer && noiseBuffer.sampleRate === ac.sampleRate) return noiseBuffer;
     const len = Math.floor(ac.sampleRate * 0.35);
     const buf = ac.createBuffer(1, len, ac.sampleRate);
     const data = buf.getChannelData(0);
     for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
-    noiseBuffer = buf;
-    return buf;
+    noiseBuffer = buf; return buf;
 }
-
-function unlock() {
-    const ac = audio();
-    if (ac && ac.state === 'suspended') ac.resume().catch(() => {});
-}
-
+function unlock() { const ac = audio(); if (ac && ac.state === 'suspended') ac.resume().catch(() => {}); }
 function burst({ freq = 2400, q = 0.9, dur = 0.09, gain = 0.16, type = 'bandpass' } = {}) {
-    if (muted) return;
-    const ac = audio();
-    if (!ac || ac.state === 'suspended') return;
-    const src = ac.createBufferSource();
-    src.buffer = getNoise(ac);
-    src.playbackRate.value = 0.85 + Math.random() * 0.4;
-    const filter = ac.createBiquadFilter();
-    filter.type = type; filter.frequency.value = freq * (0.86 + Math.random() * 0.28); filter.Q.value = q;
-    const amp = ac.createGain();
-    const t0 = ac.currentTime;
-    amp.gain.setValueAtTime(0, t0);
-    amp.gain.linearRampToValueAtTime(gain, t0 + 0.005);
-    amp.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-    src.connect(filter).connect(amp).connect(ac.destination);
-    src.start(t0); src.stop(t0 + dur + 0.02);
+    if (muted) return; const ac = audio(); if (!ac || ac.state === 'suspended') return;
+    const src = ac.createBufferSource(); src.buffer = getNoise(ac); src.playbackRate.value = 0.85 + Math.random() * 0.4;
+    const filter = ac.createBiquadFilter(); filter.type = type; filter.frequency.value = freq * (0.86 + Math.random() * 0.28); filter.Q.value = q;
+    const amp = ac.createGain(); const t0 = ac.currentTime;
+    amp.gain.setValueAtTime(0, t0); amp.gain.linearRampToValueAtTime(gain, t0 + 0.005); amp.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    src.connect(filter).connect(amp).connect(ac.destination); src.start(t0); src.stop(t0 + dur + 0.02);
 }
-
 function riffle() { burst({ freq: 2600, q: 0.8, dur: 0.085, gain: 0.14 }); }
 function land() { burst({ freq: 900, q: 0.7, dur: 0.13, gain: 0.1, type: 'lowpass' }); }
-function shutter() {
-    burst({ freq: 5200, q: 3.5, dur: 0.045, gain: 0.2 });
-    setTimeout(() => burst({ freq: 1500, q: 1.2, dur: 0.07, gain: 0.11 }), 55);
-}
+function shutter() { burst({ freq: 5200, q: 3.5, dur: 0.045, gain: 0.2 }); setTimeout(() => burst({ freq: 1500, q: 1.2, dur: 0.07, gain: 0.11 }), 55); }
 function tickSfx() { burst({ freq: 1800, q: 6, dur: 0.05, gain: 0.09 }); }
 
-async function extractFramesFromVideo(file, count, onProgress) {
-    return new Promise((resolve, reject) => {
-        const video = document.createElement('video');
-        video.preload = 'auto';
-        video.muted = true;
-        video.playsInline = true;
-        const url = URL.createObjectURL(file);
-        video.src = url;
-
-        video.onloadeddata = async () => {
-            try {
-                let actualDuration = video.duration;
-                if (!actualDuration || actualDuration === Infinity) {
-                    video.currentTime = 1e10;
-                    await new Promise(r => video.onseeked = r);
-                    actualDuration = video.currentTime;
-                    video.currentTime = 0;
-                    await new Promise(r => video.onseeked = r);
-                }
-                const interval = actualDuration / count;
-                const frames = [];
-                const w = video.videoWidth;
-                const h = video.videoHeight;
-                const canvas = document.createElement('canvas');
-                canvas.width = w; canvas.height = h;
-                const ctx = canvas.getContext('2d');
-
-                for (let i = 0; i < count; i++) {
-                    video.currentTime = Math.min(i * interval, actualDuration - 0.1);
-                    await new Promise(r => {
-                        const handler = () => { video.removeEventListener('seeked', handler); r(); };
-                        video.addEventListener('seeked', handler);
-                        setTimeout(() => { video.removeEventListener('seeked', handler); r(); }, 1500); 
-                    });
-                    ctx.drawImage(video, 0, 0, w, h);
-                    const frameCanvas = document.createElement('canvas');
-                    frameCanvas.width = w; frameCanvas.height = h;
-                    frameCanvas.getContext('2d').drawImage(canvas, 0, 0);
-                    frames.push(frameCanvas);
-                    if (onProgress) onProgress(i / count);
-                }
-                URL.revokeObjectURL(url);
-                resolve(frames);
-            } catch(e) {
-                reject(e);
-            }
-        };
-        video.onerror = () => reject(new Error("Error loading video file."));
-        video.load();
-    });
-}
-
+/* --- CONSTANTS & CONFIG --- */
 const PACES = [
-    { id: 'slow',   fps: 2, label: 'Sloooow', note: 'Strike a new pose every half second' },
-    { id: 'normal', fps: 3, label: 'Stop-Motion', note: 'Move between every flash' },
-    { id: 'quick',  fps: 6, label: 'Quick', note: 'Smoother, more like video' },
+    { id: 'slow', fps: 2, label: 'Slow' },
+    { id: 'normal', fps: 3, label: 'Stop-Motion' },
+    { id: 'quick', fps: 6, label: 'Quick' },
+];
+const SPEEDS = [
+    { id: 'slowmo', fps: 4, label: 'Slow-Mo' },
+    { id: 'normal', fps: 10, label: 'Normal' },
+    { id: 'zoom', fps: 18, label: 'Zoom' },
 ];
 const paceById = (id) => PACES.find((p) => p.id === id) || PACES[1];
+const speedById = (id) => SPEEDS.find((s) => s.id === id) || SPEEDS[1];
+const PAGE = { w: 480, h: 360, scale: 2, gutter: 52, margin: 17, footer: 42 };
+
+let bindEdge = 'left';
+function setBindEdge(edge) { bindEdge = edge === 'top' ? 'top' : 'left'; }
+function getBindEdge() { return bindEdge; }
+function photoBox() {
+    if (bindEdge === 'top') return { x: PAGE.margin, y: PAGE.gutter, w: PAGE.w - PAGE.margin * 2, h: PAGE.h - PAGE.gutter - PAGE.footer };
+    return { x: PAGE.gutter, y: PAGE.margin, w: PAGE.w - PAGE.gutter - PAGE.margin, h: PAGE.h - PAGE.margin - PAGE.footer };
+}
+function makeCanvas(w, h) { const c = document.createElement('canvas'); c.width = Math.round(w); c.height = Math.round(h); return c; }
+
+/* --- CAPTURE LOGIC --- */
+async function extractFramesFromVideo(file, count, onProgress) {
+    return new Promise((resolve, reject) => {
+        const video = document.createElement('video'); video.preload = 'auto'; video.muted = true; video.playsInline = true;
+        const url = URL.createObjectURL(file); video.src = url;
+        video.onloadeddata = async () => {
+            try {
+                let dur = video.duration;
+                if (!dur || dur === Infinity) { video.currentTime = 1e10; await new Promise(r => video.onseeked = r); dur = video.currentTime; video.currentTime = 0; await new Promise(r => video.onseeked = r); }
+                const interval = dur / count; const frames = []; const w = video.videoWidth; const h = video.videoHeight;
+                const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h; const ctx = canvas.getContext('2d');
+                for (let i = 0; i < count; i++) {
+                    video.currentTime = Math.min(i * interval, dur - 0.1);
+                    await new Promise(r => { const hnd = () => { video.removeEventListener('seeked', hnd); r(); }; video.addEventListener('seeked', hnd); setTimeout(hnd, 1500); });
+                    ctx.drawImage(video, 0, 0, w, h);
+                    const frameCanvas = document.createElement('canvas'); frameCanvas.width = w; frameCanvas.height = h;
+                    frameCanvas.getContext('2d').drawImage(canvas, 0, 0); frames.push(frameCanvas);
+                    if (onProgress) onProgress(i / count);
+                }
+                URL.revokeObjectURL(url); resolve(frames);
+            } catch(e) { reject(e); }
+        };
+        video.onerror = () => reject(new Error("Error loading video.")); video.load();
+    });
+}
 
 async function startCamera(videoEl) {
     if (!navigator.mediaDevices?.getUserMedia) throw Object.assign(new Error(), { reason: 'unsupported' });
     let stream;
-    try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 960 }, height: { ideal: 720 }, facingMode: 'user' }, audio: false });
-    } catch (e) {
-        throw Object.assign(new Error(), { reason: e.name === 'NotAllowedError' ? 'denied' : 'none' });
-    }
-    videoEl.srcObject = stream;
-    videoEl.muted = true;
-    videoEl.playsInline = true;
-    await videoEl.play().catch(() => {});
-    if (!videoEl.videoWidth) {
-        await new Promise(r => setTimeout(r, 1000));
-    }
+    try { stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 960 }, height: { ideal: 720 }, facingMode: 'user' }, audio: false }); }
+    catch (e) { throw Object.assign(new Error(), { reason: e.name === 'NotAllowedError' ? 'denied' : 'none' }); }
+    videoEl.srcObject = stream; videoEl.muted = true; videoEl.playsInline = true; await videoEl.play().catch(() => {});
+    if (!videoEl.videoWidth) await new Promise(r => setTimeout(r, 1000));
     return stream;
 }
 
-function grab(videoEl, w, h) {
-    const c = document.createElement('canvas');
-    c.width = w; c.height = h;
-    c.getContext('2d').drawImage(videoEl, 0, 0, w, h);
-    return c;
-}
+function grab(videoEl, w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(videoEl, 0, 0, w, h); return c; }
 
 function recordFrames(videoEl, { count = 24, fps = 3, onFrame = null, signal = null } = {}) {
     return new Promise((resolve, reject) => {
-        const interval = 1000 / fps;
-        const startedAt = performance.now();
-        const frames = [];
-        const w = videoEl.videoWidth || 640;
-        const h = videoEl.videoHeight || 480;
-        let timer = 0;
+        const interval = 1000 / fps; const startedAt = performance.now(); const frames = [];
+        const w = videoEl.videoWidth || 640; const h = videoEl.videoHeight || 480; let timer = 0;
         const abort = () => { clearTimeout(timer); reject(Object.assign(new Error('cancelled'), { reason: 'cancelled' })); };
         signal?.addEventListener('abort', abort, { once: true });
-
         function step() {
             const now = performance.now();
             while (frames.length < count && now >= startedAt + frames.length * interval) {
-                const idx = frames.length;
-                frames.push(grab(videoEl, w, h));
-                onFrame?.(idx + 1, count, frames[idx]);
+                const idx = frames.length; frames.push(grab(videoEl, w, h)); onFrame?.(idx + 1, count, frames[idx]);
             }
             if (frames.length >= count) { signal?.removeEventListener('abort', abort); resolve(frames); return; }
             timer = setTimeout(step, Math.max(0, startedAt + frames.length * interval - performance.now()));
@@ -464,16 +437,11 @@ function recordFrames(videoEl, { count = 24, fps = 3, onFrame = null, signal = n
 
 function countdown(seconds = 3, onTick = () => {}, signal = null) {
     return new Promise((resolve, reject) => {
-        const startedAt = performance.now();
-        const total = seconds * 1000;
-        let shown = -1;
-        let timer = 0;
+        const startedAt = performance.now(); const total = seconds * 1000; let shown = -1; let timer = 0;
         const abort = () => { clearTimeout(timer); reject(Object.assign(new Error('cancelled'), { reason: 'cancelled' })); };
         signal?.addEventListener('abort', abort, { once: true });
-
         function step() {
-            const elapsed = performance.now() - startedAt;
-            const left = Math.max(0, Math.ceil((total - elapsed) / 1000));
+            const elapsed = performance.now() - startedAt; const left = Math.max(0, Math.ceil((total - elapsed) / 1000));
             if (left !== shown) { shown = left; onTick(left); }
             if (elapsed >= total) { signal?.removeEventListener('abort', abort); resolve(); return; }
             timer = setTimeout(step, 90);
@@ -482,75 +450,36 @@ function countdown(seconds = 3, onTick = () => {}, signal = null) {
     });
 }
 
-const CURL_DEFAULTS = { bend: 0.62, stiff: 1.35, focal: 5.0, slices: 132 };
-function curlAngles(t, bend = CURL_DEFAULTS.bend) {
-    const tt = clamp(t, 0, 1);
-    const lead = bend * Math.sin(Math.PI * tt);
-    return { a0: Math.PI * tt - lead, a1: Math.PI * tt + lead };
-}
+/* --- FLIPBOOK PHYSICS --- */
+function curlAngles(t, bend = 0.62) { const tt = clamp(t, 0, 1); const lead = bend * Math.sin(Math.PI * tt); return { a0: Math.PI * tt - lead, a1: Math.PI * tt + lead }; }
 const LX = -0.34, LH = 0.94, LN = Math.hypot(LX, LH);
-function shade(phi, back) {
-    const nx = back ? Math.sin(phi) : -Math.sin(phi);
-    const nh = back ? -Math.cos(phi) : Math.cos(phi);
-    return Math.max(0, (nx * LX + nh * LH) / LN);
-}
+function shade(phi, back) { const nx = back ? Math.sin(phi) : -Math.sin(phi); const nh = back ? -Math.cos(phi) : Math.cos(phi); return Math.max(0, (nx * LX + nh * LH) / LN); }
 
 function solveLeaf(opts) {
-    const { t, W, H, spineX, top, camX = spineX, camY = top + H / 2, bend = CURL_DEFAULTS.bend, stiff = CURL_DEFAULTS.stiff, focal = CURL_DEFAULTS.focal, slices = CURL_DEFAULTS.slices } = opts;
-    const n = Math.max(2, slices | 0);
-    const { a0, a1 } = curlAngles(t, bend);
-    const dphi = a1 - a0;
-    const f = focal * W;
-    const ds = W / (n - 1);
-
-    const sx = new Float64Array(n), yTop = new Float64Array(n), yBot = new Float64Array(n), phiArr = new Float64Array(n), light = new Float64Array(n), back = new Uint8Array(n), frac = new Float64Array(n), depth = new Float64Array(n), across = new Float64Array(n);
+    const { t, W, H, spineX, top, camX = spineX, camY = top + H / 2, bend = 0.62, stiff = 1.35, focal = 5.0, slices = 132 } = opts;
+    const n = Math.max(2, slices | 0); const { a0, a1 } = curlAngles(t, bend); const dphi = a1 - a0; const f = focal * W; const ds = W / (n - 1);
+    const sx = new Float64Array(n), yTop = new Float64Array(n), yBot = new Float64Array(n), phiArr = new Float64Array(n), light = new Float64Array(n), back = new Uint8Array(n), frac = new Float64Array(n), depth = new Float64Array(n);
     let u = 0, h = 0, prevCos = Math.cos(a0), prevSin = Math.sin(a0);
-
     for (let i = 0; i < n; i++) {
-        const sigma = i / (n - 1);
-        const phi = a0 + dphi * Math.pow(sigma, stiff);
-        const c = Math.cos(phi), s = Math.sin(phi);
+        const sigma = i / (n - 1); const phi = a0 + dphi * Math.pow(sigma, stiff); const c = Math.cos(phi), s = Math.sin(phi);
         if (i > 0) { u += ((prevCos + c) / 2) * ds; h += ((prevSin + s) / 2) * ds; }
-        prevCos = c; prevSin = s;
-        const p = f / Math.max(f - h, f * 0.2);
-        const worldX = spineX + u;
-        const isBack = c < 0 ? 1 : 0;
-        sx[i] = camX + (worldX - camX) * p;
-        yTop[i] = camY + (top - camY) * p;
-        yBot[i] = camY + (top + H - camY) * p;
-        phiArr[i] = phi; back[i] = isBack; light[i] = shade(phi, isBack); frac[i] = sigma; depth[i] = h; across[i] = u;
+        prevCos = c; prevSin = s; const p = f / Math.max(f - h, f * 0.2); const worldX = spineX + u; const isBack = c < 0 ? 1 : 0;
+        sx[i] = camX + (worldX - camX) * p; yTop[i] = camY + (top - camY) * p; yBot[i] = camY + (top + H - camY) * p;
+        phiArr[i] = phi; back[i] = isBack; light[i] = shade(phi, isBack); frac[i] = sigma; depth[i] = h;
     }
-    return { n, sx, yTop, yBot, phi: phiArr, light, back, frac, depth, across, a0, a1, edgeX: sx[n - 1], edgeLift: depth[n - 1], reach: Math.max(...Array.from(sx, (v) => Math.abs(v - spineX))) };
+    return { n, sx, yTop, yBot, light, back, frac, edgeX: sx[n - 1] };
 }
-function dragToProgress(dx, W) { const raw = clamp(-dx / (W * 0.92), 0, 1); return raw * raw * (3 - 2 * raw); }
 
-const PAGE = { w: 480, h: 360, scale: 2, gutter: 52, margin: 17, footer: 42 };
-let bindEdge = 'left';
-function setBindEdge(edge) { bindEdge = edge === 'top' ? 'top' : 'left'; }
-function getBindEdge() { return bindEdge; }
-function photoBox() {
-    if (bindEdge === 'top') return { x: PAGE.margin, y: PAGE.gutter, w: PAGE.w - PAGE.margin * 2, h: PAGE.h - PAGE.gutter - PAGE.footer };
-    return { x: PAGE.gutter, y: PAGE.margin, w: PAGE.w - PAGE.gutter - PAGE.margin, h: PAGE.h - PAGE.margin - PAGE.footer };
-}
-function makeCanvas(w, h) { const c = document.createElement('canvas'); c.width = Math.round(w); c.height = Math.round(h); return c; }
-
+/* --- PAGE COMPOSITION --- */
 function punchHoles(ctx, w, h, side = 'left') {
-    const s = PAGE.scale; const top = bindEdge === 'top'; const far = side === 'right';
-    const inset = PAGE.gutter * s * 0.24;
-    const along = top ? w : h; const across = far ? (top ? h - inset : w - inset) : inset;
-    const r = 6.4 * s;
-    ctx.fillStyle = '#FAFAFA';
+    const s = PAGE.scale; const top = bindEdge === 'top'; const far = side === 'right'; const inset = PAGE.gutter * s * 0.24;
+    const along = top ? w : h; const across = far ? (top ? h - inset : w - inset) : inset; const r = 6.4 * s;
     for (let i = 0; i < 5; i++) {
-        const at = along * ((i + 0.5) / 5);
-        const cx = top ? at : across; const cy = top ? across : at;
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.lineWidth = 2 * s; ctx.strokeStyle = '#111';
-        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+        const at = along * ((i + 0.5) / 5); const cx = top ? at : across; const cy = top ? across : at;
+        ctx.globalCompositeOperation = 'destination-out'; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+        ctx.globalCompositeOperation = 'source-over'; ctx.lineWidth = 2 * s; ctx.strokeStyle = '#111'; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
     }
 }
-
 function holePositions() {
     const out = []; const inset = PAGE.gutter * 0.24; const top = bindEdge === 'top'; const along = top ? PAGE.w : PAGE.h;
     for (let i = 0; i < 5; i++) { const at = along * ((i + 0.5) / 5); out.push({ x: top ? at : inset, y: top ? inset : at, r: 6.4 }); }
@@ -560,144 +489,79 @@ function holePositions() {
 function composePage(src, { index = 0, total = 1, mirror = true } = {}) {
     const s = PAGE.scale; const w = PAGE.w * s; const h = PAGE.h * s;
     const c = makeCanvas(w, h); const ctx = c.getContext('2d');
-
-    // Brutalist Base Paper
     ctx.fillStyle = '#FAFAFA'; ctx.fillRect(0, 0, w, h);
     ctx.lineWidth = 6; ctx.strokeStyle = '#111'; ctx.strokeRect(0, 0, w, h);
 
-    // Photo Placement
-    const box = photoBox();
-    const bx = box.x * s, by = box.y * s, bw = box.w * s, bh = box.h * s;
+    const box = photoBox(); const bx = box.x * s, by = box.y * s, bw = box.w * s, bh = box.h * s;
     const sw = src.videoWidth || src.width; const sh = src.videoHeight || src.height;
     if (sw && sh) {
-        const scale = Math.max(bw / sw, bh / sh);
-        const dw = sw * scale, dh = sh * scale;
-        const dx = bx + (bw - dw) / 2, dy = by + (bh - dh) / 2;
-
-        // Hard Drop Shadow
-        ctx.fillStyle = '#111'; ctx.fillRect(bx + 8, by + 8, bw, bh);
-
-        ctx.save();
-        ctx.beginPath(); ctx.rect(bx, by, bw, bh); ctx.clip();
+        const scale = Math.max(bw / sw, bh / sh); const dw = sw * scale, dh = sh * scale; const dx = bx + (bw - dw) / 2, dy = by + (bh - dh) / 2;
+        ctx.fillStyle = '#111'; ctx.fillRect(bx + 8, by + 8, bw, bh); // Hard shadow
+        ctx.save(); ctx.beginPath(); ctx.rect(bx, by, bw, bh); ctx.clip();
         if (mirror) { ctx.translate(bx * 2 + bw, 0); ctx.scale(-1, 1); }
-        ctx.filter = 'contrast(1.1)';
-        ctx.drawImage(src, dx, dy, dw, dh);
-        ctx.restore();
-        
+        ctx.filter = 'contrast(1.1) saturate(1.1)'; ctx.drawImage(src, dx, dy, dw, dh); ctx.restore();
         ctx.lineWidth = 4; ctx.strokeStyle = '#111'; ctx.strokeRect(bx, by, bw, bh);
     }
-
-    // Page Number
-    const numX = (box.x + box.w - 10) * s, numY = (PAGE.h - 18) * s;
-    ctx.fillStyle = '#FF00FF';
-    ctx.font = `900 ${22 * s}px "Space Grotesk", sans-serif`;
-    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-    ctx.fillText(`#${index + 1}`, numX, numY);
-
-    punchHoles(ctx, w, h);
-    return c;
+    const numX = (box.x + box.w - 10) * s, numY = (PAGE.h - 22) * s;
+    ctx.fillStyle = '#FF00FF'; ctx.font = `900 ${24 * s}px "Space Grotesk", sans-serif`; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.fillText(`${index + 1}/${total}`, numX, numY);
+    punchHoles(ctx, w, h); return c;
 }
 
 function composeVerso() {
     const s = PAGE.scale; const w = PAGE.w * s; const h = PAGE.h * s;
     const c = makeCanvas(w, h); const ctx = c.getContext('2d');
-    ctx.fillStyle = '#FAFAFA'; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#E2E8F0'; ctx.fillRect(0, 0, w, h);
     ctx.lineWidth = 6; ctx.strokeStyle = '#111'; ctx.strokeRect(0, 0, w, h);
-
-    ctx.save();
-    ctx.translate(w * 0.5, h * 0.5);
-    ctx.rotate(-0.1);
-    ctx.fillStyle = '#00FFFF';
-    ctx.fillRect(-80*s, -20*s, 160*s, 40*s);
-    ctx.strokeRect(-80*s, -20*s, 160*s, 40*s);
-    ctx.fillStyle = '#111';
-    ctx.font = `900 ${18 * s}px "Space Grotesk", sans-serif`;
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('DELULUPRINTER', 0, 0);
-    ctx.restore();
-
-    punchHoles(ctx, w, h, 'right');
-    return c;
+    ctx.save(); ctx.translate(w * 0.5, h * 0.5); ctx.rotate(-0.1);
+    ctx.fillStyle = '#00FFFF'; ctx.fillRect(-100*s, -24*s, 200*s, 48*s); ctx.strokeRect(-100*s, -24*s, 200*s, 48*s);
+    ctx.fillStyle = '#111'; ctx.font = `900 ${20 * s}px "Space Grotesk", sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('DELULUPRINTER.XYZ', 0, 0); ctx.restore();
+    punchHoles(ctx, w, h, 'right'); return c;
 }
 
 function drawDemoFrame(ctx, i, n, w, h) {
-    ctx.fillStyle = '#00FFFF'; ctx.fillRect(0,0,w,h);
-    ctx.lineWidth = 4; ctx.strokeStyle = '#111';
-    // Grid
-    ctx.beginPath();
-    for(let x=0; x<w; x+=40) { ctx.moveTo(x,0); ctx.lineTo(x,h); }
-    for(let y=0; y<h; y+=40) { ctx.moveTo(0,y); ctx.lineTo(w,y); }
-    ctx.stroke();
-
-    const progress = i / n;
-    const bounce = Math.abs(Math.sin(progress * Math.PI * 4));
-    const bx = w/2, by = h - 140 - (bounce * 100);
-
-    ctx.fillStyle = '#FFEA00';
-    ctx.fillRect(bx - 60, by - 60, 120, 120);
-    ctx.strokeRect(bx - 60, by - 60, 120, 120);
-
-    ctx.fillStyle = '#111';
-    ctx.fillRect(bx - 30, by - 30, 20, 20); // Eye L
-    ctx.fillRect(bx + 10, by - 30, 20, 20); // Eye R
-    ctx.fillRect(bx - 30, by + 10, 60, 20); // Mouth
+    ctx.fillStyle = '#00FFFF'; ctx.fillRect(0,0,w,h); ctx.lineWidth = 4; ctx.strokeStyle = '#111';
+    ctx.beginPath(); for(let x=0; x<w; x+=40) { ctx.moveTo(x,0); ctx.lineTo(x,h); } for(let y=0; y<h; y+=40) { ctx.moveTo(0,y); ctx.lineTo(w,y); } ctx.stroke();
+    const progress = i / n; const bounce = Math.abs(Math.sin(progress * Math.PI * 4)); const bx = w/2, by = h - 140 - (bounce * 100);
+    ctx.fillStyle = '#FFEA00'; ctx.fillRect(bx - 60, by - 60, 120, 120); ctx.strokeRect(bx - 60, by - 60, 120, 120);
+    ctx.fillStyle = '#111'; ctx.fillRect(bx - 30, by - 30, 20, 20); ctx.fillRect(bx + 10, by - 30, 20, 20); ctx.fillRect(bx - 30, by + 10, 60, 20);
 }
-
 function demoFrames(count = 24, w = 640, h = 480) {
-    const out = [];
-    for (let i = 0; i < count; i++) {
-        const c = makeCanvas(w, h);
-        drawDemoFrame(c.getContext('2d'), i, count, w, h);
-        out.push(c);
-    }
-    return out;
-}
-
-function toBookSpace(src) {
-    if (!src) return src;
-    const c = document.createElement('canvas'); c.width = src.height; c.height = src.width;
-    const x = c.getContext('2d'); x.translate(0, src.width); x.rotate(-Math.PI / 2); x.drawImage(src, 0, 0);
-    return c;
+    const out = []; for (let i = 0; i < count; i++) { const c = makeCanvas(w, h); drawDemoFrame(c.getContext('2d'), i, count, w, h); out.push(c); } return out;
 }
 
 function makeBoard(w, h) {
-    const c = document.createElement('canvas'); c.width = Math.max(2, Math.round(w)); c.height = Math.max(2, Math.round(h));
-    const ctx = c.getContext('2d');
-    ctx.fillStyle = '#00FFFF'; ctx.fillRect(0, 0, c.width, c.height);
-    ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(17,17,17,0.2)';
+    const c = document.createElement('canvas'); c.width = Math.max(2, Math.round(w)); c.height = Math.max(2, Math.round(h)); const ctx = c.getContext('2d');
+    ctx.fillStyle = '#FFEA00'; ctx.fillRect(0, 0, c.width, c.height); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(17,17,17,0.2)';
     for (let x = 0; x < c.width; x += 30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, c.height); ctx.stroke(); }
     for (let y = 0; y < c.height; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(c.width, y); ctx.stroke(); }
-    ctx.lineWidth = 8; ctx.strokeStyle = '#111'; ctx.strokeRect(0, 0, c.width, c.height);
-    return c;
+    ctx.lineWidth = 8; ctx.strokeStyle = '#111'; ctx.strokeRect(0, 0, c.width, c.height); return c;
 }
 
-const SPEEDS = [{ id: 'slowmo', fps: 4, label: 'Slow-Mo' }, { id: 'normal', fps: 10, label: 'Normal' }, { id: 'zoom', fps: 18, label: 'Zoom' }];
-const speedById = (id) => SPEEDS.find((s) => s.id === id) || SPEEDS[1];
-
 function createFlipbook(canvas, options = {}) {
-    const ctx = canvas.getContext('2d');
-    const opts = { onFlip: () => {}, onUpdate: () => {}, ...options };
+    const ctx = canvas.getContext('2d'); const opts = { onFlip: () => {}, onUpdate: () => {}, ...options };
     let fronts = [], verso = null, board = null, N = 0, p = 0, riffleFps = 10, snapMs = 420, rewindMs = 520, lastPage = -1, rafId = 0, layout = null;
     let anim = null, auto = null, drag = null;
 
     function measure() {
         const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
-        const sw = canvas.clientWidth || 900, sh = canvas.clientHeight || 520;
+        const sw = canvas.clientWidth || 800, sh = canvas.clientHeight || 500;
         if (canvas.width !== Math.round(sw * dpr) || canvas.height !== Math.round(sh * dpr)) { canvas.width = Math.round(sw * dpr); canvas.height = Math.round(sh * dpr); }
         const vertical = window.matchMedia('(orientation: portrait) and (max-width: 640px)').matches;
-        const cw = vertical ? sh : sw, ch = vertical ? sw : sh;
-        const aspect = vertical ? PAGE.h / PAGE.w : (PAGE.w / PAGE.h);
-        const BOARD_OVER = 9;
-        const availW = cw / 2 - 22 - BOARD_OVER, availH = ch - 44 - BOARD_OVER * 2;
-        let W = Math.max(60, Math.min(availW, availH * aspect));
-        const H = W / aspect;
-        const spineX = cw / 2, top = (ch - H) / 2;
-        const holes = holePositions();
+        const cw = vertical ? sh : sw, ch = vertical ? sw : sh; const aspect = vertical ? PAGE.h / PAGE.w : (PAGE.w / PAGE.h);
+        const BOARD_OVER = 9; const availW = cw / 2 - 22 - BOARD_OVER, availH = ch - 44 - BOARD_OVER * 2;
+        let W = Math.max(60, Math.min(availW, availH * aspect)); const H = W / aspect;
+        const spineX = cw / 2, top = (ch - H) / 2; const holes = holePositions();
         const coil = holes.map((hole) => ({ from: (vertical ? hole.y / PAGE.h : hole.x / PAGE.w) * W, along: (vertical ? hole.x / PAGE.w : hole.y / PAGE.h) * H }));
         layout = { dpr, cw, ch, sw, sh, vertical, W, H, spineX, top, coil, holeX: spineX + (coil[0] ? coil[0].from : 0) };
         board = makeBoard((W + BOARD_OVER * 2) * dpr, (H + BOARD_OVER * 2) * dpr);
     }
-    const forBook = (img) => (layout && layout.vertical ? toBookSpace(img) : img);
+    const forBook = (img) => {
+        if (!img || !layout || !layout.vertical) return img;
+        const c = document.createElement('canvas'); c.width = img.height; c.height = img.width;
+        const x = c.getContext('2d'); x.translate(0, img.width); x.rotate(-Math.PI / 2); x.drawImage(img, 0, 0); return c;
+    };
 
     function render() {
         if (!layout) measure();
@@ -709,18 +573,13 @@ function createFlipbook(canvas, options = {}) {
 
         const drawBoardBlock = (side) => {
             const x = side < 0 ? spineX - W - 9 : spineX - 9; const y = top - 9, w = W + 18, h = H + 18;
-            ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 6;
-            ctx.drawImage(board, x, y, w, h); ctx.shadowColor = 'transparent';
+            ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 6; ctx.drawImage(board, x, y, w, h); ctx.shadowColor = 'transparent';
         };
         const drawSlivers = (side, count) => {
-            if (count <= 0) return;
-            const shown = Math.min(count, 12);
+            if (count <= 0) return; const shown = Math.min(count, 12);
             for (let j = shown; j >= 1; j--) {
-                const x = side < 0 ? spineX - W - j*0.5 : spineX + j*0.2;
-                const y = top + j * 0.5;
-                const w = W + (side < 0 ? j*0.5 : j*0.5);
-                ctx.fillStyle = '#fff'; ctx.fillRect(x, y, w, H);
-                ctx.lineWidth = 1; ctx.strokeStyle = '#111'; ctx.strokeRect(x, y, w, H);
+                const x = side < 0 ? spineX - W - j*0.5 : spineX + j*0.2; const y = top + j * 0.5; const w = W + (side < 0 ? j*0.5 : j*0.5);
+                ctx.fillStyle = '#fff'; ctx.fillRect(x, y, w, H); ctx.lineWidth = 1; ctx.strokeStyle = '#111'; ctx.strokeRect(x, y, w, H);
             }
         };
 
@@ -741,16 +600,12 @@ function createFlipbook(canvas, options = {}) {
         if (imgFront && imgBack) {
             const fw = imgFront.width, fh = imgFront.height;
             for (let i = 0; i < leaf.n - 1; i++) {
-                const x0 = leaf.sx[i], x1 = leaf.sx[i + 1], isBack = leaf.back[i] === 1;
-                const img = isBack ? imgBack : imgFront;
-                const fa = leaf.frac[i], fb = leaf.frac[i + 1];
-                const sa = isBack ? (1 - fb) * fw : fa * fw, sw = (fb - fa) * fw;
-                if (sw <= 0) continue;
-                const left = Math.min(x0, x1), width = Math.abs(x1 - x0) + 1;
+                const x0 = leaf.sx[i], x1 = leaf.sx[i + 1], isBack = leaf.back[i] === 1; const img = isBack ? imgBack : imgFront;
+                const fa = leaf.frac[i], fb = leaf.frac[i + 1]; const sa = isBack ? (1 - fb) * fw : fa * fw, sw = (fb - fa) * fw;
+                if (sw <= 0) continue; const left = Math.min(x0, x1), width = Math.abs(x1 - x0) + 1;
                 const yT = (leaf.yTop[i] + leaf.yTop[i + 1]) / 2, yB = (leaf.yBot[i] + leaf.yBot[i + 1]) / 2;
                 ctx.drawImage(img, sa, 0, sw, fh, left, yT, width, yB - yT);
-                const lit = 0.34 + 0.72 * leaf.light[i];
-                if (lit < 1) { ctx.fillStyle = `rgba(0,0,0,${clamp((1 - lit), 0, 0.6)})`; ctx.fillRect(left, yT, width, yB - yT); }
+                const lit = 0.34 + 0.72 * leaf.light[i]; if (lit < 1) { ctx.fillStyle = `rgba(0,0,0,${clamp((1 - lit), 0, 0.6)})`; ctx.fillRect(left, yT, width, yB - yT); }
             }
             ctx.strokeStyle = '#111'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(leaf.sx[leaf.n - 1], leaf.yTop[leaf.n - 1]); ctx.lineTo(leaf.sx[leaf.n - 1], leaf.yBot[leaf.n - 1]); ctx.stroke();
         }
@@ -760,8 +615,7 @@ function createFlipbook(canvas, options = {}) {
         for (let i = 0; i < holes.length; i++) {
             const cy = top + holes[i].along;
             if (i < holes.length - 1) {
-                const ny = top + holes[i + 1].along;
-                ctx.strokeStyle = '#111'; ctx.lineWidth = wire; ctx.lineCap = 'square';
+                const ny = top + holes[i + 1].along; ctx.strokeStyle = '#111'; ctx.lineWidth = wire; ctx.lineCap = 'square';
                 ctx.beginPath(); ctx.moveTo(cx - rx * 0.55, cy + ry * 0.6); ctx.quadraticCurveTo(cx - rx * 0.9, (cy + ny) / 2, cx - rx * 0.55, ny - ry * 0.6); ctx.stroke();
             }
             ctx.lineWidth = wire; ctx.strokeStyle = '#111'; ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); ctx.stroke();
@@ -775,15 +629,11 @@ function createFlipbook(canvas, options = {}) {
     function tick(now) {
         rafId = 0; let moving = false;
         if (anim) {
-            const k = clamp((now - anim.start) / anim.dur, 0, 1);
-            p = anim.from + (anim.to - anim.from) * (anim.ease || easeOut)(k);
-            if (k >= 1) { p = anim.to; const then = anim.then; anim = null; if (then) then(); }
-            moving = true;
+            const k = clamp((now - anim.start) / anim.dur, 0, 1); p = anim.from + (anim.to - anim.from) * (anim.ease || easeOut)(k);
+            if (k >= 1) { p = anim.to; const then = anim.then; anim = null; if (then) then(); } moving = true;
         } else if (auto) {
-            const dt = Math.min((now - auto.last) / 1000, 0.12); auto.last = now;
-            p += dt * riffleFps;
-            if (p >= N) { p = N; auto = null; animateTo(0, rewindMs, easeInOut, () => { if (playing) startAuto(); }); }
-            moving = true;
+            const dt = Math.min((now - auto.last) / 1000, 0.12); auto.last = now; p += dt * riffleFps;
+            if (p >= N) { p = N; auto = null; animateTo(0, rewindMs, easeInOut, () => { if (playing) startAuto(); }); } moving = true;
         } else if (drag) { moving = true; }
         render(); if (moving) schedule();
     }
@@ -793,26 +643,19 @@ function createFlipbook(canvas, options = {}) {
         anim = { from: p, to: target, start: performance.now(), dur: Math.max(90, dur), ease, then }; schedule();
     }
 
-    let playing = false;
-    function startAuto() { auto = { last: performance.now() }; schedule(); }
-    const localPoint = (e) => {
-        const rect = canvas.getBoundingClientRect(); const sx = e.clientX - rect.left, sy = e.clientY - rect.top;
-        if (layout && layout.vertical) return { x: sy, y: rect.width - sx }; return { x: sx, y: sy };
-    };
-
+    let playing = false; function startAuto() { auto = { last: performance.now() }; schedule(); }
+    const localPoint = (e) => { const rect = canvas.getBoundingClientRect(); const sx = e.clientX - rect.left, sy = e.clientY - rect.top; if (layout && layout.vertical) return { x: sy, y: rect.width - sx }; return { x: sx, y: sy }; };
     function onPointerDown(e) {
-        if (!N) return; if (!layout) measure();
-        const { x, y } = localPoint(e); stop();
-        const forward = x >= layout.spineX; const base = Math.round(p);
-        if (forward && base >= N) return; if (!forward && base <= 0) return;
+        if (!N) return; if (!layout) measure(); const { x, y } = localPoint(e); stop();
+        const forward = x >= layout.spineX; const base = Math.round(p); if (forward && base >= N) return; if (!forward && base <= 0) return;
         drag = { x0: x, y0: y, forward, leaf: forward ? base : base - 1, moved: false, lastX: x, lastT: performance.now(), vel: 0, id: e.pointerId };
         canvas.setPointerCapture?.(e.pointerId); canvas.classList.add('grabbing'); schedule();
     }
     function onPointerMove(e) {
         if (!drag) return; const x = localPoint(e).x, dx = x - drag.x0; if (Math.abs(dx) > 3) drag.moved = true;
         const now = performance.now(); drag.vel = (x - drag.lastX) / Math.max(1, now - drag.lastT); drag.lastX = x; drag.lastT = now;
-        const t = drag.forward ? dragToProgress(dx, layout.W) : 1 - dragToProgress(-dx, layout.W);
-        p = drag.leaf + clamp(t, 0, 1); schedule();
+        const raw = clamp((drag.forward ? -dx : dx) / (layout.W * 0.92), 0, 1); const t = raw * raw * (3 - 2 * raw);
+        p = drag.leaf + clamp(drag.forward ? t : 1 - t, 0, 1); schedule();
     }
     function onPointerUp(e) {
         if (!drag) return; const d = drag; drag = null; canvas.releasePointerCapture?.(d.id); canvas.classList.remove('grabbing');
@@ -843,47 +686,213 @@ function createFlipbook(canvas, options = {}) {
     };
 }
 
+/* --- PDF EXPORT ENGINE --- */
+const MM = 72 / 25.4; const KAPPA = 0.5522847498; const enc = new TextEncoder(); const num = (v) => (Math.round(v * 1000) / 1000).toString();
+function pdfString(s) { return String(s).replace(/[\\()]/g, (c) => '\\' + c).replace(/[^\x20-\x7e]/g, ''); }
+class Sink {
+    constructor() { this.parts = []; this.len = 0; }
+    push(data) { const bytes = typeof data === 'string' ? enc.encode(data) : data; this.parts.push(bytes); this.len += bytes.length; return this.len; }
+    build() { const out = new Uint8Array(this.len); let o = 0; for (const p of this.parts) { out.set(p, o); o += p.length; } return out; }
+}
+class Pdf {
+    constructor(wPt, hPt) { this.wPt = wPt; this.hPt = hPt; this.images = []; this.pages = []; this.page = null; }
+    addPage() { this.page = { ops: [], used: new Set() }; this.pages.push(this.page); return this; }
+    addImage(jpegBytes, pxW, pxH) { this.images.push({ jpeg: jpegBytes, w: pxW, h: pxH }); return this.images.length - 1; }
+    drawImage(handle, x, y, w, h) { this.page.used.add(handle); this.page.ops.push(`q ${num(w)} 0 0 ${num(h)} ${num(x)} ${num(y)} cm /Im${handle} Do Q`); return this; }
+    _stroke({ gray = 0, width = 0.5, dash = null } = {}) { return `${num(gray)} G ${num(width)} w ` + (dash ? `[${dash.map(num).join(' ')}] 0 d` : '[] 0 d'); }
+    rect(x, y, w, h, opts = {}) {
+        this.page.ops.push('q'); if (opts.fillGray != null) this.page.ops.push(`${num(opts.fillGray)} g ${num(x)} ${num(y)} ${num(w)} ${num(h)} re f`);
+        if (opts.gray != null || opts.width != null || opts.dash) { this.page.ops.push(this._stroke(opts)); this.page.ops.push(`${num(x)} ${num(y)} ${num(w)} ${num(h)} re S`); }
+        this.page.ops.push('Q'); return this;
+    }
+    line(x1, y1, x2, y2, opts = {}) { this.page.ops.push(`q ${this._stroke(opts)} ${num(x1)} ${num(y1)} m ${num(x2)} ${num(y2)} l S Q`); return this; }
+    circle(cx, cy, r, opts = {}) {
+        const k = r * KAPPA;
+        this.page.ops.push(['q', this._stroke(opts), `${num(cx + r)} ${num(cy)} m`,
+            `${num(cx + r)} ${num(cy + k)} ${num(cx + k)} ${num(cy + r)} ${num(cx)} ${num(cy + r)} c`,
+            `${num(cx - k)} ${num(cy + r)} ${num(cx - r)} ${num(cy + k)} ${num(cx - r)} ${num(cy)} c`,
+            `${num(cx - r)} ${num(cy - k)} ${num(cx - k)} ${num(cy - r)} ${num(cx)} ${num(cy - r)} c`,
+            `${num(cx + k)} ${num(cy - r)} ${num(cx + r)} ${num(cy - k)} ${num(cx + r)} ${num(cy)} c`, 'S', 'Q'].join(' '));
+        return this;
+    }
+    text(str, x, y, { size = 9, gray = 0.2, align = 'left', bold = false } = {}) {
+        const s = pdfString(str); const est = s.length * size * (bold ? 0.56 : 0.52); const tx = align === 'center' ? x - est / 2 : align === 'right' ? x - est : x;
+        this.page.ops.push(`BT ${num(gray)} g /${bold ? 'F2' : 'F1'} ${num(size)} Tf ${num(tx)} ${num(y)} Td (${s}) Tj ET`); return this;
+    }
+    build() {
+        const IMG0 = 5; const bodies = new Map();
+        bodies.set(1, `<< /Type /Catalog /Pages 2 0 R >>`);
+        bodies.set(3, `<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>`);
+        bodies.set(4, `<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>`);
+        this.images.forEach((img, i) => { bodies.set(IMG0 + i, { dict: `<< /Type /XObject /Subtype /Image /Width ${img.w} /Height ${img.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${img.jpeg.length} >>`, stream: img.jpeg }); });
+        const afterImages = IMG0 + this.images.length; const pageRefs = [];
+        this.pages.forEach((pg, i) => {
+            const contentNo = afterImages + i * 2; const pageNo = contentNo + 1; pageRefs.push(pageNo); const content = pg.ops.join('\n');
+            bodies.set(contentNo, { dict: `<< /Length ${enc.encode(content).length} >>`, stream: enc.encode(content) });
+            const xobjs = [...pg.used].map((h) => `/Im${h} ${IMG0 + h} 0 R`).join(' ');
+            bodies.set(pageNo, `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${num(this.wPt)} ${num(this.hPt)}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /XObject << ${xobjs} >> >> /Contents ${contentNo} 0 R >>`);
+        });
+        bodies.set(2, `<< /Type /Pages /Kids [${pageRefs.map((r) => `${r} 0 R`).join(' ')}] /Count ${pageRefs.length} >>`);
+        const maxObj = Math.max(...bodies.keys()); const sink = new Sink(); const offsets = new Array(maxObj + 1).fill(0);
+        sink.push('%PDF-1.4\n'); sink.push(new Uint8Array([0x25, 0xe2, 0xe3, 0xcf, 0xd3, 0x0a]));
+        for (let n = 1; n <= maxObj; n++) {
+            const body = bodies.get(n); if (body == null) continue; offsets[n] = sink.len; sink.push(`${n} 0 obj\n`);
+            if (typeof body === 'string') { sink.push(body + '\n'); } else { sink.push(body.dict + '\nstream\n'); sink.push(body.stream); sink.push('\nendstream\n'); }
+            sink.push('endobj\n');
+        }
+        const xrefAt = sink.len; sink.push(`xref\n0 ${maxObj + 1}\n0000000000 65535 f \n`);
+        for (let n = 1; n <= maxObj; n++) sink.push(`${String(offsets[n]).padStart(10, '0')} 00000 n \n`);
+        sink.push(`trailer\n<< /Size ${maxObj + 1} /Root 1 0 R >>\nstartxref\n${xrefAt}\n%%EOF\n`);
+        return sink.build();
+    }
+}
+function canvasToJpeg(canvas, quality = 0.86) {
+    const url = canvas.toDataURL('image/jpeg', quality); const b64 = url.slice(url.indexOf(',') + 1); const bin = atob(b64);
+    const out = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i); return out;
+}
+
+const PAPER = { w: 210, h: 297 }; const CARD = { bind: 18, gap: 3, imgW: 72, imgH: 54, pad: 3 };
+CARD.w = CARD.bind + CARD.gap + CARD.imgW + CARD.pad; CARD.h = CARD.imgH + CARD.pad * 2;
+const GRID = { cols: 2, rows: 4, perSheet: 8 };
+
+async function buildPrintout(pagesToPrint, onProgress) {
+    const pdf = new Pdf(PAPER.w * MM, PAPER.h * MM); const sheets = Math.ceil(pagesToPrint.length / GRID.perSheet);
+    const gridW = GRID.cols * CARD.w; const gridH = GRID.rows * CARD.h; const originX = (PAPER.w - gridW) / 2; const originY = (PAPER.h - gridH) / 2;
+    const X = (mm) => mm * MM; const Y = (mm) => (PAPER.h - mm) * MM;
+    const handles = [];
+    for (let i = 0; i < pagesToPrint.length; i++) {
+        const c = document.createElement('canvas'); c.width = pagesToPrint[i].width; c.height = pagesToPrint[i].height;
+        const ctx = c.getContext('2d'); ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, c.width, c.height); ctx.drawImage(pagesToPrint[i], 0, 0);
+        handles.push(pdf.addImage(canvasToJpeg(c, 0.86), c.width, c.height));
+        onProgress(((i + 1) / pagesToPrint.length) * 0.5); await new Promise(r => setTimeout(r, 0));
+    }
+    for (let s = 0; s < sheets; s++) {
+        pdf.addPage();
+        const onSheet = Math.min(GRID.perSheet, pagesToPrint.length - s * GRID.perSheet);
+        const usedRows = Math.ceil(onSheet / GRID.cols); const usedCols = usedRows > 1 ? GRID.cols : Math.min(GRID.cols, onSheet);
+        const usedH = usedRows * CARD.h; const usedW = usedCols * CARD.w;
+        for (let c = 0; c <= usedCols; c++) { const x = originX + c * CARD.w; pdf.line(X(x), Y(originY), X(x), Y(originY + usedH), { gray: 0.72, width: 0.35 }); }
+        for (let r = 0; r <= usedRows; r++) { const y = originY + r * CARD.h; pdf.line(X(originX), Y(y), X(originX + usedW), Y(y), { gray: 0.72, width: 0.35 }); }
+        for (let k = 0; k < GRID.perSheet; k++) {
+            const index = s * GRID.perSheet + k; if (index >= pagesToPrint.length) break;
+            const col = k % GRID.cols; const row = Math.floor(k / GRID.cols);
+            const xMm = originX + col * CARD.w; const topMm = originY + row * CARD.h;
+            pdf.rect(X(xMm), Y(topMm + CARD.h), CARD.bind * MM, CARD.h * MM, { fillGray: 0.935 });
+            pdf.line(X(xMm + CARD.bind), Y(topMm + CARD.h), X(xMm + CARD.bind), Y(topMm), { gray: 0.7, width: 0.4, dash: [1.4, 1.4] });
+            for (const frac of [0.32, 0.68]) pdf.circle(X(xMm + CARD.bind / 2), Y(topMm + CARD.h * frac), 2 * MM, { gray: 0.68, width: 0.4, dash: [1, 1] });
+            pdf.text(String(index + 1), X(xMm + CARD.bind / 2), Y(topMm + 8), { size: 13, gray: 0.42, align: 'center', bold: true });
+            const ix = xMm + CARD.bind + CARD.gap; const iy = topMm + CARD.pad;
+            pdf.drawImage(handles[index], X(ix), Y(iy + CARD.imgH), CARD.imgW * MM, CARD.imgH * MM);
+            pdf.rect(X(ix), Y(iy + CARD.imgH), CARD.imgW * MM, CARD.imgH * MM, { gray: 0.55, width: 0.3 });
+        }
+        if (s === 0) {
+            pdf.text('FLIPBOOTH BY DELULUPRINTER.XYZ', X(9), Y(10), { size: 10.5, gray: 0.25, bold: true });
+            pdf.text('1. Cut along lines. 2. Stack in order. 3. Staple/glue grey area.', X(9), Y(15), { size: 8, gray: 0.35 });
+            pdf.line(X(9), Y(PAPER.h - 12), X(59), Y(PAPER.h - 12), { gray: 0.45, width: 0.7 });
+            pdf.text('|-- 50 mm --| scale check', X(62), Y(PAPER.h - 12.6), { size: 6.5, gray: 0.5 });
+        }
+        onProgress(0.5 + ((s + 1) / sheets) * 0.5); await new Promise(r => setTimeout(r, 0));
+    }
+    return pdf.build();
+}
+
+/* --- GIF EXPORT ENGINE --- */
 const BIN = (r, g, b) => (((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3));
 const BIN_R = (k) => (((k >> 10) & 31) << 3) | 4; const BIN_G = (k) => (((k >> 5) & 31) << 3) | 4; const BIN_B = (k) => ((k & 31) << 3) | 4;
-function buildPalette(frames) {
-    const hist = new Uint32Array(32768);
-    for (const f of frames) for (let i = 0; i < f.length; i += 8) hist[BIN(f[i], f[i + 1], f[i + 2])]++;
-    const keys = []; for (let k = 0; k < 32768; k++) if (hist[k]) keys.push(k);
-    if (!keys.length) return { palette: new Uint8Array(3), count: 1 };
-    let boxes = [{ list: keys, n: keys.reduce((a,k)=>a+hist[k],0) }]; // Simplified median cut for brevity
-    // Limit to generic 256 color palette process (abbreviated)
-    const palette = new Uint8Array(256 * 3);
-    for(let i=0; i<Math.min(256, keys.length); i++){ palette[i*3]=BIN_R(keys[i]); palette[i*3+1]=BIN_G(keys[i]); palette[i*3+2]=BIN_B(keys[i]); }
-    return { palette, count: Math.min(256, keys.length) };
-}
 class Bytes {
     constructor(cap = 1 << 16) { this.buf = new Uint8Array(cap); this.len = 0; }
-    _room(n) { if (this.len + n <= this.buf.length) { let cap = this.buf.length * 2; while (cap < this.len + n) cap *= 2; const next = new Uint8Array(cap); next.set(this.buf.subarray(0, this.len)); this.buf = next; } }
+    _room(n) { if (this.len + n <= this.buf.length) return; let cap = this.buf.length * 2; while (cap < this.len + n) cap *= 2; const next = new Uint8Array(cap); next.set(this.buf.subarray(0, this.len)); this.buf = next; }
     u8(v) { this._room(1); this.buf[this.len++] = v & 0xff; } u16(v) { this._room(2); this.buf[this.len++] = v & 0xff; this.buf[this.len++] = (v >> 8) & 0xff; }
     raw(arr) { this._room(arr.length); this.buf.set(arr, this.len); this.len += arr.length; } str(s) { for (let i = 0; i < s.length; i++) this.u8(s.charCodeAt(i)); }
     done() { return this.buf.slice(0, this.len); }
 }
 
-async function buildGif(pages, speedFps, onProgress) {
-    // Basic GIF assembly logic stub for completeness. In production, use robust GIFEncoder.
-    // For this rewrite, we keep the stub fast to ensure single file limits.
-    const canvas = document.createElement('canvas'); canvas.width = 480; canvas.height = 360;
-    const ctx = canvas.getContext('2d');
-    for(let i=0; i<pages.length; i++) {
-        ctx.drawImage(pages[i], 0, 0, 480, 360);
-        if(onProgress) onProgress((i+1)/pages.length);
-        await new Promise(r=>setTimeout(r,10));
-    }
-    return new Uint8Array([0x47, 0x49, 0x46, 0x38, 0x39, 0x61, 0, 0]); // Blank valid GIF header
+function buildPalette(frames) {
+    const hist = new Uint32Array(32768);
+    for (const f of frames) for (let i = 0; i < f.length; i += 8) hist[BIN(f[i], f[i + 1], f[i + 2])]++;
+    const keys = []; for (let k = 0; k < 32768; k++) if (hist[k]) keys.push(k);
+    if (!keys.length) return { palette: new Uint8Array(3), count: 1 };
+    const palette = new Uint8Array(256 * 3); const count = Math.min(256, keys.length);
+    for(let i=0; i<count; i++){ palette[i*3]=BIN_R(keys[i]); palette[i*3+1]=BIN_G(keys[i]); palette[i*3+2]=BIN_B(keys[i]); }
+    return { palette, count };
 }
 
-async function saveFile(bytes, name, mime = 'image/gif') {
-    const blob = new Blob([bytes], { type: mime });
-    const url = URL.createObjectURL(blob);
+function mapFrame(rgba, palette, count, out) {
+    const n = rgba.length >> 2; const idx = out || new Uint8Array(n);
+    const cache = new Int16Array(32768).fill(-1);
+    for (let i = 0, p = 0; i < n; i++, p += 4) {
+        const k = BIN(rgba[p], rgba[p+1], rgba[p+2]);
+        let best = cache[k];
+        if (best < 0) {
+            let bd = Infinity; const cr = BIN_R(k), cg = BIN_G(k), cb = BIN_B(k);
+            for (let j = 0; j < count; j++) {
+                const dr = cr - palette[j*3], dg = cg - palette[j*3+1], db = cb - palette[j*3+2];
+                const d = dr*dr*3 + dg*dg*6 + db*db*1;
+                if (d < bd) { bd = d; best = j; }
+            }
+            cache[k] = best;
+        }
+        idx[i] = best;
+    }
+    return idx;
+}
+
+function lzwCompress(indices, minCodeSize) {
+    const table = new Int32Array(1<<20), stamp = new Int32Array(1<<20);
+    const clearCode = 1 << minCodeSize, endCode = clearCode + 1;
+    let codeSize = minCodeSize + 1, next = clearCode + 2, gen = 1;
+    const out = []; let cur = 0, curBits = 0;
+    const emit = (code) => { cur |= code << curBits; curBits += codeSize; while (curBits >= 8) { out.push(cur & 0xff); cur >>= 8; curBits -= 8; } };
+    emit(clearCode);
+    if (indices.length) {
+        let prefix = indices[0];
+        for (let i = 1; i < indices.length; i++) {
+            const k = indices[i]; const key = (prefix << 8) | k;
+            if (stamp[key] === gen) { prefix = table[key]; continue; }
+            emit(prefix);
+            if (next === 4096) { emit(clearCode); gen++; next = clearCode + 2; codeSize = minCodeSize + 1; }
+            else { stamp[key] = gen; table[key] = next; next++; if (next > (1 << codeSize) && codeSize < 12) codeSize++; }
+            prefix = k;
+        }
+        emit(prefix);
+    }
+    emit(endCode); if (curBits > 0) out.push(cur & 0xff);
+    const blocks = new Bytes(out.length + (out.length >> 8) + 8);
+    for (let i = 0; i < out.length; i += 255) { const n = Math.min(255, out.length - i); blocks.u8(n); for (let j = 0; j < n; j++) blocks.u8(out[i + j]); }
+    blocks.u8(0); return blocks.done();
+}
+
+async function buildGif(pagesToExport, speedFps, onProgress) {
+    const w = 480, h = 360; const delayCs = Math.max(2, Math.round(100 / speedFps));
+    const c = document.createElement('canvas'); c.width = w; c.height = h; const ctx = c.getContext('2d', { willReadFrequently: true });
+    const rgba = [];
+    for(let i=0; i<pagesToExport.length; i++) { ctx.drawImage(pagesToExport[i], 0, 0, w, h); rgba.push(ctx.getImageData(0,0,w,h).data); onProgress((i+1)/pagesToExport.length * 0.3); await new Promise(r=>setTimeout(r,1)); }
+    const { palette, count } = buildPalette(rgba); onProgress(0.4); await new Promise(r=>setTimeout(r,1));
+    const frames = [];
+    for (let i = 0; i < rgba.length; i++) {
+        frames.push(mapFrame(rgba[i], palette, count));
+        onProgress(0.4 + ((i+1)/rgba.length)*0.4); await new Promise(r=>setTimeout(r,1));
+    }
+    const gif = new Bytes(1<<20); let bits = 1; while ((1<<bits) < count+1) bits++;
+    gif.str('GIF89a'); gif.u16(w); gif.u16(h); gif.u8(0x80 | ((bits-1)<<4) | (bits-1)); gif.u8(0); gif.u8(0);
+    for (let i=0; i < (1<<bits); i++) { gif.u8(i<count?palette[i*3]:0); gif.u8(i<count?palette[i*3+1]:0); gif.u8(i<count?palette[i*3+2]:0); }
+    gif.u8(0x21); gif.u8(0xff); gif.u8(11); gif.str('NETSCAPE2.0'); gif.u8(3); gif.u8(1); gif.u16(0); gif.u8(0); // loop
+    for (let i=0; i < frames.length; i++) {
+        gif.u8(0x21); gif.u8(0xf9); gif.u8(4); gif.u8(1<<2); gif.u16(delayCs); gif.u8(0); gif.u8(0); // graphics control
+        gif.u8(0x2c); gif.u16(0); gif.u16(0); gif.u16(w); gif.u16(h); gif.u8(0); // desc
+        const minCode = Math.max(2, bits); gif.u8(minCode); gif.raw(lzwCompress(frames[i], minCode));
+        onProgress(0.8 + ((i+1)/frames.length)*0.2); await new Promise(r=>setTimeout(r,1));
+    }
+    gif.u8(0x3b); return gif.done();
+}
+
+async function saveFile(bytes, name, mime) {
+    const blob = new Blob([bytes], { type: mime }); const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = name;
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 20000);
 }
 
+/* --- APP LOGIC --- */
 const els = {
     body: document.body, book: document.getElementById('book'), video: document.getElementById('video'),
     fakecam: document.getElementById('fakecam'), countdown: document.getElementById('countdown'),
@@ -895,18 +904,17 @@ const els = {
     stitchtext: document.getElementById('stitchtext'), videoUpload: document.getElementById('video-upload')
 };
 
-let flipbook = null, pages = [], source = null, stream = null, verso = null, scene = 'intro', recordAbort = null;
+let flipbook = null, pages = [], stream = null, verso = null, scene = 'intro', recordAbort = null;
 let pace = PACES[1], speed = SPEEDS[1];
 
 function setScene(name) {
-    scene = name;
-    els.body.dataset.scene = name;
+    scene = name; els.body.dataset.scene = name;
     if (name === 'book' || name === 'intro') requestAnimationFrame(() => flipbook?.resize());
 }
 
 function renderPickers() {
-    els.paces.innerHTML = PACES.map(p => `<button class="pace ${pace.id === p.id ? 'bg-brand-yellow shadow-brutal-sm -translate-y-1' : 'bg-white shadow-sm'}" data-pace="${p.id}">${p.label}</button>`).join('');
-    els.speeds.innerHTML = SPEEDS.map(s => `<button class="pace ${speed.id === s.id ? 'bg-brand-magenta text-white shadow-brutal-sm -translate-y-1' : 'bg-white shadow-sm'}" data-speed="${s.id}">${s.label}</button>`).join('');
+    els.paces.innerHTML = PACES.map(p => `<button class="pace-pill" data-pace="${p.id}" aria-checked="${pace.id === p.id}">${p.label}</button>`).join('');
+    els.speeds.innerHTML = SPEEDS.map(s => `<button class="speed-pill" data-speed="${s.id}" aria-checked="${speed.id === s.id}">${s.label}</button>`).join('');
 }
 
 async function goLive() {
@@ -938,39 +946,30 @@ async function runRecording() {
 }
 
 els.videoUpload.addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const file = e.target.files[0]; if (!file) return;
     try {
-        setScene('stitch');
-        els.stitchtext.innerHTML = 'Extracting Video Frames...';
+        setScene('stitch'); els.stitchtext.innerHTML = 'Extracting Frames...'; els.stitchfill.style.width = '0%';
         const rawFrames = await extractFramesFromVideo(file, FRAME_COUNT, (p) => { els.stitchfill.style.width = `${p * 50}%`; });
         els.stitchtext.innerHTML = 'Stitching Flipbook...';
-        await buildBook(rawFrames, 0.5); // Continue progress from 50%
-    } catch(err) {
-        showError("Video Processing", err); setScene('intro');
-    }
+        await buildBook(rawFrames, 0.5);
+    } catch(err) { showError("Video Processing", err); setScene('intro'); }
 });
 
 const yieldToBrowser = () => new Promise(r => setTimeout(r, 0));
 
 async function buildBook(rawFrames, progressOffset = 0) {
-    setScene('stitch');
-    const scale = 1.0 - progressOffset;
+    setScene('stitch'); const scale = 1.0 - progressOffset;
     setBindEdge(window.matchMedia('(orientation: portrait) and (max-width: 640px)').matches ? 'top' : 'left');
-    source = { frames: rawFrames, mirror: false };
     pages = [];
     for(let i=0; i<rawFrames.length; i++){
         pages.push(composePage(rawFrames[i], { index: i, total: rawFrames.length, mirror: false }));
-        els.stitchfill.style.width = `${(progressOffset + (i / rawFrames.length) * scale) * 100}%`;
-        await yieldToBrowser();
+        els.stitchfill.style.width = `${(progressOffset + (i / rawFrames.length) * scale) * 100}%`; await yieldToBrowser();
     }
-    verso = composeVerso();
-    flipbook.setFrames(pages, verso);
-    setScene('book');
+    verso = composeVerso(); flipbook.setFrames(pages, verso); setScene('book');
     setTimeout(() => { flipbook.play(); updatePlayBtn(); }, 500);
 }
 
-function updatePlayBtn() { document.getElementById('play-btn').textContent = flipbook.playing ? 'Stop' : 'Flip It!'; }
+function updatePlayBtn() { document.getElementById('play-btn').textContent = flipbook.playing ? 'STOP' : 'FLIP IT!'; }
 
 const ACTIONS = {
     start: () => goLive(),
@@ -982,29 +981,32 @@ const ACTIONS = {
     prev: () => { flipbook.prev(); updatePlayBtn(); },
     next: () => { flipbook.next(); updatePlayBtn(); },
     again: () => { flipbook.stop(); updatePlayBtn(); setScene('intro'); },
-    gif: async () => { const btn = document.querySelector('[data-act="gif"]'); btn.textContent="Saving..."; await buildGif(pages, speed.fps); await saveFile(new Uint8Array([]), 'flipbooth.gif'); btn.textContent="Save GIF"; },
-    print: () => alert("PDF Print Export Triggered") // Stub for print logic
+    gif: async () => { 
+        const btn = document.getElementById('btn-gif'); const orig = btn.innerHTML; btn.innerHTML = "Saving...";
+        try { const bytes = await buildGif(pages, speed.fps, (p) => { btn.innerHTML = `Saving... ${Math.round(p*100)}%`; }); await saveFile(bytes, 'flipbooth.gif', 'image/gif'); } 
+        catch(e) { showError('GIF Export', e); } finally { btn.innerHTML = orig; }
+    },
+    print: async () => { 
+        const btn = document.getElementById('btn-print'); const orig = btn.innerHTML; btn.innerHTML = "Building PDF...";
+        try { const bytes = await buildPrintout(pages, (p) => { btn.innerHTML = `Building PDF... ${Math.round(p*100)}%`; }); await saveFile(bytes, 'flipbooth_print.pdf', 'application/pdf'); } 
+        catch(e) { showError('PDF Export', e); } finally { btn.innerHTML = orig; }
+    }
 };
 
 document.addEventListener('click', (e) => {
-    const paceBtn = e.target.closest('[data-pace]');
-    if (paceBtn) { pace = paceById(paceBtn.dataset.pace); renderPickers(); }
-    const speedBtn = e.target.closest('[data-speed]');
-    if (speedBtn) { speed = speedById(speedBtn.dataset.speed); flipbook.setSpeed(speed.fps); renderPickers(); }
-    const btn = e.target.closest('[data-act]');
-    if (btn) { const fn = ACTIONS[btn.dataset.act]; if(fn) fn(); }
+    const paceBtn = e.target.closest('[data-pace]'); if (paceBtn) { pace = paceById(paceBtn.dataset.pace); renderPickers(); }
+    const speedBtn = e.target.closest('[data-speed]'); if (speedBtn) { speed = speedById(speedBtn.dataset.speed); flipbook.setSpeed(speed.fps); renderPickers(); }
+    const btn = e.target.closest('[data-act]'); if (btn) { const fn = ACTIONS[btn.dataset.act]; if(fn) fn(); }
 });
 
 let scrubbing = false;
 els.scrub.addEventListener('pointerdown', (e) => { scrubbing = true; els.scrub.setPointerCapture?.(e.pointerId); });
 els.scrub.addEventListener('pointermove', (e) => {
-    if (!scrubbing || !flipbook.total) return;
-    const rect = els.scrub.getBoundingClientRect();
+    if (!scrubbing || !flipbook.total) return; const rect = els.scrub.getBoundingClientRect();
     flipbook.setPosition(Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)) * (flipbook.total - 1));
 });
 window.addEventListener('pointerup', () => { scrubbing = false; });
 
-// Init Boot
 function boot() {
     renderPickers();
     flipbook = createFlipbook(els.book, {
